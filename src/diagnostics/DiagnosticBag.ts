@@ -1,4 +1,4 @@
-import { SrcLoc } from "../lexer/Lexer";
+import { Diagnostic } from "./Diagnostic";
 
 export class DiagnosticBag {
   public diagnostics: Diagnostic[];
@@ -46,33 +46,4 @@ export class DiagnosticBag {
   toArray() {
     return ([] as Diagnostic[]).concat(this.diagnostics);
   }
-}
-
-export class Diagnostic {
-  constructor(
-    public type: DiagnosticTypes,
-    public message: string,
-    public span: TextSpan
-  ) {}
-
-  public static create(type: DiagnosticTypes, message: string, span: TextSpan) {
-    return new Diagnostic(type, message, span);
-  }
-
-  toString() {
-    return this.message;
-  }
-}
-
-export class TextSpan {
-  constructor(public text: string, public location: SrcLoc) {}
-
-  public static create(text: string, location: SrcLoc) {
-    return new TextSpan(text, location);
-  }
-}
-
-export enum DiagnosticTypes {
-  Error,
-  Warning,
 }
