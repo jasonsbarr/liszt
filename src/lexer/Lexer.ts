@@ -60,6 +60,16 @@ class Input {
   public peek() {
     return this.buffer[this.pos];
   }
+
+  public readWhile(test: (char: string) => boolean) {
+    let result = "";
+
+    while (test(this.peek())) {
+      result += this.next();
+    }
+
+    return result;
+  }
 }
 
 enum TokenTypes {
