@@ -8,7 +8,7 @@ export class LexResult {
     public file: string
   ) {}
 
-  public static create(
+  public static new(
     tokens: TokenBag,
     diagnostics: DiagnosticBag,
     file: string

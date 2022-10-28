@@ -7,12 +7,12 @@ export class DiagnosticBag {
     this.diagnostics = [];
   }
 
-  public static create() {
+  public static new() {
     return new DiagnosticBag();
   }
 
   public static fromArray(diagnostics: Diagnostic[]) {
-    let db = DiagnosticBag.create();
+    let db = DiagnosticBag.new();
 
     for (let diagnostic of diagnostics) {
       db.append(diagnostic);
@@ -22,7 +22,7 @@ export class DiagnosticBag {
   }
 
   public static from(other: DiagnosticBag) {
-    let db = DiagnosticBag.create();
+    let db = DiagnosticBag.new();
 
     for (let diagnostic of other) {
       db.append(diagnostic);

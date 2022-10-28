@@ -8,7 +8,7 @@ export class Diagnostic {
     public span: TextSpan
   ) {}
 
-  public static create(type: DiagnosticTypes, message: string, span: TextSpan) {
+  public static new(type: DiagnosticTypes, message: string, span: TextSpan) {
     return new Diagnostic(type, message, span);
   }
 

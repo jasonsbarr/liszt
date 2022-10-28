@@ -11,7 +11,7 @@ export class Token {
     public trivia: string = ""
   ) {}
 
-  public static create(
+  public static new(
     type: TokenTypes,
     name: TokenNames,
     value: string,

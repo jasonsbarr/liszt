@@ -15,7 +15,7 @@ export class Input {
     this.length = buffer.length;
   }
 
-  public static create(buffer: string) {
+  public static new(buffer: string) {
     return new Input(buffer);
   }
 

@@ -10,7 +10,7 @@ export class TokenBag {
     this.tokens = [];
   }
 
-  public static create() {
+  public static new() {
     return new TokenBag();
   }
 
@@ -19,11 +19,11 @@ export class TokenBag {
   }
 
   public addEOFToken(pos: number, line: number, col: number, trivia: string) {
-    const token = Token.create(
+    const token = Token.new(
       TokenTypes.EOF,
       TokenNames.EOF,
       "EOF",
-      SrcLoc.create(pos, line, col),
+      SrcLoc.new(pos, line, col),
       trivia
     );
 
@@ -37,11 +37,11 @@ export class TokenBag {
     col: number,
     trivia: string
   ) {
-    const token = Token.create(
+    const token = Token.new(
       TokenTypes.Integer,
       TokenNames.Integer,
       value,
-      SrcLoc.create(pos, line, col),
+      SrcLoc.new(pos, line, col),
       trivia
     );
 

@@ -1,5 +1,5 @@
 import { Lexer } from "./Lexer";
 
 export const tokenize = (input: string, fileName = "<stdin>") => {
-  return Lexer.create(input, fileName).tokenize();
+  return Lexer.new(input, fileName).tokenize();
 };

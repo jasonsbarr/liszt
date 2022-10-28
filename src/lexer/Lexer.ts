@@ -12,12 +12,12 @@ export class Lexer {
 
   constructor(input: string, fileName: string) {
     this.fileName = fileName;
-    this.input = Input.create(input);
-    this.tokens = TokenBag.create();
-    this.diagnostics = DiagnosticBag.create();
+    this.input = Input.new(input);
+    this.tokens = TokenBag.new();
+    this.diagnostics = DiagnosticBag.new();
   }
 
-  public static create(input: string, fileName: string = "<stdin>") {
+  public static new(input: string, fileName: string = "<stdin>") {
     return new Lexer(input, fileName);
   }
 
@@ -47,6 +47,6 @@ export class Lexer {
       }
     }
 
-    return LexResult.create(this.tokens, this.diagnostics, this.fileName);
+    return LexResult.new(this.tokens, this.diagnostics, this.fileName);
   }
 }
