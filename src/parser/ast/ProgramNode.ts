@@ -1,11 +1,10 @@
 import { ASTNode } from "./ASTNode";
 
 export class ProgramNode extends ASTNode {
-  public type = "Program";
   private _children: ASTNode[];
 
   constructor() {
-    super();
+    super("ProgramNode");
     this._children = [];
   }
 
