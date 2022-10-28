@@ -22,15 +22,15 @@ export class TokenBag {
   }
 
   public addEOFToken(pos: number, line: number, col: number, trivia: string) {
-    const token = Token.new(
-      TokenTypes.EOF,
-      TokenNames.EOF,
-      "EOF",
-      SrcLoc.new(pos, line, col),
-      trivia
+    this.append(
+      Token.new(
+        TokenTypes.EOF,
+        TokenNames.EOF,
+        "EOF",
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
     );
-
-    this.append(token);
   }
 
   public addIntegerToken(
@@ -40,15 +40,15 @@ export class TokenBag {
     col: number,
     trivia: string
   ) {
-    const token = Token.new(
-      TokenTypes.Integer,
-      TokenNames.Integer,
-      value,
-      SrcLoc.new(pos, line, col),
-      trivia
+    this.append(
+      Token.new(
+        TokenTypes.Integer,
+        TokenNames.Integer,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
     );
-
-    this.append(token);
   }
 
   public get(i: number) {
