@@ -9,15 +9,7 @@ export class ExpressionParser extends LHVParser {
     super(lexResult);
   }
 
-  protected parseExpr() {
-    return this.parseAtom();
-  }
-
-  protected parseExpression() {
-    return this.parseExpr();
-  }
-
-  protected parseAtom(): ASTNode {
+  private parseAtom(): ASTNode {
     const token = this.reader.next();
     switch (token.name) {
       case TokenNames.Integer:
@@ -25,5 +17,13 @@ export class ExpressionParser extends LHVParser {
       default:
         throw new Error(`Unknown token kind ${token.name}`);
     }
+  }
+
+  private parseExpr() {
+    return this.parseAtom();
+  }
+
+  protected parseExpression() {
+    return this.parseExpr();
   }
 }
