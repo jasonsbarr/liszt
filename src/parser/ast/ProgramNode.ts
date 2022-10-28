@@ -1,8 +1,11 @@
-export class ProgramNode {
+import { ASTNode } from "./ASTNode";
+
+export class ProgramNode extends ASTNode {
   public type = "Program";
-  private _children: SyntaxNode[];
+  private _children: ASTNode[];
 
   constructor() {
+    super();
     this._children = [];
   }
 
@@ -10,7 +13,7 @@ export class ProgramNode {
     return new ProgramNode();
   }
 
-  public append(node: SyntaxNode) {
+  public append(node: ASTNode) {
     this._children.push(node);
   }
 
@@ -18,7 +21,3 @@ export class ProgramNode {
     return this._children;
   }
 }
-
-export type SyntaxNode = {
-  ProgramNode: ProgramNode;
-};

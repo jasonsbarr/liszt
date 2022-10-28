@@ -1,7 +1,7 @@
 import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
 import { LexResult } from "../lexer/LexResult";
 import { TokenBag } from "../lexer/TokenBag";
-import { SyntaxNode } from "./ast";
+import { SyntaxNode } from "./ast/SyntaxNode";
 
 export class Reader {
   private _tokens: TokenBag;
