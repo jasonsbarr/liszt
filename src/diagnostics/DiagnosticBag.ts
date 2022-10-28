@@ -21,7 +21,7 @@ export class DiagnosticBag {
     return db;
   }
 
-  public static of(other: DiagnosticBag) {
+  public static from(other: DiagnosticBag) {
     let db = DiagnosticBag.create();
 
     for (let diagnostic of other) {
