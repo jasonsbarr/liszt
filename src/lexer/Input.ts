@@ -34,7 +34,7 @@ export class Input {
   public next() {
     const char = this._buffer[this.pos++];
 
-    if (this.peek() === os.EOL) {
+    if (this.peek() === os.EOL || this._buffer.slice(0, -2) === os.EOL) {
       this.line++;
       this.col = 1;
     } else {
