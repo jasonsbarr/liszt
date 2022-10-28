@@ -1,6 +1,10 @@
 import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
 import { LexResult } from "../lexer/LexResult";
 import { TokenBag } from "../lexer/TokenBag";
+import { TokenNames } from "../lexer/TokenNames";
+import { TokenTypes } from "../lexer/TokenTypes";
+import { ASTNode } from "./ast/ASTNode";
+import { IntegerNode } from "./ast/IntegerNode";
 import { ProgramNode } from "./ast/ProgramNode";
 import { SyntaxTree } from "./ast/SyntaxTree";
 
@@ -59,7 +63,23 @@ export class ExpressionParser extends LHVParser {
     super(lexResult);
   }
 
-  public parseExpression() {}
+  protected parseExpr() {
+    return this.parseAtom();
+  }
+
+  protected parseExpression() {
+    return this.parseExpr();
+  }
+
+  protected parseAtom(): ASTNode {
+    const token = this.reader.next();
+    switch (token.name) {
+      case TokenNames.Integer:
+        return IntegerNode.new(token, token.location);
+      default:
+        throw new Error(`Unknown token kind ${token.name}`);
+    }
+  }
 }
 
 export class RuleParser extends ExpressionParser {
@@ -84,8 +104,14 @@ export class Parser extends RuleParser {
     ).location;
     let program = ProgramNode.new(start, end);
 
+    while (!this.reader.eof()) {
+      program.append(this.parseToplevel());
+    }
+
     return SyntaxTree.new(program, this.diagnostics, this.lexResult);
   }
 
-  public parseToplevel() {}
+  private parseToplevel() {
+    return this.parseExpression();
+  }
 }

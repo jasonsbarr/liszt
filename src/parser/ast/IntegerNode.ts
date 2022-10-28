@@ -4,11 +4,11 @@ import { PrimitiveNode } from "./PrimitiveNode";
 import { SrcLoc } from "../../lexer/SrcLoc";
 
 export class IntegerNode extends PrimitiveNode {
-  constructor(value: Token, start: SrcLoc) {
-    super(SyntaxNodes.Integer, value, start);
+  constructor(token: Token, start: SrcLoc) {
+    super(SyntaxNodes.Integer, token, start);
   }
 
-  public static new(value: Token, start: SrcLoc) {
-    return new IntegerNode(value, start);
+  public static new(token: Token, start: SrcLoc) {
+    return new IntegerNode(token, start);
   }
 }

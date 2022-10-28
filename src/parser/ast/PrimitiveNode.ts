@@ -4,11 +4,11 @@ import { ASTNode } from "./ASTNode";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class PrimitiveNode extends ASTNode {
-  public value: Token;
+  public token: Token;
 
-  constructor(type: SyntaxNodes, value: Token, start: SrcLoc) {
+  constructor(type: SyntaxNodes, token: Token, start: SrcLoc) {
     super(type, start);
-    this.value = value;
+    this.token = token;
   }
 
   public get children(): ASTNode[] {
@@ -16,6 +16,6 @@ export class PrimitiveNode extends ASTNode {
   }
 
   public toString() {
-    return `${this.type}: ${this.value}`;
+    return `${this.type}: ${this.token}`;
   }
 }
