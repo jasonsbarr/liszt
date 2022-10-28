@@ -45,6 +45,10 @@ export abstract class BaseParser {
     this.reader = Reader.new(lexResult.tokens);
     this.diagnostics = DiagnosticBag.new();
   }
+}
 
-  public abstract parse(): SyntaxNode;
+export class ExpressionParser extends BaseParser {
+  constructor(lexResult: LexResult) {
+    super(lexResult);
+  }
 }

@@ -20,4 +20,8 @@ export class ProgramNode extends ASTNode {
   public get children() {
     return this._children;
   }
+
+  public toString() {
+    return "ProgramNode";
+  }
 }

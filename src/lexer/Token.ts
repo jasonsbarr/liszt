@@ -20,4 +20,8 @@ export class Token {
   ) {
     return new Token(type, name, value, location, trivia);
   }
+
+  public toString() {
+    return `${this.type}: ${this.value}`;
+  }
 }
