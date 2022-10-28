@@ -1,7 +1,8 @@
 import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
 import { LexResult } from "../lexer/LexResult";
 import { TokenBag } from "../lexer/TokenBag";
-import { SyntaxNode } from "./ast/SyntaxNode";
+import { ProgramNode } from "./ast/ProgramNode";
+import { SyntaxTree } from "./ast/SyntaxTree";
 
 export class Reader {
   private _tokens: TokenBag;
@@ -69,4 +70,20 @@ export class Parser extends RuleParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
+
+  public static new(lexResult: LexResult) {
+    return new Parser(lexResult);
+  }
+
+  public parse(): SyntaxTree {
+    const start = this.lexResult.tokens.get(0).location;
+    const end = this.lexResult.tokens.get(
+      this.lexResult.tokens.length - 1
+    ).location;
+    let program = ProgramNode.new(start, end);
+
+    return SyntaxTree.new(program, this.diagnostics, this.lexResult);
+  }
+
+  public parseToplevel() {}
 }
