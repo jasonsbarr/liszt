@@ -1,10 +1,11 @@
 import { ASTNode } from "./ASTNode";
+import { SyntaxNodes } from "./SyntaxNodes";
 
 export class ProgramNode extends ASTNode {
   private _children: ASTNode[];
 
   constructor() {
-    super("ProgramNode");
+    super(SyntaxNodes.Program);
     this._children = [];
   }
 
