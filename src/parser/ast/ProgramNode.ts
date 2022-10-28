@@ -1,16 +1,17 @@
+import { SrcLoc } from "../../lexer/SrcLoc";
 import { ASTNode } from "./ASTNode";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class ProgramNode extends ASTNode {
   private _children: ASTNode[];
 
-  constructor() {
-    super(SyntaxNodes.Program);
+  constructor(start: SrcLoc, end: SrcLoc) {
+    super(SyntaxNodes.Program, start, end);
     this._children = [];
   }
 
-  public static new() {
-    return new ProgramNode();
+  public static new(start: SrcLoc, end: SrcLoc) {
+    return new ProgramNode(start, end);
   }
 
   public append(node: ASTNode) {

@@ -47,7 +47,25 @@ export abstract class BaseParser {
   }
 }
 
-export class ExpressionParser extends BaseParser {
+export class LHVParser extends BaseParser {
+  constructor(lexResult: LexResult) {
+    super(lexResult);
+  }
+}
+
+export class ExpressionParser extends LHVParser {
+  constructor(lexResult: LexResult) {
+    super(lexResult);
+  }
+}
+
+export class RuleParser extends ExpressionParser {
+  constructor(lexResult: LexResult) {
+    super(lexResult);
+  }
+}
+
+export class Parser extends RuleParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
