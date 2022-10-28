@@ -1,6 +1,7 @@
 import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
 import { LexResult } from "../lexer/LexResult";
 import { TokenBag } from "../lexer/TokenBag";
+import { SyntaxNode } from "./ast";
 
 export class Reader {
   private _tokens: TokenBag;
@@ -34,7 +35,7 @@ export class Reader {
   }
 }
 
-export class BaseParser {
+export abstract class BaseParser {
   protected lexResult: LexResult;
   protected reader: Reader;
   protected diagnostics: DiagnosticBag;
@@ -44,4 +45,6 @@ export class BaseParser {
     this.reader = Reader.new(lexResult.tokens);
     this.diagnostics = DiagnosticBag.new();
   }
+
+  public abstract parse(): SyntaxNode;
 }
