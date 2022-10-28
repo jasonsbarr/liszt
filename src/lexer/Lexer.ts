@@ -1,15 +1,15 @@
 class Token {
   constructor(
-    public type: number,
-    public name: number,
+    public type: TokenTypes,
+    public name: TokenNames,
     public value: string,
     public trivia: string = "",
     public location: SrcLoc
   ) {}
 
   public static create(
-    type: number,
-    name: number,
+    type: TokenTypes,
+    name: TokenNames,
     value: string,
     trivia: string = "",
     location: SrcLoc
