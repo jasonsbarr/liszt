@@ -1,4 +1,5 @@
 import { TokenBag } from "../lexer/TokenBag";
+import { TokenTypes } from "../lexer/TokenTypes";
 
 export class Reader {
   private _tokens: TokenBag;
@@ -16,7 +17,7 @@ export class Reader {
   }
 
   public eof() {
-    return this.pos >= this.length;
+    return this.peek().type === TokenTypes.EOF;
   }
 
   public lookahead(i: number) {

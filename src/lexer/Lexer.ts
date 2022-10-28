@@ -29,18 +29,27 @@ export class Lexer {
   }
 
   public tokenize() {
+    let trivia = "";
+
     while (!this.input.eof()) {
       let char = this.input.peek();
-      let trivia = "";
 
       if (isDigit(char)) {
         this.readNumber(trivia);
+        trivia = "";
       } else {
         throw new Error(
           `Unrecognized character ${char} (${this.input.col}:${this.input.line})`
         );
       }
     }
+
+    this.tokens.addEOFToken(
+      this.input.pos,
+      this.input.line,
+      this.input.col,
+      trivia
+    );
 
     return LexResult.new(
       this.tokens,
