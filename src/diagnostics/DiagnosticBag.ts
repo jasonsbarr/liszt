@@ -2,9 +2,11 @@ import { Diagnostic } from "./Diagnostic";
 
 export class DiagnosticBag {
   private _diagnostics: Diagnostic[];
+  public length: number;
 
   constructor() {
     this._diagnostics = [];
+    this.length = 0;
   }
 
   public static new() {
@@ -33,6 +35,7 @@ export class DiagnosticBag {
 
   private append(diagnostic: Diagnostic) {
     this._diagnostics.push(diagnostic);
+    this.length++;
   }
 
   public concat(other: DiagnosticBag) {
