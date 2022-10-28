@@ -89,6 +89,7 @@ export enum TokenTypes {
   Integer,
   Float,
   Operator,
+  EOF,
 }
 
 export enum TokenNames {
@@ -99,6 +100,7 @@ export enum TokenNames {
   Times,
   Div,
   Mod,
+  EOF,
 }
 
 export class LexResult {
@@ -130,6 +132,18 @@ export class TokenBag {
 
   private append(token: Token) {
     this.tokens.push(token);
+  }
+
+  public addEOFToken(pos: number, line: number, col: number, trivia: string) {
+    const token = Token.create(
+      TokenTypes.EOF,
+      TokenNames.EOF,
+      "EOF",
+      SrcLoc.create(pos, line, col),
+      trivia
+    );
+
+    this.append(token);
   }
 
   public addIntegerToken(
@@ -183,9 +197,10 @@ export class Lexer {
   public tokenize() {
     while (!this.input.eof()) {
       let char = this.input.peek();
+      let trivia = "";
 
       if (isDigit(char)) {
-        this.readNumber();
+        this.readNumber(trivia);
       } else {
         throw new Error(
           `Unrecognized character ${char} (${this.input.col}:${this.input.line})`
@@ -196,3 +211,7 @@ export class Lexer {
     return LexResult.create(this.tokens, this.diagnostics, this.fileName);
   }
 }
+
+export const tokenize = (input: string, fileName = "<stdin>") => {
+  return Lexer.create(input, fileName).tokenize();
+};
