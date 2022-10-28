@@ -1,4 +1,4 @@
-class Token {
+export class Token {
   constructor(
     public type: TokenTypes,
     public name: TokenNames,
@@ -19,14 +19,19 @@ class Token {
 }
 
 export class SrcLoc {
-  constructor(public pos: number, public line: number, public col: number) {}
+  constructor(
+    public pos: number,
+    public line: number,
+    public col: number,
+    public file: string
+  ) {}
 
-  public static create(pos: number, line: number, col: number) {
-    return new SrcLoc(pos, line, col);
+  public static create(pos: number, line: number, col: number, file: string) {
+    return new SrcLoc(pos, line, col, file);
   }
 }
 
-class Input {
+export class Input {
   public buffer: string;
   public pos: number;
   public line: number;
@@ -72,13 +77,13 @@ class Input {
   }
 }
 
-enum TokenTypes {
+export enum TokenTypes {
   Integer,
   Float,
   Operator,
 }
 
-enum TokenNames {
+export enum TokenNames {
   Integer,
   Float,
   Plus,
@@ -86,4 +91,14 @@ enum TokenNames {
   Times,
   Div,
   Mod,
+}
+
+export class Lexer {
+  public fileName: string;
+  public input: Input;
+
+  constructor(input: string, fileName: string = "<stdin>") {
+    this.fileName = fileName;
+    this.input = Input.create(input);
+  }
 }
