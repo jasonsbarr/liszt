@@ -1,10 +1,10 @@
 import { Diagnostic } from "./Diagnostic";
 
 export class DiagnosticBag {
-  public diagnostics: Diagnostic[];
+  private _diagnostics: Diagnostic[];
 
   constructor() {
-    this.diagnostics = [];
+    this._diagnostics = [];
   }
 
   public static new() {
@@ -32,16 +32,20 @@ export class DiagnosticBag {
   }
 
   private append(diagnostic: Diagnostic) {
-    this.diagnostics.push(diagnostic);
+    this._diagnostics.push(diagnostic);
+  }
+
+  public get diagnostics() {
+    return this._diagnostics;
   }
 
   *[Symbol.iterator]() {
-    for (let diagnostic of this.diagnostics) {
+    for (let diagnostic of this._diagnostics) {
       yield diagnostic;
     }
   }
 
   toArray() {
-    return ([] as Diagnostic[]).concat(this.diagnostics);
+    return ([] as Diagnostic[]).concat(this._diagnostics);
   }
 }

@@ -4,10 +4,10 @@ import { TokenNames } from "./TokenNames";
 import { TokenTypes } from "./TokenTypes";
 
 export class TokenBag {
-  public tokens: Token[];
+  private _tokens: Token[];
 
   constructor() {
-    this.tokens = [];
+    this._tokens = [];
   }
 
   public static new() {
@@ -15,7 +15,7 @@ export class TokenBag {
   }
 
   private append(token: Token) {
-    this.tokens.push(token);
+    this._tokens.push(token);
   }
 
   public addEOFToken(pos: number, line: number, col: number, trivia: string) {
@@ -46,5 +46,9 @@ export class TokenBag {
     );
 
     this.append(token);
+  }
+
+  public get tokens() {
+    return this._tokens;
   }
 }
