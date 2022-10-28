@@ -42,6 +42,11 @@ export class Lexer {
       }
     }
 
-    return LexResult.new(this.tokens, this.diagnostics, this.fileName);
+    return LexResult.new(
+      this.tokens,
+      this.diagnostics,
+      this.fileName,
+      this.input.buffer
+    );
   }
 }

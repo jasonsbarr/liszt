@@ -5,14 +5,16 @@ export class LexResult {
   constructor(
     public tokens: TokenBag,
     public diagnostics: DiagnosticBag,
-    public file: string
+    public file: string,
+    public source: string
   ) {}
 
   public static new(
     tokens: TokenBag,
     diagnostics: DiagnosticBag,
-    file: string
+    file: string,
+    source: string
   ) {
-    return new LexResult(tokens, diagnostics, file);
+    return new LexResult(tokens, diagnostics, file, source);
   }
 }

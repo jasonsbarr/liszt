@@ -1,14 +1,14 @@
 import os from "os";
 
 export class Input {
-  public buffer: string;
+  private _buffer: string;
   public pos: number;
   public line: number;
   public col: number;
   public length: number;
 
   constructor(buffer: string) {
-    this.buffer = buffer;
+    this._buffer = buffer;
     this.pos = 0;
     this.line = 1;
     this.col = 1;
@@ -19,16 +19,20 @@ export class Input {
     return new Input(buffer);
   }
 
+  public get buffer() {
+    return this._buffer;
+  }
+
   public eof() {
     return this.pos >= this.length;
   }
 
   public lookahead(chars: number) {
-    return this.buffer[this.pos + chars];
+    return this._buffer[this.pos + chars];
   }
 
   public next() {
-    const char = this.buffer[this.pos++];
+    const char = this._buffer[this.pos++];
 
     if (this.peek() === os.EOL) {
       this.line++;
@@ -41,7 +45,7 @@ export class Input {
   }
 
   public peek() {
-    return this.buffer[this.pos];
+    return this._buffer[this.pos];
   }
 
   public readWhile(test: (char: string) => boolean) {
