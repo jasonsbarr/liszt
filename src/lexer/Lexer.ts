@@ -21,7 +21,7 @@ export class Lexer {
     return new Lexer(input, fileName);
   }
 
-  public readNumber(trivia = "") {
+  private readNumber(trivia = "") {
     let digitString = this.input.readWhile(isDigit);
 
     this.tokens.addIntegerToken(
