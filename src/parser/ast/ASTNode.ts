@@ -2,12 +2,12 @@ import { SrcLoc } from "../../lexer/SrcLoc";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export abstract class ASTNode {
-  public type: string;
+  public kind: string;
   public start: SrcLoc;
   public end?: SrcLoc;
 
-  constructor(type: SyntaxNodes, start: SrcLoc, end?: SrcLoc) {
-    this.type = type;
+  constructor(kind: SyntaxNodes, start: SrcLoc, end?: SrcLoc) {
+    this.kind = kind;
     this.start = start;
     this.end = end;
   }

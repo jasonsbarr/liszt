@@ -6,8 +6,8 @@ import { SyntaxNodes } from "./SyntaxNodes";
 export class PrimitiveNode extends ASTNode {
   public token: Token;
 
-  constructor(type: SyntaxNodes, token: Token, start: SrcLoc) {
-    super(type, start);
+  constructor(kind: SyntaxNodes, token: Token, start: SrcLoc) {
+    super(kind, start);
     this.token = token;
   }
 
@@ -16,6 +16,6 @@ export class PrimitiveNode extends ASTNode {
   }
 
   public toString() {
-    return `${this.type}: ${this.token}`;
+    return `${this.kind}: ${this.token}`;
   }
 }

@@ -115,3 +115,5 @@ export class Parser extends RuleParser {
     return this.parseExpression();
   }
 }
+
+export const parse = (lexResult: LexResult) => Parser.new(lexResult).parse();
