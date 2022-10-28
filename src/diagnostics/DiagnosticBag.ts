@@ -33,8 +33,6 @@ export class DiagnosticBag {
 
   private append(diagnostic: Diagnostic) {
     this.diagnostics.push(diagnostic);
-
-    return this;
   }
 
   *[Symbol.iterator]() {
