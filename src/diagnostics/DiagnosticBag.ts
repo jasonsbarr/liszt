@@ -35,6 +35,16 @@ export class DiagnosticBag {
     this._diagnostics.push(diagnostic);
   }
 
+  public concat(other: DiagnosticBag) {
+    let db = DiagnosticBag.from(this);
+
+    for (let diagnostic of other) {
+      db.append(diagnostic);
+    }
+
+    return db;
+  }
+
   public get diagnostics() {
     return this._diagnostics;
   }
