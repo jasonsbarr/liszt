@@ -26,6 +26,42 @@ class SrcLoc {
   }
 }
 
+class Input {
+  public buffer: string;
+  public pos: number;
+  public line: number;
+  public col: number;
+  public length: number;
+
+  constructor(buffer: string) {
+    this.buffer = buffer;
+    this.pos = 0;
+    this.line = 1;
+    this.col = 1;
+    this.length = buffer.length;
+  }
+
+  public static create(buffer: string) {
+    return new Input(buffer);
+  }
+
+  public eof() {
+    return this.pos >= this.length;
+  }
+
+  public lookahead(chars: number) {
+    return this.buffer[this.pos + chars];
+  }
+
+  public next() {
+    return this.buffer[this.pos++];
+  }
+
+  public peek() {
+    return this.buffer[this.pos];
+  }
+}
+
 enum TokenTypes {
   Integer,
   Float,
