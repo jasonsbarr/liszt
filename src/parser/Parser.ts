@@ -58,6 +58,8 @@ export class ExpressionParser extends LHVParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
+
+  public parseExpression() {}
 }
 
 export class RuleParser extends ExpressionParser {
