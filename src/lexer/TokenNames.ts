@@ -1,10 +1,10 @@
 export enum TokenNames {
-  Integer,
-  Float,
-  Plus,
-  Minus,
-  Times,
-  Div,
-  Mod,
-  EOF,
+  Integer = "Integer",
+  Float = "Float",
+  Plus = "Plus",
+  Minus = "Minus",
+  Times = "Times",
+  Div = "Div",
+  Mod = "Mod",
+  EOF = "EOF",
 }

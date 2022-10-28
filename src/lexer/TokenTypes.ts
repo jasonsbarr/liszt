@@ -1,6 +1,6 @@
 export enum TokenTypes {
-  Integer,
-  Float,
-  Operator,
-  EOF,
+  Integer = "Integer",
+  Float = "Float",
+  Operator = "Operator",
+  EOF = "EOF",
 }
