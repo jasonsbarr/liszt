@@ -13,7 +13,6 @@ export class Parser extends RuleParser {
   }
 
   public parse(): SyntaxTree {
-    console.log(this.lexResult.tokens);
     const start = this.lexResult.tokens.get(0).location;
     const end = this.lexResult.tokens.get(
       this.lexResult.tokens.length - 1
@@ -24,7 +23,13 @@ export class Parser extends RuleParser {
       program.append(this.parseToplevel());
     }
 
-    return SyntaxTree.new(program, this.diagnostics, this.lexResult);
+    return SyntaxTree.new(
+      program,
+      this.lexResult.tokens,
+      this.diagnostics,
+      this.lexResult.source,
+      this.lexResult.file
+    );
   }
 
   private parseToplevel() {

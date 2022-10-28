@@ -4,6 +4,10 @@ import { ASTNode } from "./ast/ASTNode";
 import { IntegerNode } from "./ast/IntegerNode";
 import { LHVParser } from "./LHVParser";
 
+const nudPrecedences = {};
+
+const ledPrecedences = {};
+
 export class ExpressionParser extends LHVParser {
   constructor(lexResult: LexResult) {
     super(lexResult);

@@ -1,19 +1,27 @@
 import { DiagnosticBag } from "../../diagnostics/DiagnosticBag";
-import { LexResult } from "../../lexer/LexResult";
+import { TokenBag } from "../../lexer/TokenBag";
 import { ASTNode } from "./ASTNode";
 
 export class SyntaxTree {
+  public diagnostics;
+
   constructor(
     public root: ASTNode,
-    public diagnostics: DiagnosticBag,
-    public lexResult: LexResult
-  ) {}
+    public tokens: TokenBag,
+    diagnostics: DiagnosticBag,
+    public source: string,
+    public file: string
+  ) {
+    this.diagnostics = DiagnosticBag.from(diagnostics);
+  }
 
   public static new(
     root: ASTNode,
+    tokens: TokenBag,
     diagnostics: DiagnosticBag,
-    lexResult: LexResult
+    source: string,
+    file: string
   ) {
-    return new SyntaxTree(root, diagnostics, lexResult);
+    return new SyntaxTree(root, tokens, diagnostics, source, file);
   }
 }
