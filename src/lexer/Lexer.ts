@@ -22,15 +22,10 @@ export class Lexer {
   }
 
   private readNumber(trivia = "") {
+    let { pos, line, col } = this.input;
     let digitString = this.input.readWhile(isDigit);
 
-    this.tokens.addIntegerToken(
-      digitString,
-      this.input.pos,
-      this.input.line,
-      this.input.col,
-      trivia
-    );
+    this.tokens.addIntegerToken(digitString, pos, line, col, trivia);
   }
 
   public tokenize() {
