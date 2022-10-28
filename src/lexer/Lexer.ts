@@ -97,8 +97,12 @@ export class Lexer {
   public fileName: string;
   public input: Input;
 
-  constructor(input: string, fileName: string = "<stdin>") {
+  constructor(input: string, fileName: string) {
     this.fileName = fileName;
     this.input = Input.create(input);
+  }
+
+  public static create(input: string, fileName: string = "<stdin>") {
+    return new Lexer(input, fileName);
   }
 }
