@@ -30,8 +30,6 @@ enum TokenTypes {
   Integer,
   Float,
   Operator,
-  Whitespace,
-  Comment,
 }
 
 enum TokenNames {
@@ -42,7 +40,4 @@ enum TokenNames {
   Times,
   Div,
   Mod,
-  WS,
-  NL,
-  Comment,
 }
