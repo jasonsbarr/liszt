@@ -1,3 +1,5 @@
+import os from "os";
+
 export class Token {
   constructor(
     public type: TokenTypes,
@@ -59,7 +61,16 @@ export class Input {
   }
 
   public next() {
-    return this.buffer[this.pos++];
+    const char = this.buffer[this.pos++];
+
+    if (this.peek() === os.EOL) {
+      this.line++;
+      this.col = 1;
+    } else {
+      this.col++;
+    }
+
+    return char;
   }
 
   public peek() {
@@ -104,5 +115,9 @@ export class Lexer {
 
   public static create(input: string, fileName: string = "<stdin>") {
     return new Lexer(input, fileName);
+  }
+
+  public tokenize() {
+    while (!this.input.eof()) {}
   }
 }
