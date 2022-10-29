@@ -1,15 +1,20 @@
-export abstract class BaseType {
-  constructor(public name: string) {}
+import * as Types from "./Types";
+import * as Constructors from "./constructors";
+import * as Validators from "./validators";
+
+module Type {
+  // types
+  export type Integer = Types.IntegerType;
+
+  export type Type = Types.Type;
+
+  // constructors
+  export const integer = Constructors.integer;
+
+  // validators
+  export const isInteger = Validators.isInteger;
 }
 
-export class IntegerType extends BaseType {
-  constructor() {
-    super("Integer");
-  }
+type Type = Type.Type;
 
-  public static new() {
-    return new IntegerType();
-  }
-}
-
-export type Type = IntegerType;
+export { Type };
