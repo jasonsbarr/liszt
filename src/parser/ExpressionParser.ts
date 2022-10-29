@@ -10,7 +10,7 @@ const nudAttributes = {
 
 const ledAttributes = {};
 
-export class ExpressionParser extends LHVParser {
+export abstract class ExpressionParser extends LHVParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
