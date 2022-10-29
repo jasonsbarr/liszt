@@ -6,7 +6,7 @@ export class ProgramNode extends ASTNode {
   private _children: ASTNode[];
 
   constructor(start: SrcLoc, end: SrcLoc) {
-    super(SyntaxNodes.Program, start, end);
+    super(SyntaxNodes.ProgramNode, start, end);
     this._children = [];
   }
 

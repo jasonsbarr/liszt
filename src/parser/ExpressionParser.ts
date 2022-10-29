@@ -1,7 +1,7 @@
 import { LexResult } from "../lexer/LexResult";
 import { TokenNames } from "../lexer/TokenNames";
 import { ASTNode } from "./ast/ASTNode";
-import { IntegerNode } from "./ast/IntegerNode";
+import { IntegerLiteral } from "./ast/IntegerLiteral";
 import { LHVParser } from "./LHVParser";
 
 const nudAttributes = {
@@ -19,7 +19,7 @@ export class ExpressionParser extends LHVParser {
     const token = this.reader.next();
     switch (token.name) {
       case TokenNames.Integer:
-        return IntegerNode.new(token, token.location);
+        return IntegerLiteral.new(token, token.location);
       default:
         throw new Error(`Unknown token kind ${token.name}`);
     }

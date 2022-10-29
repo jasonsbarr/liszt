@@ -3,12 +3,12 @@ import { SyntaxNodes } from "./SyntaxNodes";
 import { PrimitiveNode } from "./PrimitiveNode";
 import { SrcLoc } from "../../lexer/SrcLoc";
 
-export class IntegerNode extends PrimitiveNode {
+export class IntegerLiteral extends PrimitiveNode {
   constructor(token: Token, start: SrcLoc) {
-    super(SyntaxNodes.Integer, token, start);
+    super(SyntaxNodes.IntegerLiteral, token, start);
   }
 
   public static new(token: Token, start: SrcLoc) {
-    return new IntegerNode(token, start);
+    return new IntegerLiteral(token, start);
   }
 }

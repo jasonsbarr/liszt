@@ -1,4 +1,4 @@
 export enum SyntaxNodes {
-  Program = "ProgramNode",
-  Integer = "IntegerNode",
+  ProgramNode = "ProgramNode",
+  IntegerLiteral = "IntegerLiteral",
 }
