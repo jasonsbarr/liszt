@@ -5,7 +5,7 @@ import { BoundProgramNode } from "../typechecker/tree/BoundProgramNode";
 import { BoundTree } from "../typechecker/tree/BoundTree";
 
 export class Emitter {
-  constructor(public tree: SyntaxTree) {}
+  constructor(public tree: BoundTree) {}
 
   public static new(tree: BoundTree) {
     return new Emitter(tree);
