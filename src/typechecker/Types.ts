@@ -1,5 +1,5 @@
 export abstract class BaseType {
-  constructor(public name: string, types: BaseType[] = []) {}
+  constructor(public name: string, public types: BaseType[] = []) {}
 }
 
 export class IntegerType extends BaseType {
