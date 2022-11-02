@@ -8,10 +8,6 @@ import { synth } from "./synth";
 import { check } from "./check";
 import { BoundIntegerLiteral } from "./tree/BoundIntegerLiteral";
 
-const typeFail = (got: string, expected: string): never => {
-  throw new Error(`Expected ${expected} type, got ${got}`);
-};
-
 export class TypeChecker {
   constructor(public tree: SyntaxTree) {}
 
