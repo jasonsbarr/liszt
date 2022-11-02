@@ -3,6 +3,14 @@ import { SyntaxNodes } from "../parser/ast/SyntaxNodes";
 import { ASTNode } from "../parser/ast/ASTNode";
 import { ProgramNode } from "../parser/ast/ProgramNode";
 import { IntegerLiteral } from "../parser/ast/IntegerLiteral";
+import { BoundProgramNode } from "./tree/BoundProgramNode";
+import { synth } from "./synth";
+import { check } from "./check";
+import { BoundIntegerLiteral } from "./tree/BoundIntegerLiteral";
+
+const typeFail = (got: string, expected: string): never => {
+  throw new Error(`Expected ${expected} type, got ${got}`);
+};
 
 export class TypeChecker {
   constructor(public tree: SyntaxTree) {}
@@ -28,7 +36,21 @@ export class TypeChecker {
     }
   }
 
-  private checkProgram(node: ProgramNode) {}
+  private checkProgram(node: ProgramNode) {
+    const nodes = node.children;
+    let boundTree = BoundProgramNode.new(node.start, node.end!);
 
-  private checkIntegerLiteral(node: IntegerLiteral) {}
+    for (let node of nodes) {
+      boundTree.children.push(this.checkNode(node));
+    }
+
+    return boundTree;
+  }
+
+  private checkIntegerLiteral(node: IntegerLiteral) {
+    const synthType = synth(node);
+    check(node, synthType);
+
+    return BoundIntegerLiteral.new(node.token, node.start);
+  }
 }
