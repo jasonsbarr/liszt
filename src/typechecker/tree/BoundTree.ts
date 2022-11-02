@@ -12,7 +12,6 @@ export class BoundTree extends SyntaxTree {
     file: string
   ) {
     super(root, tokens, diagnostics, source, file);
-    this.diagnostics = DiagnosticBag.from(this.diagnostics);
   }
 
   public static new(
