@@ -1,5 +1,6 @@
 import vm from "vm";
 import readlineSync from "readline-sync";
+import chalk from "chalk";
 import { compile } from "./compile";
 
 const READ = () => readlineSync.question("liszt> ");
@@ -17,7 +18,7 @@ export const repl = () => {
 
       PRINT(EVAL(input));
     } catch (e: any) {
-      console.log(e.message);
+      console.log(chalk.redBright(e.message));
     }
   }
 };
