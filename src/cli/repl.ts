@@ -8,7 +8,12 @@ const PRINT = console.log;
 
 while (true) {
   try {
-    PRINT(EVAL(READ()));
+    let input = READ();
+    PRINT(EVAL(input));
+
+    if (input === "") {
+      break;
+    }
   } catch (e: any) {
     console.log(e.message);
   }
