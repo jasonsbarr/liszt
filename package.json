@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "liszt": "./bin/liszt.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["programming language"],
+  "author": "Jason Barr <jason@jasonsbarr.com>",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^18.11.7",
