@@ -7,7 +7,11 @@ export class PrimitiveNode extends ASTNode {
   public token: Token;
 
   constructor(kind: SyntaxNodes, token: Token, start: SrcLoc) {
-    super(kind, start);
+    super(
+      kind,
+      start,
+      SrcLoc.new(start.pos, start.line, start.col + token.value.length)
+    );
     this.token = token;
   }
 
