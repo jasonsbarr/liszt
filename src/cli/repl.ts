@@ -9,11 +9,12 @@ const PRINT = console.log;
 while (true) {
   try {
     let input = READ();
-    PRINT(EVAL(input));
 
     if (input === "") {
       break;
     }
+
+    PRINT(EVAL(input));
   } catch (e: any) {
     console.log(e.message);
   }
