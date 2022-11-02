@@ -7,9 +7,15 @@ import { BoundProgramNode } from "./tree/BoundProgramNode";
 import { synth } from "./synth";
 import { check } from "./check";
 import { BoundIntegerLiteral } from "./tree/BoundIntegerLiteral";
+import { BoundTree } from "./tree/BoundTree";
+import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
 
 export class TypeChecker {
-  constructor(public tree: SyntaxTree) {}
+  public diagnostics: DiagnosticBag;
+
+  constructor(public tree: SyntaxTree) {
+    this.diagnostics = DiagnosticBag.from(tree.diagnostics);
+  }
 
   public static new(tree: SyntaxTree) {
     return new TypeChecker(tree);
@@ -17,8 +23,15 @@ export class TypeChecker {
 
   public check() {
     const program = this.tree.root;
+    const boundProgram = this.checkNode(program);
 
-    return this.checkNode(program);
+    return BoundTree.new(
+      boundProgram as BoundProgramNode,
+      this.tree.tokens,
+      this.diagnostics,
+      this.tree.source,
+      this.tree.file
+    );
   }
 
   private checkNode(node: ASTNode) {
@@ -34,13 +47,13 @@ export class TypeChecker {
 
   private checkProgram(node: ProgramNode) {
     const nodes = node.children;
-    let boundTree = BoundProgramNode.new(node.start, node.end!);
+    let boundProgram = BoundProgramNode.new(node.start, node.end!);
 
     for (let node of nodes) {
-      boundTree.children.push(this.checkNode(node));
+      boundProgram.children.push(this.checkNode(node));
     }
 
-    return boundTree;
+    return boundProgram;
   }
 
   private checkIntegerLiteral(node: IntegerLiteral) {
