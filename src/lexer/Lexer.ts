@@ -2,6 +2,7 @@ import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
 import {
   isAlphaNumeric,
   isBinInt,
+  isBooleanLiteral,
   isComment,
   isDecimalInt,
   isDigit,
@@ -10,13 +11,18 @@ import {
   isFloat,
   isHexChar,
   isHexInt,
+  isIdChar,
+  isIdStart,
+  isKeyword,
   isNewline,
   isOctInt,
   isWhitespace,
+  KEYWORDS,
 } from "./helpers";
 import { Input } from "./Input";
 import { LexResult } from "./LexResult";
 import { TokenBag } from "./TokenBag";
+import { TokenNames } from "./TokenNames";
 
 export class Lexer {
   public fileName: string;
@@ -137,6 +143,25 @@ export class Lexer {
     return str;
   }
 
+  private readIdentifier(trivia: string) {
+    const { pos, line, col } = this.input;
+    let value = this.input.next();
+    value += this.input.readWhile(isIdChar);
+
+    if (isBooleanLiteral(value)) {
+      this.tokens.addBooleanToken(
+        value === "true" ? TokenNames.True : TokenNames.False,
+        value,
+        pos,
+        line,
+        col,
+        trivia
+      );
+    } else {
+      throw new Error(`Unknown token ${value}`);
+    }
+  }
+
   public tokenize() {
     let trivia = "";
 
@@ -157,6 +182,9 @@ export class Lexer {
         trivia = "";
       } else if (isDoubleQuote(char)) {
         this.readString(trivia);
+        trivia = "";
+      } else if (isIdStart(char)) {
+        this.readIdentifier(trivia);
         trivia = "";
       } else {
         throw new Error(

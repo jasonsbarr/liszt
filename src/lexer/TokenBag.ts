@@ -21,6 +21,25 @@ export class TokenBag {
     this.length++;
   }
 
+  public addBooleanToken(
+    name: TokenNames.True | TokenNames.False,
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.Boolean,
+        name,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public addEOFToken(pos: number, line: number, col: number, trivia: string) {
     this.append(
       Token.new(

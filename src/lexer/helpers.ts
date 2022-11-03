@@ -1,3 +1,5 @@
+import { TokenNames } from "./TokenNames";
+
 export const isDigit = (c: string) => /\d/.test(c);
 
 export const isWhitespace = (c: string) => / \t/.test(c);
@@ -29,4 +31,11 @@ export const isIdStart = (c: string) => /\p{L}/u.test(c);
 
 export const isIdChar = (c: string) => /\p{L}/u.test(c);
 
-export const KEYWORDS = { true: "TRUE", false: "FALSE" };
+export const KEYWORDS = {
+  true: TokenNames.True,
+  false: TokenNames.False,
+};
+
+export const isKeyword = (str: string) => str in KEYWORDS;
+
+export const isBooleanLiteral = (str: string) => /true|false/.test(str);
