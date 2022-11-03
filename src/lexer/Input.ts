@@ -27,7 +27,7 @@ export class Input {
     return this.pos >= this.length;
   }
 
-  public lookahead(chars: number) {
+  public lookahead(chars: number = 1) {
     return this._buffer[this.pos + chars];
   }
 
