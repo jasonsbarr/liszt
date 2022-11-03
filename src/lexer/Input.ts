@@ -28,11 +28,11 @@ export class Input {
   }
 
   public lookahead(chars: number = 1) {
-    return this._buffer[this.pos + chars];
+    return this._buffer.charAt(this.pos + chars);
   }
 
   public next() {
-    const char = this._buffer[this.pos++];
+    const char = this._buffer.charAt(this.pos++);
 
     if (this.peek() === os.EOL || this._buffer.slice(0, -2) === os.EOL) {
       this.line++;
