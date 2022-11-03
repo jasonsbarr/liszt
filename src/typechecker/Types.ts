@@ -2,7 +2,17 @@ export abstract class BaseType {
   constructor(public name: string, public types: BaseType[] = []) {}
 }
 
-export class IntegerType extends BaseType {
+export class NumberType extends BaseType {
+  constructor(name: string) {
+    super(name);
+  }
+
+  public static new(name: string) {
+    return new NumberType(name);
+  }
+}
+
+export class IntegerType extends NumberType {
   constructor() {
     super("Integer");
   }
@@ -12,7 +22,7 @@ export class IntegerType extends BaseType {
   }
 }
 
-export class FloatType extends BaseType {
+export class FloatType extends NumberType {
   constructor() {
     super("Float");
   }
@@ -52,4 +62,10 @@ export class NilType extends BaseType {
   }
 }
 
-export type Type = IntegerType | FloatType | StringType | BooleanType | NilType;
+export type Type =
+  | IntegerType
+  | FloatType
+  | NumberType
+  | StringType
+  | BooleanType
+  | NilType;
