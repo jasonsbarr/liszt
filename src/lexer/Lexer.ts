@@ -85,6 +85,9 @@ export class Lexer {
       } else if (isDigit(char)) {
         this.readNumber(trivia);
         trivia = "";
+      } else if (isDot(char)) {
+        this.readNumber(trivia);
+        trivia = "";
       } else {
         throw new Error(
           `Unrecognized character ${char} (${this.input.col}:${this.input.line})`
