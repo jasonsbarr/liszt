@@ -1,5 +1,5 @@
 import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
-import { isDigit } from "./helpers";
+import { isComment, isDigit, isNewline, isWhitespace } from "./helpers";
 import { Input } from "./Input";
 import { LexResult } from "./LexResult";
 import { TokenBag } from "./TokenBag";
@@ -28,13 +28,23 @@ export class Lexer {
     this.tokens.addIntegerToken(digitString, pos, line, col, trivia);
   }
 
+  private readWhitespace() {
+    return this.input.readWhile(isWhitespace);
+  }
+
   public tokenize() {
     let trivia = "";
 
     while (!this.input.eof()) {
       let char = this.input.peek();
 
-      if (isDigit(char)) {
+      if (isWhitespace(char)) {
+        trivia += this.readWhitespace();
+      } else if (isNewline(char)) {
+        trivia += this.input.readWhile(isNewline);
+      } else if (isComment(char)) {
+        trivia += this.input.readWhile((c) => !isNewline(c));
+      } else if (isDigit(char)) {
         this.readNumber(trivia);
         trivia = "";
       } else {
