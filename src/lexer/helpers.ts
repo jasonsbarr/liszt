@@ -37,6 +37,8 @@ export const KEYWORDS = {
   nil: TokenNames.Nil,
 };
 
+export type kw = keyof typeof KEYWORDS;
+
 export const isKeyword = (str: string) => str in KEYWORDS;
 
 export const isBooleanLiteral = (str: string) => /true|false/.test(str);
