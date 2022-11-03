@@ -60,7 +60,8 @@ export class Emitter {
   }
 
   private emitString(node: BoundStringLiteral) {
-    return node.token.value;
+    const value = node.token.value.slice(1, -1);
+    return "`" + value + "`";
   }
 
   private emitBoolean(node: BoundBooleanLiteral) {
