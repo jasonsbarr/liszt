@@ -48,6 +48,15 @@ export class Lexer {
     if (isDot(this.input.peek())) {
       numberString += this.input.next();
       numberString += this.input.readWhile(isDigit);
+
+      if (/e/.test(this.input.peek())) {
+        numberString += this.input.next();
+
+        if (/\+|\-/.test(this.input.peek())) {
+          numberString += this.input.next();
+          numberString += this.input.readWhile(isDigit);
+        }
+      }
     }
   }
 
