@@ -100,7 +100,7 @@ export class Lexer {
       } else if (ch === "\\") {
         escaped = true;
       } else if (isDoubleQuote(ch)) {
-        str += this.input.next();
+        str += ch;
         break;
       } else if (isNewline(ch)) {
         throw new Error("Unexpected EOL in string literal");
