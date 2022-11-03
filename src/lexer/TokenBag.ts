@@ -69,6 +69,24 @@ export class TokenBag {
     );
   }
 
+  public addStringToken(
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.String,
+        TokenNames.String,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public get(i: number) {
     return this._tokens[i];
   }

@@ -73,7 +73,10 @@ export class Lexer {
   }
 
   private readString(trivia: string) {
+    const { pos, line, col } = this.input;
     const value = this.readEscaped();
+
+    this.tokens.addStringToken(value, pos, line, col, trivia);
   }
 
   private readEscaped() {
