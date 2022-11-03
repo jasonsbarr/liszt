@@ -6,7 +6,7 @@ import { BoundNodes } from "./BoundNodes";
 export class BoundNilLiteral extends NilLiteral {
   constructor(token: Token, start: SrcLoc) {
     super(token, start);
-    this.kind = BoundNodes.BoundStringLiteral;
+    this.kind = BoundNodes.BoundNilLiteral;
   }
 
   public static new(token: Token, start: SrcLoc) {
