@@ -6,6 +6,7 @@ import {
   isDecimalInt,
   isDigit,
   isDot,
+  isFloat,
   isHexInt,
   isNewline,
   isOctInt,
@@ -36,15 +37,6 @@ export class Lexer {
     let { pos, line, col } = this.input;
     let numberString = this.input.readWhile(isAlphaNumeric);
 
-    if (
-      isBinInt(numberString) ||
-      isHexInt(numberString) ||
-      isOctInt(numberString) ||
-      isDecimalInt(numberString)
-    ) {
-      this.tokens.addIntegerToken(numberString, pos, line, col, trivia);
-    }
-
     if (isDot(this.input.peek())) {
       numberString += this.input.next();
       numberString += this.input.readWhile(isDigit);
@@ -57,6 +49,20 @@ export class Lexer {
           numberString += this.input.readWhile(isDigit);
         }
       }
+      if (isFloat(numberString)) {
+        this.tokens.addFloatToken(numberString, pos, line, col, trivia);
+      } else {
+        throw new Error(`Invalid number format ${numberString}`);
+      }
+    } else if (
+      isBinInt(numberString) ||
+      isHexInt(numberString) ||
+      isOctInt(numberString) ||
+      isDecimalInt(numberString)
+    ) {
+      this.tokens.addIntegerToken(numberString, pos, line, col, trivia);
+    } else {
+      throw new Error(`Invalid number format ${numberString}`);
     }
   }
 
