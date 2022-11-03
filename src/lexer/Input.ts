@@ -51,7 +51,7 @@ export class Input {
   public readWhile(test: (char: string) => boolean) {
     let result = "";
 
-    while (test(this.peek())) {
+    while (test(this.peek()) && !this.eof()) {
       result += this.next();
     }
 
