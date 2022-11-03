@@ -35,6 +35,8 @@ export const KEYWORDS = {
   true: TokenNames.True,
   false: TokenNames.False,
   nil: TokenNames.Nil,
+  NaN: TokenNames.NaN,
+  Infinity: TokenNames.Infinity,
 };
 
 export type kw = keyof typeof KEYWORDS;
@@ -44,3 +46,7 @@ export const isKeyword = (str: string) => str in KEYWORDS;
 export const isBooleanLiteral = (str: string) => /true|false/.test(str);
 
 export const isNilLiteral = (str: string) => /nil/.test(str);
+
+export const isNanValue = (str: string) => /NaN/.test(str);
+
+export const isInfinity = (str: string) => /Infinity/.test(str);

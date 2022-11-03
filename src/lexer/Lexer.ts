@@ -13,7 +13,9 @@ import {
   isHexInt,
   isIdChar,
   isIdStart,
+  isInfinity,
   isKeyword,
+  isNanValue,
   isNewline,
   isNilLiteral,
   isOctInt,
@@ -159,6 +161,8 @@ export class Lexer {
         col,
         trivia
       );
+    } else if (isNanValue(value) || isInfinity(value)) {
+      this.tokens.addFloatToken(value, pos, line, col, trivia);
     } else if (isNilLiteral(value)) {
       this.tokens.addNilToken(pos, line, col, trivia);
     } else {

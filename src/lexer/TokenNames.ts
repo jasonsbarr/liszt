@@ -5,6 +5,8 @@ export enum TokenNames {
   True = "True",
   False = "False",
   Nil = "Nil",
+  NaN = "NaN",
+  Infinity = "Infinity",
   Plus = "Plus",
   Minus = "Minus",
   Times = "Times",
