@@ -20,3 +20,5 @@ export const isDot = (c: string) => /\./.test(c);
 
 export const isFloat = (str: string) =>
   /[0-9]*\.[0-9]+(e[\+\-][0-9]+)?/.test(str);
+
+export const isDoubleQuote = (c: string) => /"/.test(c);
