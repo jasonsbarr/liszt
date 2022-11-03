@@ -33,6 +33,24 @@ export class TokenBag {
     );
   }
 
+  public addFloatToken(
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.Float,
+        TokenNames.Float,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public addIntegerToken(
     value: string,
     pos: number,
