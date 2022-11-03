@@ -2,6 +2,7 @@ import { LexResult } from "../lexer/LexResult";
 import { TokenTypes } from "../lexer/TokenTypes";
 import { ASTNode } from "./ast/ASTNode";
 import { BooleanLiteral } from "./ast/BooleanLiteral";
+import { FloatLiteral } from "./ast/FloatLiteral";
 import { IntegerLiteral } from "./ast/IntegerLiteral";
 import { NilLiteral } from "./ast/NilLiteral";
 import { StringLiteral } from "./ast/StringLiteral";
@@ -26,6 +27,8 @@ export abstract class ExpressionParser extends LHVParser {
     switch (token.type) {
       case TokenTypes.Integer:
         return IntegerLiteral.new(token, token.location);
+      case TokenTypes.Float:
+        return FloatLiteral.new(token, token.location);
       case TokenTypes.String:
         return StringLiteral.new(token, token.location);
       case TokenTypes.Boolean:
