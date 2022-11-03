@@ -45,7 +45,7 @@ export class Input {
   }
 
   public peek() {
-    return this._buffer[this.pos];
+    return this._buffer.charAt(this.pos);
   }
 
   public readWhile(test: (char: string) => boolean) {
