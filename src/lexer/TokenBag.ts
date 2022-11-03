@@ -22,7 +22,7 @@ export class TokenBag {
   }
 
   public addBooleanToken(
-    name: TokenNames.True | TokenNames.False,
+    name: TokenNames,
     value: string,
     pos: number,
     line: number,

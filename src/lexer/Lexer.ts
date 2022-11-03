@@ -19,6 +19,7 @@ import {
   isOctInt,
   isWhitespace,
   KEYWORDS,
+  kw,
 } from "./helpers";
 import { Input } from "./Input";
 import { LexResult } from "./LexResult";
@@ -151,7 +152,7 @@ export class Lexer {
 
     if (isBooleanLiteral(value)) {
       this.tokens.addBooleanToken(
-        value === "true" ? TokenNames.True : TokenNames.False,
+        KEYWORDS[value as kw], // hack to make sure it knows value is a key in KEYWORDS
         value,
         pos,
         line,
