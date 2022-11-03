@@ -1,5 +1,16 @@
 import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
-import { isComment, isDigit, isNewline, isWhitespace } from "./helpers";
+import {
+  isAlphaNumeric,
+  isBinInt,
+  isComment,
+  isDecimalInt,
+  isDigit,
+  isDot,
+  isHexInt,
+  isNewline,
+  isOctInt,
+  isWhitespace,
+} from "./helpers";
 import { Input } from "./Input";
 import { LexResult } from "./LexResult";
 import { TokenBag } from "./TokenBag";
@@ -23,9 +34,21 @@ export class Lexer {
 
   private readNumber(trivia = "") {
     let { pos, line, col } = this.input;
-    let digitString = this.input.readWhile(isDigit);
+    let numberString = this.input.readWhile(isAlphaNumeric);
 
-    this.tokens.addIntegerToken(digitString, pos, line, col, trivia);
+    if (
+      isBinInt(numberString) ||
+      isHexInt(numberString) ||
+      isOctInt(numberString) ||
+      isDecimalInt(numberString)
+    ) {
+      this.tokens.addIntegerToken(numberString, pos, line, col, trivia);
+    }
+
+    if (isDot(this.input.peek())) {
+      numberString += this.input.next();
+      numberString += this.input.readWhile(isDigit);
+    }
   }
 
   private readWhitespace() {

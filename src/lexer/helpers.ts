@@ -15,3 +15,5 @@ export const isHexInt = (str: string) => /0x[0-9a-fA-F]+/.test(str);
 export const isOctInt = (str: string) => /0o[0-7]+/.test(str);
 
 export const isBinInt = (str: string) => /0b[0-1]+/.test(str);
+
+export const isDot = (c: string) => /\./.test(c);
