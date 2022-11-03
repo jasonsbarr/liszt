@@ -34,8 +34,11 @@ export const isIdChar = (c: string) => /\p{L}/u.test(c);
 export const KEYWORDS = {
   true: TokenNames.True,
   false: TokenNames.False,
+  nil: TokenNames.Nil,
 };
 
 export const isKeyword = (str: string) => str in KEYWORDS;
 
 export const isBooleanLiteral = (str: string) => /true|false/.test(str);
+
+export const isNilLiteral = (str: string) => /nil/.test(str);

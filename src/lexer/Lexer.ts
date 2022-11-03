@@ -15,6 +15,7 @@ import {
   isIdStart,
   isKeyword,
   isNewline,
+  isNilLiteral,
   isOctInt,
   isWhitespace,
   KEYWORDS,
@@ -157,6 +158,7 @@ export class Lexer {
         col,
         trivia
       );
+    } else if (isNilLiteral(value)) {
     } else {
       throw new Error(`Unknown token ${value}`);
     }

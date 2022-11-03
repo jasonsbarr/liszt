@@ -4,6 +4,7 @@ export enum TokenNames {
   String = "String",
   True = "True",
   False = "False",
+  Nil = "Nil",
   Plus = "Plus",
   Minus = "Minus",
   Times = "Times",

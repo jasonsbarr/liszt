@@ -5,4 +5,5 @@ export enum TokenTypes {
   EOF = "EOFToken",
   String = "StringToken",
   Boolean = "BooleanToken",
+  Nil = "NilToken",
 }
