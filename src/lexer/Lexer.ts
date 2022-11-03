@@ -159,6 +159,7 @@ export class Lexer {
         trivia
       );
     } else if (isNilLiteral(value)) {
+      this.tokens.addNilToken(pos, line, col, trivia);
     } else {
       throw new Error(`Unknown token ${value}`);
     }

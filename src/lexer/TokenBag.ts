@@ -88,7 +88,7 @@ export class TokenBag {
     );
   }
 
-  public addNilLiteral(pos: number, line: number, col: number, trivia: string) {
+  public addNilToken(pos: number, line: number, col: number, trivia: string) {
     this.append(
       Token.new(
         TokenTypes.Nil,
