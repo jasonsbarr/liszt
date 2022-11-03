@@ -22,3 +22,5 @@ export const isFloat = (str: string) =>
   /[0-9]*\.[0-9]+(e[\+\-][0-9]+)?/.test(str);
 
 export const isDoubleQuote = (c: string) => /"/.test(c);
+
+export const isHexChar = (c: string) => /[0-9a-zA-Z]/.test(c);

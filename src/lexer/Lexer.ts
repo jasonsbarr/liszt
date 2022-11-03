@@ -8,6 +8,7 @@ import {
   isDot,
   isDoubleQuote,
   isFloat,
+  isHexChar,
   isHexInt,
   isNewline,
   isOctInt,
@@ -100,7 +101,38 @@ export class Lexer {
     return str;
   }
 
-  private readEscapeSequence(c: string) {}
+  private readEscapeSequence(c: string) {
+    let str = "";
+    let seq = "";
+
+    if (c === "n") {
+      str += "\n";
+    } else if (c === "b") {
+      str += "\b";
+    } else if (c === "f") {
+      str += "\f";
+    } else if (c === "r") {
+      str += "\r";
+    } else if (c === "t") {
+      str += "\t";
+    } else if (c === "v") {
+      str += "\v";
+    } else if (c === "0") {
+      str += "\0";
+    } else if (c === "'") {
+      str += "'";
+    } else if (c === '"') {
+      str += '"';
+    } else if (c === "\\") {
+      str += "\\";
+    } else if (c === "u" || c === "U") {
+      // is Unicode escape sequence
+      seq += this.input.readWhile(isHexChar);
+      str += String.fromCodePoint(parseInt(seq, 16));
+    }
+
+    return str;
+  }
 
   public tokenize() {
     let trivia = "";
