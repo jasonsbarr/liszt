@@ -1,6 +1,9 @@
 import { Type } from "./Type";
 
 export const isSubtype = (t1: Type, t2: Type) => {
-  if (Type.isInteger(t1) && Type.isInteger(t2)) return true;
+  if (Type.isNumber(t1) && Type.isNumber(t2)) return true;
+  else if (Type.isString(t1) && Type.isString(t2)) return true;
+  else if (Type.isBoolean(t1) && Type.isBoolean(t2)) return true;
+  else if (Type.isNil(t1) && Type.isNil(t2)) return true;
   else return false;
 };
