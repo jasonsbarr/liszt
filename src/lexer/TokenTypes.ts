@@ -4,4 +4,5 @@ export enum TokenTypes {
   Operator = "OperatorToken",
   EOF = "EOFToken",
   String = "StringToken",
+  Boolean = "BooleanToken",
 }

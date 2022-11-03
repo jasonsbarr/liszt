@@ -2,6 +2,8 @@ export enum TokenNames {
   Integer = "Integer",
   Float = "Float",
   String = "String",
+  True = "True",
+  False = "False",
   Plus = "Plus",
   Minus = "Minus",
   Times = "Times",
