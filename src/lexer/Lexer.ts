@@ -6,6 +6,7 @@ import {
   isDecimalInt,
   isDigit,
   isDot,
+  isDoubleQuote,
   isFloat,
   isHexInt,
   isNewline,
@@ -33,7 +34,7 @@ export class Lexer {
     return new Lexer(input, fileName);
   }
 
-  private readNumber(trivia = "") {
+  private readNumber(trivia: string) {
     let { pos, line, col } = this.input;
     let numberString = this.input.readWhile(isAlphaNumeric);
 
@@ -70,6 +71,37 @@ export class Lexer {
     return this.input.readWhile(isWhitespace);
   }
 
+  private readString(trivia: string) {
+    const value = this.readEscaped();
+  }
+
+  private readEscaped() {
+    let escaped = false;
+    let str = this.input.next(); // get opening quotation mark
+
+    while (!this.input.eof()) {
+      let ch = this.input.next();
+
+      if (escaped) {
+        str += this.readEscapeSequence(ch);
+        escaped = false;
+      } else if (ch === "\\") {
+        escaped = true;
+      } else if (isDoubleQuote(ch)) {
+        str += this.input.next();
+        break;
+      } else if (isNewline(ch)) {
+        throw new Error("Unexpected EOL in string literal");
+      } else {
+        str += ch;
+      }
+    }
+
+    return str;
+  }
+
+  private readEscapeSequence(c: string) {}
+
   public tokenize() {
     let trivia = "";
 
@@ -87,6 +119,9 @@ export class Lexer {
         trivia = "";
       } else if (isDot(char)) {
         this.readNumber(trivia);
+        trivia = "";
+      } else if (isDoubleQuote(char)) {
+        this.readString(trivia);
         trivia = "";
       } else {
         throw new Error(
