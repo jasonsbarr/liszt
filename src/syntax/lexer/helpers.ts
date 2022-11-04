@@ -31,16 +31,6 @@ export const isIdStart = (c: string) => /\p{L}_\$/u.test(c);
 
 export const isIdChar = (c: string) => /[\p{L}\p{N}_\$]/u.test(c);
 
-export const KEYWORDS = {
-  true: TokenNames.True,
-  false: TokenNames.False,
-  nil: TokenNames.Nil,
-  NaN: TokenNames.NaN,
-  Infinity: TokenNames.Infinity,
-};
-
-export type kw = keyof typeof KEYWORDS;
-
 export const isKeyword = (str: string) => str in KEYWORDS;
 
 export const isBooleanLiteral = (str: string) => /true|false/.test(str);
@@ -54,6 +44,16 @@ export const isInfinity = (str: string) => /Infinity/.test(str);
 export const isOpChar = (c: string) => /[=]/.test(c);
 
 export const isPunc = (c: string) => /[:\{\}\.]/.test(c);
+
+export const KEYWORDS = {
+  true: TokenNames.True,
+  false: TokenNames.False,
+  nil: TokenNames.Nil,
+  NaN: TokenNames.NaN,
+  Infinity: TokenNames.Infinity,
+};
+
+export type kw = keyof typeof KEYWORDS;
 
 export const OPERATORS = { "=": TokenNames.Equals };
 
