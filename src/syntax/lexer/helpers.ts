@@ -50,3 +50,20 @@ export const isNilLiteral = (str: string) => /nil/.test(str);
 export const isNanValue = (str: string) => /NaN/.test(str);
 
 export const isInfinity = (str: string) => /Infinity/.test(str);
+
+export const isOpChar = (c: string) => /[=]/.test(c);
+
+export const isPunc = (c: string) => /[:\{\}\.]/.test(c);
+
+export const OPERATORS = { "=": TokenNames.Equals };
+
+export type ops = keyof typeof OPERATORS;
+
+export const PUNC = {
+  ":": TokenNames.Colon,
+  "{": TokenNames.LBracket,
+  "}": TokenNames.RBracket,
+  ".": TokenNames.Dot,
+};
+
+export type punc = keyof typeof PUNC;

@@ -12,5 +12,10 @@ export enum TokenNames {
   Times = "Times",
   Div = "Div",
   Mod = "Mod",
+  LBracket = "LBracket",
+  RBracket = "RBracket",
+  Colon = "Colon",
+  Dot = "Dot",
+  Equals = "Equals",
   EOF = "EOF",
 }
