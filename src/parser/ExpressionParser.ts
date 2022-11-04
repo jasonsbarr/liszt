@@ -1,4 +1,5 @@
 import { LexResult } from "../lexer/LexResult";
+import { TokenNames } from "../lexer/TokenNames";
 import { TokenTypes } from "../lexer/TokenTypes";
 import { ASTNode } from "./ast/ASTNode";
 import { BooleanLiteral } from "./ast/BooleanLiteral";
@@ -9,10 +10,14 @@ import { StringLiteral } from "./ast/StringLiteral";
 import { LHVParser } from "./LHVParser";
 
 const nudAttributes = {
-  Integer: { prec: 0, assoc: "none" },
-  String: { prec: 0, assoc: "none" },
-  Boolean: { prec: 0, assoc: "none" },
-  Nil: { prec: 0, assoc: "none" },
+  [TokenNames.Integer]: { prec: 0, assoc: "none" },
+  [TokenNames.Float]: { prec: 0, assoc: "none" },
+  [TokenNames.NaN]: { prec: 0, assoc: "none" },
+  [TokenNames.Infinity]: { prec: 0, assoc: "none" },
+  [TokenNames.String]: { prec: 0, assoc: "none" },
+  [TokenNames.True]: { prec: 0, assoc: "none" },
+  [TokenNames.False]: { prec: 0, assoc: "none" },
+  [TokenNames.Nil]: { prec: 0, assoc: "none" },
 };
 
 const ledAttributes = {};
