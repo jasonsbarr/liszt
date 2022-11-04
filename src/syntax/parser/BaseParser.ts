@@ -1,4 +1,4 @@
-import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
+import { DiagnosticBag } from "../../diagnostics/DiagnosticBag";
 import { LexResult } from "../lexer/LexResult";
 import { Reader } from "./Reader";
 
