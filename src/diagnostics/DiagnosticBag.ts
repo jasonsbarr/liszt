@@ -33,6 +33,10 @@ export class DiagnosticBag {
     return db;
   }
 
+  public any() {
+    return this._diagnostics.length > 0;
+  }
+
   private append(diagnostic: Diagnostic) {
     this._diagnostics.push(diagnostic);
     this.length++;
