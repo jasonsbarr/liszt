@@ -5,11 +5,9 @@ import { TokenTypes } from "./TokenTypes";
 
 export class TokenBag {
   private _tokens: Token[];
-  public length: number;
 
   constructor() {
     this._tokens = [];
-    this.length = 0;
   }
 
   public static new() {
@@ -18,7 +16,6 @@ export class TokenBag {
 
   private append(token: Token) {
     this._tokens.push(token);
-    this.length++;
   }
 
   public addBooleanToken(
@@ -120,6 +117,10 @@ export class TokenBag {
 
   public get(i: number) {
     return this._tokens[i];
+  }
+
+  public get length() {
+    return this._tokens.length;
   }
 
   public get tokens() {
