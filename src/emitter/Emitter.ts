@@ -1,4 +1,4 @@
-import { ASTNode } from "../parser/ast/ASTNode";
+import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { BoundBooleanLiteral } from "../typechecker/tree/BoundBooleanLiteral";
 import { BoundFloatLiteral } from "../typechecker/tree/BoundFloatLiteral";
 import { BoundIntegerLiteral } from "../typechecker/tree/BoundIntegerLiteral";

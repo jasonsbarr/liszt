@@ -1,5 +1,5 @@
-import { SrcLoc } from "../../lexer/SrcLoc";
-import { ProgramNode } from "../../parser/ast/ProgramNode";
+import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { ProgramNode } from "../../syntax/parser/ast/ProgramNode";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundProgramNode extends ProgramNode {

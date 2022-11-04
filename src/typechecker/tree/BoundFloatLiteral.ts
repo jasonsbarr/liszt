@@ -1,6 +1,6 @@
-import { SrcLoc } from "../../lexer/SrcLoc";
-import { Token } from "../../lexer/Token";
-import { FloatLiteral } from "../../parser/ast/FloatLiteral";
+import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { Token } from "../../syntax/lexer/Token";
+import { FloatLiteral } from "../../syntax/parser/ast/FloatLiteral";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundFloatLiteral extends FloatLiteral {

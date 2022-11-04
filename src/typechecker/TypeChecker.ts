@@ -1,22 +1,22 @@
-import { SyntaxTree } from "../parser/ast/SyntaxTree";
-import { SyntaxNodes } from "../parser/ast/SyntaxNodes";
-import { ASTNode } from "../parser/ast/ASTNode";
-import { ProgramNode } from "../parser/ast/ProgramNode";
-import { IntegerLiteral } from "../parser/ast/IntegerLiteral";
+import { SyntaxTree } from "../syntax/parser/ast/SyntaxTree";
+import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { ASTNode } from "../syntax/parser/ast/ASTNode";
+import { ProgramNode } from "../syntax/parser/ast/ProgramNode";
+import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
 import { BoundProgramNode } from "./tree/BoundProgramNode";
 import { synth } from "./synth";
 import { check } from "./check";
 import { BoundIntegerLiteral } from "./tree/BoundIntegerLiteral";
 import { BoundTree } from "./tree/BoundTree";
 import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
-import { FloatLiteral } from "../parser/ast/FloatLiteral";
+import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
 import { BoundFloatLiteral } from "./tree/BoundFloatLiteral";
-import { StringLiteral } from "../parser/ast/StringLiteral";
-import { PrimitiveNode } from "../parser/ast/PrimitiveNode";
+import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
+import { PrimitiveNode } from "../syntax/parser/ast/PrimitiveNode";
 import { BoundStringLiteral } from "./tree/BoundStringLiteral";
-import { BooleanLiteral } from "../parser/ast/BooleanLiteral";
+import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { BoundBooleanLiteral } from "./tree/BoundBooleanLiteral";
-import { NilLiteral } from "../parser/ast/NilLiteral";
+import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
 import { BoundNilLiteral } from "./tree/BoundNilLiteral";
 
 export class TypeChecker {

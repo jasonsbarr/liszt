@@ -1,6 +1,6 @@
 import { Type } from "./Type";
-import { SyntaxNodes } from "../parser/ast/SyntaxNodes";
-import { ASTNode } from "../parser/ast/ASTNode";
+import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { ASTNode } from "../syntax/parser/ast/ASTNode";
 
 export const synth = (ast: ASTNode) => {
   switch (ast.kind) {

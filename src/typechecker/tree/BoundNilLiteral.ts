@@ -1,6 +1,6 @@
-import { SrcLoc } from "../../lexer/SrcLoc";
-import { Token } from "../../lexer/Token";
-import { NilLiteral } from "../../parser/ast/NilLiteral";
+import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { Token } from "../../syntax/lexer/Token";
+import { NilLiteral } from "../../syntax/parser/ast/NilLiteral";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundNilLiteral extends NilLiteral {

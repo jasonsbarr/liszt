@@ -1,6 +1,6 @@
-import { SrcLoc } from "../../lexer/SrcLoc";
-import { Token } from "../../lexer/Token";
-import { StringLiteral } from "../../parser/ast/StringLiteral";
+import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { Token } from "../../syntax/lexer/Token";
+import { StringLiteral } from "../../syntax/parser/ast/StringLiteral";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundStringLiteral extends StringLiteral {

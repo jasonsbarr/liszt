@@ -1,4 +1,4 @@
-import { SrcLoc } from "../lexer/SrcLoc";
+import { SrcLoc } from "../syntax/lexer/SrcLoc";
 
 export class TextSpan {
   constructor(public text: string, public location: SrcLoc) {}

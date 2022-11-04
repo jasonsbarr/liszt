@@ -1,4 +1,4 @@
-import { ASTNode } from "../parser/ast/ASTNode";
+import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { isSubtype } from "./isSubtype";
 import { synth } from "./synth";
 import { Type } from "./Type";

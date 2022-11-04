@@ -1,6 +1,6 @@
-import { SrcLoc } from "../../lexer/SrcLoc";
-import { Token } from "../../lexer/Token";
-import { IntegerLiteral } from "../../parser/ast/IntegerLiteral";
+import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { Token } from "../../syntax/lexer/Token";
+import { IntegerLiteral } from "../../syntax/parser/ast/IntegerLiteral";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundIntegerLiteral extends IntegerLiteral {

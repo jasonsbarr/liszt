@@ -1,6 +1,6 @@
-import { SrcLoc } from "../../lexer/SrcLoc";
-import { Token } from "../../lexer/Token";
-import { BooleanLiteral } from "../../parser/ast/BooleanLiteral";
+import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { Token } from "../../syntax/lexer/Token";
+import { BooleanLiteral } from "../../syntax/parser/ast/BooleanLiteral";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundBooleanLiteral extends BooleanLiteral {

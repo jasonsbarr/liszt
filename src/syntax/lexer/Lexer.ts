@@ -1,4 +1,4 @@
-import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
+import { DiagnosticBag } from "../../diagnostics/DiagnosticBag";
 import {
   isAlphaNumeric,
   isBinInt,

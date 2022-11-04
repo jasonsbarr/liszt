@@ -1,5 +1,5 @@
 import { TypeChecker } from "./TypeChecker";
-import { SyntaxTree } from "../parser/ast/SyntaxTree";
+import { SyntaxTree } from "../syntax/parser/ast/SyntaxTree";
 
 export const checktypes = (tree: SyntaxTree) => {
   const checker = TypeChecker.new(tree);

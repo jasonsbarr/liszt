@@ -1,6 +1,6 @@
 import { DiagnosticBag } from "../../diagnostics/DiagnosticBag";
-import { TokenBag } from "../../lexer/TokenBag";
-import { SyntaxTree } from "../../parser/ast/SyntaxTree";
+import { TokenBag } from "../../syntax/lexer/TokenBag";
+import { SyntaxTree } from "../../syntax/parser/ast/SyntaxTree";
 import { BoundProgramNode } from "./BoundProgramNode";
 
 export class BoundTree extends SyntaxTree {
