@@ -14,6 +14,14 @@ export class TokenBag {
     return new TokenBag();
   }
 
+  public get length() {
+    return this._tokens.length;
+  }
+
+  public get tokens() {
+    return this._tokens;
+  }
+
   private append(token: Token) {
     this._tokens.push(token);
   }
@@ -117,13 +125,5 @@ export class TokenBag {
 
   public get(i: number) {
     return this._tokens[i];
-  }
-
-  public get length() {
-    return this._tokens.length;
-  }
-
-  public get tokens() {
-    return this._tokens;
   }
 }
