@@ -36,7 +36,7 @@ export class DiagnosticBag {
   }
 
   public any() {
-    return this._diagnostics.length > 0;
+    return this.length > 0;
   }
 
   private append(diagnostic: Diagnostic) {
