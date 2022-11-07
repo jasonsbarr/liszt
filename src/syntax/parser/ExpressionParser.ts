@@ -31,19 +31,27 @@ export abstract class ExpressionParser extends LHVParser {
   }
 
   private parseAtom(): ASTNode {
-    const token = this.reader.next();
+    const token = this.reader.peek();
     switch (token.type) {
       case TokenTypes.Integer:
+        this.reader.skip(TokenNames.Integer);
         return IntegerLiteral.new(token, token.location);
       case TokenTypes.Float:
+        this.reader.skip(TokenNames.Float);
         return FloatLiteral.new(token, token.location);
       case TokenTypes.String:
+        this.reader.skip(TokenNames.String);
         return StringLiteral.new(token, token.location);
       case TokenTypes.Boolean:
+        this.reader.skip(
+          token.name === TokenNames.True ? TokenNames.True : TokenNames.False
+        );
         return BooleanLiteral.new(token, token.location);
       case TokenTypes.Nil:
+        this.reader.skip(TokenNames.Nil);
         return NilLiteral.new(token, token.location);
       case TokenTypes.Identifier:
+        this.reader.skip(TokenNames.Identifier);
         return Identifier.new(token, token.location);
       default: {
         switch (token.name) {
