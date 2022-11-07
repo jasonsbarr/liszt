@@ -75,7 +75,7 @@ export class TokenBag {
     );
   }
 
-  public addIdentiferToken(
+  public addIdentifierToken(
     value: string,
     pos: number,
     line: number,
