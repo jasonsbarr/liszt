@@ -50,6 +50,10 @@ export const KEYWORDS = {
   NaN: TokenNames.NaN,
   Infinity: TokenNames.Infinity,
   as: TokenNames.As,
+  integer: TokenNames.IntegerKeyword,
+  float: TokenNames.FloatKeyword,
+  boolean: TokenNames.BooleanKeyword,
+  string: TokenNames.StringKeyword,
 };
 
 export type kw = keyof typeof KEYWORDS;

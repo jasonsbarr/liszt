@@ -26,6 +26,5 @@ export enum TokenNames {
   IntegerKeyword = "IntegerKeyword",
   FloatKeyword = "FloatKeyword",
   BooleanKeyword = "BooleanKeyword",
-  NilKeyword = "NilKeyword",
   EOF = "EOF",
 }
