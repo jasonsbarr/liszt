@@ -1,5 +1,5 @@
-# Liszt Precursor
+# Nyx Precursor
 
-Repo for trying out the code I will eventually write on camera for the Liszt Programming Language
+Repo for trying out the code I will eventually write on camera for the Nyx Programming Language
 
 Written with TypeScript v4.8.4.
