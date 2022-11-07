@@ -91,7 +91,7 @@ export abstract class ExpressionParser extends LHVParser {
       properties.push(ObjectProperty.new(key, value, st, en.location));
 
       // note that this will allow trailing commas on object literals
-      if (en.name !== TokenNames.LBrace) {
+      if (this.reader.peek().name !== TokenNames.RBrace) {
         this.reader.skip(TokenNames.Comma);
       }
     }
