@@ -23,6 +23,8 @@ import {
   isWhitespace,
   KEYWORDS,
   kw,
+  punc,
+  PUNC,
 } from "./helpers";
 import { Input } from "./Input";
 import { LexResult } from "./LexResult";
@@ -206,6 +208,7 @@ export class Lexer {
         trivia = "";
       } else if (isPunc(char)) {
         this.tokens.addPuncToken(
+          PUNC[char as punc],
           char,
           this.input.pos,
           this.input.line,

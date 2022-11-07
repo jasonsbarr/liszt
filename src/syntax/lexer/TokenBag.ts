@@ -143,6 +143,7 @@ export class TokenBag {
   }
 
   public addPuncToken(
+    name: TokenNames,
     value: string,
     pos: number,
     line: number,
@@ -152,7 +153,7 @@ export class TokenBag {
     this.append(
       Token.new(
         TokenTypes.Punctuation,
-        TokenNames.LParen,
+        name,
         value,
         SrcLoc.new(pos, line, col),
         trivia
