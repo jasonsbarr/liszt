@@ -1,20 +1,16 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { Token } from "../../syntax/lexer/Token";
 import { Type } from "../Type";
-import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
+import { BoundPrimitiveNode } from "./BoundPrimitiveNode";
 
-export class BoundFloatLiteral extends BoundASTNode {
+export class BoundFloatLiteral extends BoundPrimitiveNode {
   public type = Type.float;
-  constructor(public token: Token, start: SrcLoc) {
-    super(BoundNodes.BoundFloatLiteral, start);
+  constructor(token: Token, start: SrcLoc) {
+    super(BoundNodes.BoundFloatLiteral, token, start);
   }
 
   public static new(token: Token, start: SrcLoc) {
     return new BoundFloatLiteral(token, start);
-  }
-
-  public toString() {
-    return `BoundFloatLiteral ${this.token.value}`;
   }
 }

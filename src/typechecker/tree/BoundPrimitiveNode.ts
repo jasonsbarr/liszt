@@ -15,4 +15,12 @@ export class BoundPrimitiveNode extends BoundASTNode {
       )
     );
   }
+
+  public get children() {
+    return [] as BoundASTNode[];
+  }
+
+  public toString() {
+    return `${this.kind}: ${this.token.value}`;
+  }
 }

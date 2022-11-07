@@ -7,4 +7,8 @@ export abstract class BoundASTNode {
     public start: SrcLoc,
     public end?: SrcLoc
   ) {}
+
+  public abstract get children(): BoundASTNode[];
+
+  public abstract toString(): string;
 }

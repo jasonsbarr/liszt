@@ -14,6 +14,10 @@ export class BoundObjectProperty extends ObjectProperty {
     super(key, value, start, end);
   }
 
+  new(key: ASTNode, value: ASTNode, start: SrcLoc, end: SrcLoc, type: Type) {
+    return new BoundObjectProperty(key, value, start, end, type);
+  }
+
   public toString() {
     return "BoundObjectProperty";
   }
