@@ -5,6 +5,7 @@ export enum SyntaxNodes {
   StringLiteral = "StringLiteral",
   BooleanLiteral = "BooleanLiteral",
   NilLiteral = "NilLiteral",
+  Identifier = "Identifier",
   ParenthesizedExpression = "ParenthesizedExpression",
   ObjectLiteral = "ObjectLiteral",
   ObjectProperty = "ObjectProperty",

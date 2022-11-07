@@ -5,6 +5,7 @@ import { TokenTypes } from "../lexer/TokenTypes";
 import { ASTNode } from "./ast/ASTNode";
 import { BooleanLiteral } from "./ast/BooleanLiteral";
 import { FloatLiteral } from "./ast/FloatLiteral";
+import { Identifier } from "./ast/Identifier";
 import { IntegerLiteral } from "./ast/IntegerLiteral";
 import { NilLiteral } from "./ast/NilLiteral";
 import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
@@ -42,10 +43,14 @@ export abstract class ExpressionParser extends LHVParser {
         return BooleanLiteral.new(token, token.location);
       case TokenTypes.Nil:
         return NilLiteral.new(token, token.location);
+      case TokenTypes.Identifier:
+        return Identifier.new(token, token.location);
       default: {
         switch (token.name) {
           case TokenNames.LParen:
             return this.parseParenthesizedExpression();
+          // case TokenNames.LBrace:
+          //   return this.parseObjectLiteral();
           default:
             throw new Error(
               `Unrecognized token (type: ${token.type}, name: ${token.name})`
@@ -62,6 +67,8 @@ export abstract class ExpressionParser extends LHVParser {
   protected parseExpression() {
     return this.parseExpr();
   }
+
+  private parseObjectLiteral() {}
 
   private parseParenthesizedExpression() {
     const start = this.reader.peek();
