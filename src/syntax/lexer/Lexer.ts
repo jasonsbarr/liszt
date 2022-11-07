@@ -19,6 +19,7 @@ import {
   isNewline,
   isNilLiteral,
   isOctInt,
+  isPunc,
   isWhitespace,
   KEYWORDS,
   kw,
@@ -194,6 +195,14 @@ export class Lexer {
       } else if (isIdStart(char)) {
         this.readIdentifier(trivia);
         trivia = "";
+      } else if (isPunc(char)) {
+        this.tokens.addPuncToken(
+          char,
+          this.input.pos,
+          this.input.line,
+          this.input.col,
+          trivia
+        );
       } else {
         throw new Error(
           `Unrecognized character ${char} (${this.input.col}:${this.input.line})`

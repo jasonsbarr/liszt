@@ -60,6 +60,8 @@ export type ops = keyof typeof OPERATORS;
 
 export const PUNC = {
   ":": TokenNames.Colon,
+  "(": TokenNames.LParen,
+  ")": TokenNames.RParen,
   "{": TokenNames.LBrace,
   "}": TokenNames.RBrace,
   ".": TokenNames.Dot,

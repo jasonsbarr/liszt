@@ -13,6 +13,8 @@ export enum TokenNames {
   Times = "Times",
   Div = "Div",
   Mod = "Mod",
+  LParen = "LParen",
+  RParen = "RParen",
   LBrace = "LBracket",
   RBrace = "RBracket",
   Colon = "Colon",

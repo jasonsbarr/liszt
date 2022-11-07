@@ -123,6 +123,24 @@ export class TokenBag {
     );
   }
 
+  public addPuncToken(
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.Punctuation,
+        TokenNames.LParen,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public addStringToken(
     value: string,
     pos: number,
