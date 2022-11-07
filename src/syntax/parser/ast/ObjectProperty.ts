@@ -1,10 +1,11 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { ASTNode } from "./ASTNode";
+import { Identifier } from "./Identifier";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class ObjectProperty extends ASTNode {
   constructor(
-    public key: ASTNode,
+    public key: Identifier,
     public value: ASTNode,
     start: SrcLoc,
     end: SrcLoc
@@ -12,7 +13,12 @@ export class ObjectProperty extends ASTNode {
     super(SyntaxNodes.ObjectProperty, start, end);
   }
 
-  public static new(key: ASTNode, value: ASTNode, start: SrcLoc, end: SrcLoc) {
+  public static new(
+    key: Identifier,
+    value: ASTNode,
+    start: SrcLoc,
+    end: SrcLoc
+  ) {
     return new ObjectProperty(key, value, start, end);
   }
 

@@ -14,7 +14,7 @@ export class BoundObjectProperty extends BoundASTNode {
     super(BoundNodes.BoundObjectProperty, start, end);
   }
 
-  new(
+  public static new(
     key: BoundASTNode,
     value: BoundASTNode,
     start: SrcLoc,

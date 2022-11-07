@@ -88,7 +88,9 @@ export abstract class ExpressionParser extends LHVParser {
       this.reader.skip(TokenNames.Colon);
       const value = this.parseExpr();
       const en = this.reader.peek();
-      properties.push(ObjectProperty.new(key, value, st, en.location));
+      properties.push(
+        ObjectProperty.new(key as Identifier, value, st, en.location)
+      );
 
       // note that this will allow trailing commas on object literals
       if (this.reader.peek().name !== TokenNames.RBrace) {
