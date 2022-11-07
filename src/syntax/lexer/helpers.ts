@@ -43,14 +43,13 @@ export const isInfinity = (str: string) => /Infinity/.test(str);
 
 export const isOpChar = (c: string) => /[=]/.test(c);
 
-export const isPunc = (c: string) => /[:\{\}\.]/.test(c);
-
 export const KEYWORDS = {
   true: TokenNames.True,
   false: TokenNames.False,
   nil: TokenNames.Nil,
   NaN: TokenNames.NaN,
   Infinity: TokenNames.Infinity,
+  as: TokenNames.As,
 };
 
 export type kw = keyof typeof KEYWORDS;
@@ -67,3 +66,5 @@ export const PUNC = {
 };
 
 export type punc = keyof typeof PUNC;
+
+export const isPunc = (c: string) => Object.keys(PUNC).includes(c);
