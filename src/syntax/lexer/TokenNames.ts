@@ -18,4 +18,5 @@ export enum TokenNames {
   Dot = "Dot",
   Equals = "Equals",
   EOF = "EOF",
+  As = "As",
 }
