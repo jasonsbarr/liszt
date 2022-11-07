@@ -1,4 +1,4 @@
-type Property = {
+export type Property = {
   name: string;
   type: Type;
 };
