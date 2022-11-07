@@ -1,21 +1,31 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
-import { ASTNode } from "../../syntax/parser/ast/ASTNode";
-import { ObjectProperty } from "../../syntax/parser/ast/ObjectProperty";
 import { Type } from "../Type";
+import { BoundASTNode } from "./BoundASTNode";
+import { BoundNodes } from "./BoundNodes";
 
-export class BoundObjectProperty extends ObjectProperty {
+export class BoundObjectProperty extends BoundASTNode {
   constructor(
-    key: ASTNode,
-    value: ASTNode,
+    public key: BoundASTNode,
+    public value: BoundASTNode,
     start: SrcLoc,
     end: SrcLoc,
     public type: Type
   ) {
-    super(key, value, start, end);
+    super(BoundNodes.BoundObjectProperty, start, end);
   }
 
-  new(key: ASTNode, value: ASTNode, start: SrcLoc, end: SrcLoc, type: Type) {
+  new(
+    key: BoundASTNode,
+    value: BoundASTNode,
+    start: SrcLoc,
+    end: SrcLoc,
+    type: Type
+  ) {
     return new BoundObjectProperty(key, value, start, end, type);
+  }
+
+  public get children() {
+    return [this.key, this.value];
   }
 
   public toString() {

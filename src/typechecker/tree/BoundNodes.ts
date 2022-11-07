@@ -5,4 +5,6 @@ export enum BoundNodes {
   BoundStringLiteral = "BoundStringLiteral",
   BoundBooleanLiteral = "BoundBooleanLiteral",
   BoundNilLiteral = "BoundNilLiteral",
+  BoundObjectProperty = "BoundObjectProperty",
+  BoundObjectLiteral = "BoundObjectLiteral",
 }
