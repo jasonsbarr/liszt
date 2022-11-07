@@ -75,6 +75,24 @@ export class TokenBag {
     );
   }
 
+  public addIdentiferToken(
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.Identifier,
+        TokenNames.Identifier,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public addIntegerToken(
     value: string,
     pos: number,

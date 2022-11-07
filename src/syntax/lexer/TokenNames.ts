@@ -7,6 +7,7 @@ export enum TokenNames {
   Nil = "Nil",
   NaN = "NaN",
   Infinity = "Infinity",
+  Identifier = "Identifier",
   Plus = "Plus",
   Minus = "Minus",
   Times = "Times",
@@ -17,6 +18,6 @@ export enum TokenNames {
   Colon = "Colon",
   Dot = "Dot",
   Equals = "Equals",
-  EOF = "EOF",
   As = "As",
+  EOF = "EOF",
 }
