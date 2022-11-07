@@ -1,4 +1,5 @@
 import { LexResult } from "../lexer/LexResult";
+import { SrcLoc } from "../lexer/SrcLoc";
 import { TokenNames } from "../lexer/TokenNames";
 import { TokenTypes } from "../lexer/TokenTypes";
 import { ASTNode } from "./ast/ASTNode";
@@ -6,6 +7,7 @@ import { BooleanLiteral } from "./ast/BooleanLiteral";
 import { FloatLiteral } from "./ast/FloatLiteral";
 import { IntegerLiteral } from "./ast/IntegerLiteral";
 import { NilLiteral } from "./ast/NilLiteral";
+import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
 import { StringLiteral } from "./ast/StringLiteral";
 import { LHVParser } from "./LHVParser";
 
@@ -40,8 +42,16 @@ export abstract class ExpressionParser extends LHVParser {
         return BooleanLiteral.new(token, token.location);
       case TokenTypes.Nil:
         return NilLiteral.new(token, token.location);
-      default:
-        throw new Error(`Unknown token kind ${token.name}`);
+      default: {
+        switch (token.name) {
+          case TokenNames.LParen:
+            return this.parseParenthesizedExpression();
+          default:
+            throw new Error(
+              `Unrecognized token (type: ${token.type}, name: ${token.name})`
+            );
+        }
+      }
     }
   }
 
@@ -51,5 +61,12 @@ export abstract class ExpressionParser extends LHVParser {
 
   protected parseExpression() {
     return this.parseExpr();
+  }
+
+  private parseParenthesizedExpression() {
+    const start = this.reader.peek();
+    const expr = this.parseExpression();
+    const end = this.reader.next();
+    return ParenthesizedExpression.new(expr, start.location, end.location);
   }
 }
