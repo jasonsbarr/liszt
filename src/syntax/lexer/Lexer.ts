@@ -212,6 +212,7 @@ export class Lexer {
           this.input.col,
           trivia
         );
+        this.input.next();
       } else {
         throw new Error(
           `Unrecognized character ${char} (${this.input.col}:${this.input.line})`

@@ -27,7 +27,7 @@ export const isDoubleQuote = (c: string) => /"/.test(c);
 
 export const isHexChar = (c: string) => /[0-9a-zA-Z]/.test(c);
 
-export const isIdStart = (c: string) => /\p{L}_\$/u.test(c);
+export const isIdStart = (c: string) => /[\p{L}_\$]/u.test(c);
 
 export const isIdChar = (c: string) => /[\p{L}\p{N}_\$]/u.test(c);
 
