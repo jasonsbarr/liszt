@@ -17,7 +17,7 @@ export class ObjectProperty extends ASTNode {
   }
 
   public get children(): ASTNode[] {
-    return [this.key, this.value];
+    return [];
   }
 
   public toString() {
