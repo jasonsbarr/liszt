@@ -14,4 +14,8 @@ export class BoundFloatLiteral extends FloatLiteral {
   public static new(token: Token, start: SrcLoc) {
     return new BoundFloatLiteral(token, start);
   }
+
+  public toString() {
+    return `BoundFloatLiteral ${this.token.value}`;
+  }
 }

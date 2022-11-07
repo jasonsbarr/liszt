@@ -14,4 +14,8 @@ export class BoundNilLiteral extends NilLiteral {
   public static new(token: Token, start: SrcLoc) {
     return new BoundNilLiteral(token, start);
   }
+
+  public toString() {
+    return "BoundNilLiteral";
+  }
 }

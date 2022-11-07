@@ -14,4 +14,8 @@ export class BoundIntegerLiteral extends IntegerLiteral {
   public static new(token: Token, start: SrcLoc) {
     return new BoundIntegerLiteral(token, start);
   }
+
+  public toString() {
+    return `BoundIntegerLiteral ${this.token.value}`;
+  }
 }

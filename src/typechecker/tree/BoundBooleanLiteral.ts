@@ -14,4 +14,8 @@ export class BoundBooleanLiteral extends BooleanLiteral {
   public static new(token: Token, start: SrcLoc) {
     return new BoundBooleanLiteral(token, start);
   }
+
+  public toString() {
+    return `BoundBooleanLiteral ${this.token.value}`;
+  }
 }

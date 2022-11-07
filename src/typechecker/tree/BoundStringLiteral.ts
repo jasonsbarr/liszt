@@ -14,4 +14,8 @@ export class BoundStringLiteral extends StringLiteral {
   public static new(token: Token, start: SrcLoc) {
     return new BoundStringLiteral(token, start);
   }
+
+  public toString() {
+    return `BoundStringLiteral ${this.token.value}`;
+  }
 }
