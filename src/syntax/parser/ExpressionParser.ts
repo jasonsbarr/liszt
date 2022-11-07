@@ -79,7 +79,7 @@ export abstract class ExpressionParser extends LHVParser {
   private parseObjectLiteral() {}
 
   private parseParenthesizedExpression() {
-    const start = this.reader.peek();
+    const start = this.reader.next();
     const expr = this.parseExpression();
     const end = this.reader.next();
     return ParenthesizedExpression.new(expr, start.location, end.location);
