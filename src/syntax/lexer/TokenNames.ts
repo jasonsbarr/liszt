@@ -22,5 +22,10 @@ export enum TokenNames {
   Comma = "Comma",
   Equals = "Equals",
   As = "As",
+  StringKeyword = "StringKeyword",
+  IntegerKeyword = "IntegerKeyword",
+  FloatKeyword = "FloatKeyword",
+  BooleanKeyword = "BooleanKeyword",
+  NilKeyword = "NilKeyword",
   EOF = "EOF",
 }
