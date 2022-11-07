@@ -111,6 +111,25 @@ export class TokenBag {
     );
   }
 
+  public addKeywordToken(
+    name: TokenNames,
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.Keyword,
+        name,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public addNilToken(pos: number, line: number, col: number, trivia: string) {
     this.append(
       Token.new(
