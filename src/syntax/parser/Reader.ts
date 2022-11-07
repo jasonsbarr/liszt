@@ -1,4 +1,5 @@
 import { TokenBag } from "../lexer/TokenBag";
+import { TokenNames } from "../lexer/TokenNames";
 import { TokenTypes } from "../lexer/TokenTypes";
 
 export class Reader {
@@ -30,5 +31,15 @@ export class Reader {
 
   public peek() {
     return this._tokens.get(this.pos);
+  }
+
+  public skip(tokenName: TokenNames) {
+    const token = this.peek();
+
+    if (token.name !== tokenName) {
+      throw new Error(`Expected ${tokenName}, got ${token.name}`);
+    }
+
+    this.pos++;
   }
 }
