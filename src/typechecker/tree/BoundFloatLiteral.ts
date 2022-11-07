@@ -1,14 +1,13 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { Token } from "../../syntax/lexer/Token";
-import { FloatLiteral } from "../../syntax/parser/ast/FloatLiteral";
 import { Type } from "../Type";
+import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
 
-export class BoundFloatLiteral extends FloatLiteral {
+export class BoundFloatLiteral extends BoundASTNode {
   public type = Type.float;
-  constructor(token: Token, start: SrcLoc) {
-    super(token, start);
-    this.kind = BoundNodes.BoundFloatLiteral;
+  constructor(public token: Token, start: SrcLoc) {
+    super(BoundNodes.BoundFloatLiteral, start);
   }
 
   public static new(token: Token, start: SrcLoc) {

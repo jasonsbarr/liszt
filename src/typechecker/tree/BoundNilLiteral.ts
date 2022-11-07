@@ -1,14 +1,13 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { Token } from "../../syntax/lexer/Token";
-import { NilLiteral } from "../../syntax/parser/ast/NilLiteral";
 import { Type } from "../Type";
 import { BoundNodes } from "./BoundNodes";
+import { BoundPrimitiveNode } from "./BoundPrimitiveNode";
 
-export class BoundNilLiteral extends NilLiteral {
+export class BoundNilLiteral extends BoundPrimitiveNode {
   public type = Type.nil;
   constructor(token: Token, start: SrcLoc) {
-    super(token, start);
-    this.kind = BoundNodes.BoundNilLiteral;
+    super(BoundNodes.BoundNilLiteral, token, start);
   }
 
   public static new(token: Token, start: SrcLoc) {

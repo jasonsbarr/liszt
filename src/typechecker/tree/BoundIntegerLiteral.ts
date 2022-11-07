@@ -1,14 +1,13 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { Token } from "../../syntax/lexer/Token";
-import { IntegerLiteral } from "../../syntax/parser/ast/IntegerLiteral";
 import { Type } from "../Type";
 import { BoundNodes } from "./BoundNodes";
+import { BoundPrimitiveNode } from "./BoundPrimitiveNode";
 
-export class BoundIntegerLiteral extends IntegerLiteral {
+export class BoundIntegerLiteral extends BoundPrimitiveNode {
   public type = Type.integer;
   constructor(token: Token, start: SrcLoc) {
-    super(token, start);
-    this.kind = BoundNodes.BoundIntegerLiteral;
+    super(BoundNodes.BoundIntegerLiteral, token, start);
   }
 
   public static new(token: Token, start: SrcLoc) {
