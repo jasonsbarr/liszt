@@ -8,6 +8,7 @@ import { FloatLiteral } from "./ast/FloatLiteral";
 import { Identifier } from "./ast/Identifier";
 import { IntegerLiteral } from "./ast/IntegerLiteral";
 import { NilLiteral } from "./ast/NilLiteral";
+import { ObjectLiteral } from "./ast/ObjectLiteral";
 import { ObjectProperty } from "./ast/ObjectProperty";
 import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
 import { StringLiteral } from "./ast/StringLiteral";
@@ -94,6 +95,9 @@ export abstract class ExpressionParser extends LHVParser {
         this.reader.skip(TokenNames.Comma);
       }
     }
+    const end = this.reader.next();
+
+    return ObjectLiteral.new(properties, start.location, end.location);
   }
 
   private parseParenthesizedExpression() {
