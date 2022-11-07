@@ -65,6 +65,7 @@ export const PUNC = {
   "{": TokenNames.LBrace,
   "}": TokenNames.RBrace,
   ".": TokenNames.Dot,
+  ",": TokenNames.Comma,
 };
 
 export type punc = keyof typeof PUNC;

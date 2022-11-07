@@ -19,6 +19,7 @@ export enum TokenNames {
   RBrace = "RBracket",
   Colon = "Colon",
   Dot = "Dot",
+  Comma = "Comma",
   Equals = "Equals",
   As = "As",
   EOF = "EOF",

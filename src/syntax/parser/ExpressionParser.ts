@@ -8,6 +8,7 @@ import { FloatLiteral } from "./ast/FloatLiteral";
 import { Identifier } from "./ast/Identifier";
 import { IntegerLiteral } from "./ast/IntegerLiteral";
 import { NilLiteral } from "./ast/NilLiteral";
+import { ObjectProperty } from "./ast/ObjectProperty";
 import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
 import { StringLiteral } from "./ast/StringLiteral";
 import { LHVParser } from "./LHVParser";
@@ -57,8 +58,8 @@ export abstract class ExpressionParser extends LHVParser {
         switch (token.name) {
           case TokenNames.LParen:
             return this.parseParenthesizedExpression();
-          // case TokenNames.LBrace:
-          //   return this.parseObjectLiteral();
+          case TokenNames.LBrace:
+            return this.parseObjectLiteral();
           default:
             throw new Error(
               `Unrecognized token (type: ${token.type}, name: ${token.name})`
@@ -76,7 +77,24 @@ export abstract class ExpressionParser extends LHVParser {
     return this.parseExpr();
   }
 
-  private parseObjectLiteral() {}
+  private parseObjectLiteral() {
+    const start = this.reader.next();
+    let properties: ObjectProperty[] = [];
+
+    while (this.reader.peek().name !== TokenNames.RBrace) {
+      const start = this.reader.peek().location;
+      const key = this.parseExpr();
+      this.reader.skip(TokenNames.Colon);
+      const value = this.parseExpr();
+      const endToken = this.reader.peek();
+      properties.push(ObjectProperty.new(key, value, start, endToken.location));
+
+      // note that this will allow trailing commas on object literals
+      if (endToken.name !== TokenNames.LBrace) {
+        this.reader.skip(TokenNames.Comma);
+      }
+    }
+  }
 
   private parseParenthesizedExpression() {
     const start = this.reader.next();
