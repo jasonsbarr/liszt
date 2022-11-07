@@ -1,3 +1,8 @@
+type Property = {
+  name: string;
+  type: Type;
+};
+
 export abstract class BaseType {
   constructor(public name: string, public types: BaseType[] = []) {}
 }
@@ -62,10 +67,21 @@ export class NilType extends BaseType {
   }
 }
 
+export class ObjectType extends BaseType {
+  constructor(public properties: Property[]) {
+    super("Object");
+  }
+
+  public static new(properties: Property[]) {
+    return new ObjectType(properties);
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
   | NumberType
   | StringType
   | BooleanType
-  | NilType;
+  | NilType
+  | ObjectType;
