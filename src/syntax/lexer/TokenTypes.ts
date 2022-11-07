@@ -7,4 +7,5 @@ export enum TokenTypes {
   Nil = "NilToken",
   Punctuation = "PunctuationToken",
   Operator = "OperatorToken",
+  Keyword = "KeywordToken",
 }
