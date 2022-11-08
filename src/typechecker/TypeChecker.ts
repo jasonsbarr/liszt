@@ -113,6 +113,6 @@ export class TypeChecker {
     const synthType = synth(node);
     check(node, synthType);
 
-    return bind(node);
+    return bind(node, synthType);
   }
 }

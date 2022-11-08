@@ -48,15 +48,13 @@ export const bind = (node: ASTNode, ty?: Type): BoundASTNode => {
         node as ObjectProperty
       );
     case SyntaxNodes.ObjectLiteral:
-      synthType = synth(node);
       const properties: BoundObjectProperty[] = (
         node as ObjectLiteral
       ).properties.map((prop) => bind(prop) as BoundObjectProperty);
-      return BoundObjectLiteral.new(
-        synthType,
-        properties,
-        node as ObjectLiteral
-      );
+      if (!ty) {
+        throw new Error(`No type given for binding object literal`);
+      }
+      return BoundObjectLiteral.new(ty, properties, node as ObjectLiteral);
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
   }
