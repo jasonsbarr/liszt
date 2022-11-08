@@ -20,7 +20,6 @@ import { Type } from "./Type";
 
 export const bind = (node: ASTNode, ty?: Type): BoundASTNode => {
   let key, value, synthType;
-
   switch (node.kind) {
     case SyntaxNodes.IntegerLiteral:
       return BoundIntegerLiteral.new(node as IntegerLiteral);
@@ -52,7 +51,7 @@ export const bind = (node: ASTNode, ty?: Type): BoundASTNode => {
         node as ObjectLiteral
       ).properties.map((prop) => bind(prop) as BoundObjectProperty);
       if (!ty) {
-        throw new Error(`No type given for binding object literal`);
+        ty = synth(node);
       }
       return BoundObjectLiteral.new(ty, properties, node as ObjectLiteral);
     default:
