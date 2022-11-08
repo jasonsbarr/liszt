@@ -36,7 +36,7 @@ export class Emitter {
       case BoundNodes.BoundNilLiteral:
         return this.emitNil(node as BoundNilLiteral);
       default:
-        throw new Error(`Unknown syntax node type ${node.kind}`);
+        throw new Error(`Unknown bound node type ${node.kind}`);
     }
   }
 
