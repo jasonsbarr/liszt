@@ -20,7 +20,8 @@ import { BoundNilLiteral } from "./tree/BoundNilLiteral";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { BoundObjectLiteral } from "./tree/BoundObjectLiteral";
 import { BoundObjectProperty } from "./tree/BoundObjectProperty";
-import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
+import { BoundIdentifier } from "./tree/BoundIdentifier";
+import { bind } from "./bind";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -85,40 +86,40 @@ export class TypeChecker {
 
   private checkIntegerLiteral(node: IntegerLiteral) {
     this.checkLiteral(node);
-    return BoundIntegerLiteral.new(node.token, node.start);
+    return bind(node);
   }
 
   private checkFloatLiteral(node: FloatLiteral) {
     this.checkLiteral(node);
-    return BoundFloatLiteral.new(node.token, node.start);
+    return bind(node);
   }
 
   private checkStringLiteral(node: StringLiteral) {
     this.checkLiteral(node);
-    return BoundStringLiteral.new(node.token, node.start);
+    return bind(node);
   }
 
   private checkBooleanLiteral(node: BooleanLiteral) {
     this.checkLiteral(node);
-    return BoundBooleanLiteral.new(node.token, node.start);
+    return bind(node);
   }
 
   private checkNilLiteral(node: NilLiteral) {
     this.checkLiteral(node);
-    return BoundNilLiteral.new(node.token, node.start);
+    return bind(node);
   }
 
   private checkObjectLiteral(node: ObjectLiteral) {
-    this.checkLiteral(node);
-    const properties = node.properties.map((prop) =>
-      BoundObjectProperty.new(
-        prop.key,
-        prop.value,
-        prop.start,
-        prop.end!,
-        synth(prop)
-      )
-    );
-    return BoundObjectLiteral.new(properties, node.start, node.end!);
+    const synthType = synth(node);
+    check(node, synthType);
+
+    let properties: BoundObjectProperty[] = [];
+
+    node.properties.map((prop) => {
+      const type = synth(prop.value);
+      return bind(node, type);
+    });
+
+    return bind(node);
   }
 }

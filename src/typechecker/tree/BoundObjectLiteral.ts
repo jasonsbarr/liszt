@@ -1,23 +1,24 @@
-import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { ObjectLiteral } from "../../syntax/parser/ast/ObjectLiteral";
+import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
 import { BoundObjectProperty } from "./BoundObjectProperty";
 
 export class BoundObjectLiteral extends BoundASTNode {
   constructor(
+    public type: Type,
     public properties: BoundObjectProperty[],
-    start: SrcLoc,
-    end: SrcLoc
+    node: ObjectLiteral
   ) {
-    super(BoundNodes.BoundObjectLiteral, start, end);
+    super(BoundNodes.BoundObjectLiteral, node.start, node.end);
   }
 
   public static new(
+    type: Type,
     properties: BoundObjectProperty[],
-    start: SrcLoc,
-    end: SrcLoc
+    node: ObjectLiteral
   ) {
-    return new BoundObjectLiteral(properties, start, end);
+    return new BoundObjectLiteral(type, properties, node);
   }
 
   public get children() {
