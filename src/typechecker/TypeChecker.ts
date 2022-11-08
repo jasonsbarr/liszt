@@ -113,13 +113,6 @@ export class TypeChecker {
     const synthType = synth(node);
     check(node, synthType);
 
-    let properties: BoundObjectProperty[] = [];
-
-    node.properties.map((prop) => {
-      const type = synth(prop.value);
-      return bind(node, type);
-    });
-
     return bind(node);
   }
 }
