@@ -1,17 +1,16 @@
-import { SrcLoc } from "../../syntax/lexer/SrcLoc";
-import { Token } from "../../syntax/lexer/Token";
+import { BooleanLiteral } from "../../syntax/parser/ast/BooleanLiteral";
 import { Type } from "../Type";
 import { BoundNodes } from "./BoundNodes";
 import { BoundPrimitiveNode } from "./BoundPrimitiveNode";
 
 export class BoundBooleanLiteral extends BoundPrimitiveNode {
   public type = Type.boolean;
-  constructor(public token: Token, start: SrcLoc) {
-    super(BoundNodes.BoundBooleanLiteral, token, start);
+  constructor(node: BooleanLiteral) {
+    super(BoundNodes.BoundBooleanLiteral, node.token, node.token.location);
   }
 
-  public static new(token: Token, start: SrcLoc) {
-    return new BoundBooleanLiteral(token, start);
+  public static new(node: BooleanLiteral) {
+    return new BoundBooleanLiteral(node);
   }
 
   public toString() {

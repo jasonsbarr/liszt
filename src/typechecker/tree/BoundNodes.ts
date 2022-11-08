@@ -7,4 +7,5 @@ export enum BoundNodes {
   BoundNilLiteral = "BoundNilLiteral",
   BoundObjectProperty = "BoundObjectProperty",
   BoundObjectLiteral = "BoundObjectLiteral",
+  BoundIdentifier = "BoundIdentifier",
 }

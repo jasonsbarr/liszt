@@ -12,12 +12,15 @@ import { DiagnosticBag } from "../diagnostics/DiagnosticBag";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
 import { BoundFloatLiteral } from "./tree/BoundFloatLiteral";
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
-import { PrimitiveNode } from "../syntax/parser/ast/PrimitiveNode";
 import { BoundStringLiteral } from "./tree/BoundStringLiteral";
 import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { BoundBooleanLiteral } from "./tree/BoundBooleanLiteral";
 import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
 import { BoundNilLiteral } from "./tree/BoundNilLiteral";
+import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
+import { BoundObjectLiteral } from "./tree/BoundObjectLiteral";
+import { BoundObjectProperty } from "./tree/BoundObjectProperty";
+import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -57,6 +60,8 @@ export class TypeChecker {
         return this.checkBooleanLiteral(node as BooleanLiteral);
       case SyntaxNodes.NilLiteral:
         return this.checkNilLiteral(node as NilLiteral);
+      case SyntaxNodes.ObjectLiteral:
+        return this.checkObjectLiteral(node as ObjectLiteral);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -73,33 +78,47 @@ export class TypeChecker {
     return boundProgram;
   }
 
-  private checkPrimitiveLiteral(node: PrimitiveNode) {
+  private checkLiteral(node: ASTNode) {
     const synthType = synth(node);
     check(node, synthType);
   }
 
   private checkIntegerLiteral(node: IntegerLiteral) {
-    this.checkPrimitiveLiteral(node);
+    this.checkLiteral(node);
     return BoundIntegerLiteral.new(node.token, node.start);
   }
 
   private checkFloatLiteral(node: FloatLiteral) {
-    this.checkPrimitiveLiteral(node);
+    this.checkLiteral(node);
     return BoundFloatLiteral.new(node.token, node.start);
   }
 
   private checkStringLiteral(node: StringLiteral) {
-    this.checkPrimitiveLiteral(node);
+    this.checkLiteral(node);
     return BoundStringLiteral.new(node.token, node.start);
   }
 
   private checkBooleanLiteral(node: BooleanLiteral) {
-    this.checkPrimitiveLiteral(node);
+    this.checkLiteral(node);
     return BoundBooleanLiteral.new(node.token, node.start);
   }
 
   private checkNilLiteral(node: NilLiteral) {
-    this.checkPrimitiveLiteral(node);
+    this.checkLiteral(node);
     return BoundNilLiteral.new(node.token, node.start);
+  }
+
+  private checkObjectLiteral(node: ObjectLiteral) {
+    this.checkLiteral(node);
+    const properties = node.properties.map((prop) =>
+      BoundObjectProperty.new(
+        prop.key,
+        prop.value,
+        prop.start,
+        prop.end!,
+        synth(prop)
+      )
+    );
+    return BoundObjectLiteral.new(properties, node.start, node.end!);
   }
 }
