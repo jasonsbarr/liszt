@@ -1,9 +1,11 @@
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { BoundBooleanLiteral } from "../typechecker/tree/BoundBooleanLiteral";
 import { BoundFloatLiteral } from "../typechecker/tree/BoundFloatLiteral";
+import { BoundIdentifier } from "../typechecker/tree/BoundIdentifier";
 import { BoundIntegerLiteral } from "../typechecker/tree/BoundIntegerLiteral";
 import { BoundNilLiteral } from "../typechecker/tree/BoundNilLiteral";
 import { BoundNodes } from "../typechecker/tree/BoundNodes";
+import { BoundObjectLiteral } from "../typechecker/tree/BoundObjectLiteral";
 import { BoundProgramNode } from "../typechecker/tree/BoundProgramNode";
 import { BoundStringLiteral } from "../typechecker/tree/BoundStringLiteral";
 import { BoundTree } from "../typechecker/tree/BoundTree";
@@ -35,6 +37,8 @@ export class Emitter {
         return this.emitBoolean(node as BoundBooleanLiteral);
       case BoundNodes.BoundNilLiteral:
         return this.emitNil(node as BoundNilLiteral);
+      case BoundNodes.BoundObjectLiteral:
+        return this.emitObject(node as BoundObjectLiteral);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -68,7 +72,27 @@ export class Emitter {
     return node.token.value;
   }
 
-  private emitNil(node: BoundNilLiteral) {
+  private emitNil(_node: BoundNilLiteral) {
     return "null";
+  }
+
+  private emitIdentifier(node: BoundIdentifier) {
+    return node.token.value;
+  }
+
+  private emitObject(node: BoundObjectLiteral) {
+    let code = "({";
+
+    code += node.properties
+      .map(({ key, value }) => {
+        return `${this.emitIdentifier(key as BoundIdentifier)}: ${this.emitNode(
+          value
+        )}`;
+      })
+      .join(", ");
+
+    code += "})";
+
+    return code;
   }
 }
