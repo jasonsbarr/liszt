@@ -10,4 +10,11 @@ export enum SyntaxNodes {
   ObjectLiteral = "ObjectLiteral",
   ObjectProperty = "ObjectProperty",
   MemberExpression = "MemberExpression",
+  AsExpression = "AsExpression",
+  TypeAnnotation = "TypeAnnotation",
+  IntegerKeyword = "IntegerKeyword",
+  FloatKeyword = "FloatKeyword",
+  BooleanKeyword = "BooleanKeyword",
+  StringKeyword = "StringKeyword",
+  TypeLiteral = "TypeLiteral",
 }
