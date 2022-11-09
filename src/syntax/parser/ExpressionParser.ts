@@ -1,6 +1,7 @@
 import { LexResult } from "../lexer/LexResult";
 import { TokenNames } from "../lexer/TokenNames";
 import { TokenTypes } from "../lexer/TokenTypes";
+import { AsExpression } from "./ast/AsExpression";
 import { ASTNode } from "./ast/ASTNode";
 import { BooleanLiteral } from "./ast/BooleanLiteral";
 import { FloatLiteral } from "./ast/FloatLiteral";
@@ -43,6 +44,15 @@ export class ExpressionParser extends TypeAnnotationParser {
   private getLedPrecedence() {
     const token = this.reader.peek();
     return ledAttributes[token.name as led]?.prec ?? -1;
+  }
+
+  private parseAsExpression(left: ASTNode) {
+    const start = left.start;
+    this.reader.skip(TokenNames.As);
+    const annotation = this.parseTypeAnnotation();
+    const end = annotation.end;
+
+    return AsExpression.new(left, annotation, start, end);
   }
 
   private parseAtom(): ASTNode {
@@ -105,6 +115,8 @@ export class ExpressionParser extends TypeAnnotationParser {
     switch (token.name) {
       case TokenNames.Dot:
         return this.parseMemberExpression(left);
+      case TokenNames.As:
+        return this.parseAsExpression(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }
