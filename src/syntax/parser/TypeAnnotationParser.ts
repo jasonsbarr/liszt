@@ -46,7 +46,7 @@ export class TypeAnnotationParser extends LHVParser {
     return StringKeyword.new(token, token.location);
   }
 
-  protected parseTypeAnnotation() {
+  public parseTypeAnnotation() {
     const type = this.parseType();
     return TypeAnnotation.new(type, type.start, type.end);
   }
@@ -95,7 +95,7 @@ export class TypeAnnotationParser extends LHVParser {
       const en = propType.end;
 
       properties.push(ObjectPropertyType.new(propName, propType, st, en));
-      token = this.reader.next();
+      token = this.reader.peek();
 
       if (token.name !== TokenNames.RBrace) {
         this.reader.skip(TokenNames.Comma);

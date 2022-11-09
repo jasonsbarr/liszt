@@ -105,7 +105,7 @@ export class ExpressionParser extends TypeAnnotationParser {
     return left;
   }
 
-  protected parseExpression(rbp: number = 0) {
+  public parseExpression(rbp: number = 0) {
     return this.parseExpr(rbp);
   }
 
