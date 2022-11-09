@@ -44,16 +44,23 @@ const synthObject = (obj: ObjectLiteral) => {
 
 const synthMember = (ast: MemberExpression) => {
   const prop = ast.property;
+
+  if (!(prop instanceof Identifier)) {
+    throw new Error(
+      `Only valid identifiers may be object property names; ${prop.kind} given`
+    );
+  }
+
   const object = synth(ast.object);
 
   if (!Type.isObject(object)) {
     throw new Error(`MemberExpression expects an object; ${object} given`);
   }
 
-  const type = propType(object, (prop as Identifier).name);
+  const type = propType(object, prop.name);
 
   if (!type) {
-    throw new Error(`No such property ${(prop as Identifier).name} on object`);
+    throw new Error(`No such property ${prop.name} on object`);
   }
 
   return type;
