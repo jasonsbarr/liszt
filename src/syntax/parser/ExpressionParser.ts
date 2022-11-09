@@ -7,6 +7,7 @@ import { BooleanLiteral } from "./ast/BooleanLiteral";
 import { FloatLiteral } from "./ast/FloatLiteral";
 import { Identifier } from "./ast/Identifier";
 import { IntegerLiteral } from "./ast/IntegerLiteral";
+import { MemberExpression } from "./ast/MemberExpression";
 import { NilLiteral } from "./ast/NilLiteral";
 import { ObjectLiteral } from "./ast/ObjectLiteral";
 import { ObjectProperty } from "./ast/ObjectProperty";
@@ -23,9 +24,16 @@ const nudAttributes = {
   [TokenNames.True]: { prec: 0, assoc: "none" },
   [TokenNames.False]: { prec: 0, assoc: "none" },
   [TokenNames.Nil]: { prec: 0, assoc: "none" },
+  [TokenNames.Identifier]: { prec: 0, assoc: "none" },
 };
 
-const ledAttributes = {};
+type nud = keyof typeof nudAttributes;
+
+const ledAttributes = {
+  [TokenNames.Dot]: { prec: 90, assoc: "left" },
+};
+
+type led = keyof typeof ledAttributes;
 
 export abstract class ExpressionParser extends LHVParser {
   constructor(lexResult: LexResult) {
@@ -70,12 +78,41 @@ export abstract class ExpressionParser extends LHVParser {
     }
   }
 
-  private parseExpr() {
-    return this.parseAtom();
+  private parseExpr(rbp: number = 0) {
+    let left = this.parseAtom();
+    let token = this.reader.peek();
+    let prec = ledAttributes[token.name as led]?.prec ?? -1;
+
+    while (rbp < prec) {
+      left = this.parseLed(left);
+      token = this.reader.peek();
+      prec = ledAttributes[token.name as led]?.prec ?? -1;
+    }
+
+    return left;
   }
 
-  protected parseExpression() {
-    return this.parseExpr();
+  protected parseExpression(rbp: number = 0) {
+    return this.parseExpr(rbp);
+  }
+
+  private parseLed(left: ASTNode) {
+    let token = this.reader.peek();
+
+    switch (token.name) {
+      case TokenNames.Dot:
+        return this.parseMemberExpression(left);
+      default:
+        throw new Error(`Token ${token.name} does not have a left denotation`);
+    }
+  }
+
+  private parseMemberExpression(left: ASTNode) {
+    const prec = ledAttributes[TokenNames.Dot]?.prec;
+    this.reader.skip(TokenNames.Dot);
+    const prop = this.parseExpression(prec);
+
+    return MemberExpression.new(left, prop, left.start, prop.end);
   }
 
   private parseObjectLiteral() {
