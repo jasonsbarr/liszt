@@ -3,6 +3,7 @@ import { ASTNode } from "../../syntax/parser/ast/ASTNode";
 import { MemberExpression } from "../../syntax/parser/ast/MemberExpression";
 import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
+import { BoundIdentifier } from "./BoundIdentifier";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundMemberExpression extends BoundASTNode {

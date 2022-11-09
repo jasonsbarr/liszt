@@ -115,7 +115,7 @@ export abstract class ExpressionParser extends LHVParser {
     this.reader.skip(TokenNames.Dot);
     const prop = this.parseExpression(prec);
 
-    return MemberExpression.new(left, prop, left.start, prop.end);
+    return MemberExpression.new(left, prop as Identifier, left.start, prop.end);
   }
 
   private parseObjectLiteral() {

@@ -3,20 +3,24 @@ import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
+import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { propType } from "./propType";
 import { synth } from "./synth";
 import { BoundASTNode } from "./tree/BoundASTNode";
 import { BoundBooleanLiteral } from "./tree/BoundBooleanLiteral";
 import { BoundFloatLiteral } from "./tree/BoundFloatLiteral";
 import { BoundIdentifier } from "./tree/BoundIdentifier";
 import { BoundIntegerLiteral } from "./tree/BoundIntegerLiteral";
+import { BoundMemberExpression } from "./tree/BoundMemberExpression";
 import { BoundObjectLiteral } from "./tree/BoundObjectLiteral";
 import { BoundObjectProperty } from "./tree/BoundObjectProperty";
 import { BoundStringLiteral } from "./tree/BoundStringLiteral";
 import { Type } from "./Type";
+import { ObjectType } from "./Types";
 
 export const bind = (node: ASTNode, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -54,6 +58,26 @@ export const bind = (node: ASTNode, ty?: Type): BoundASTNode => {
         ty = synth(node);
       }
       return BoundObjectLiteral.new(ty, properties, node as ObjectLiteral);
+    case SyntaxNodes.MemberExpression:
+      const obj = (node as MemberExpression).object;
+      const prop = (node as MemberExpression).property as Identifier;
+      const synthObjType = synth(obj);
+      const pType = propType(synthObjType as ObjectType, prop.name);
+
+      if (!pType) {
+        throw new Error(
+          `Property ${
+            (node as MemberExpression).property.name
+          } does not exist on object`
+        );
+      }
+
+      return BoundMemberExpression.new(
+        pType,
+        bind(obj),
+        bind(prop),
+        node as MemberExpression
+      );
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
   }

@@ -47,7 +47,9 @@ const synthMember = (ast: MemberExpression) => {
 
   if (!(prop instanceof Identifier)) {
     throw new Error(
-      `Only valid identifiers may be object property names; ${prop.kind} given`
+      `Only valid identifiers may be object property names; ${
+        (prop as ASTNode).kind
+      } given`
     );
   }
 

@@ -1,11 +1,12 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { ASTNode } from "./ASTNode";
+import { Identifier } from "./Identifier";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class MemberExpression extends ASTNode {
   constructor(
     public object: ASTNode,
-    public property: ASTNode,
+    public property: Identifier,
     start: SrcLoc,
     end: SrcLoc
   ) {
@@ -14,7 +15,7 @@ export class MemberExpression extends ASTNode {
 
   public static new(
     object: ASTNode,
-    property: ASTNode,
+    property: Identifier,
     start: SrcLoc,
     end: SrcLoc
   ) {
