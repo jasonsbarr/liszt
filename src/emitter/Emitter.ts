@@ -3,6 +3,7 @@ import { BoundBooleanLiteral } from "../typechecker/tree/BoundBooleanLiteral";
 import { BoundFloatLiteral } from "../typechecker/tree/BoundFloatLiteral";
 import { BoundIdentifier } from "../typechecker/tree/BoundIdentifier";
 import { BoundIntegerLiteral } from "../typechecker/tree/BoundIntegerLiteral";
+import { BoundMemberExpression } from "../typechecker/tree/BoundMemberExpression";
 import { BoundNilLiteral } from "../typechecker/tree/BoundNilLiteral";
 import { BoundNodes } from "../typechecker/tree/BoundNodes";
 import { BoundObjectLiteral } from "../typechecker/tree/BoundObjectLiteral";
@@ -37,8 +38,12 @@ export class Emitter {
         return this.emitBoolean(node as BoundBooleanLiteral);
       case BoundNodes.BoundNilLiteral:
         return this.emitNil(node as BoundNilLiteral);
+      case BoundNodes.BoundIdentifier:
+        return this.emitIdentifier(node as BoundIdentifier);
       case BoundNodes.BoundObjectLiteral:
         return this.emitObject(node as BoundObjectLiteral);
+      case BoundNodes.BoundMemberExpression:
+        return this.emitMemberExpression(node as BoundMemberExpression);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -94,5 +99,9 @@ export class Emitter {
     code += "})";
 
     return code;
+  }
+
+  private emitMemberExpression(node: BoundMemberExpression): string {
+    return `${this.emitNode(node.object)}.${this.emitNode(node.property)}`;
   }
 }
