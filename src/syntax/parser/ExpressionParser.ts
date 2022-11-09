@@ -85,12 +85,10 @@ export abstract class ExpressionParser extends LHVParser {
 
   private parseExpr(rbp: number = 0) {
     let left = this.parseAtom();
-    let token = this.reader.peek();
     let prec = this.getLedPrecedence();
 
     while (rbp < prec) {
       left = this.parseLed(left);
-      token = this.reader.peek();
       prec = this.getLedPrecedence();
     }
 
