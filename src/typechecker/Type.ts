@@ -11,6 +11,7 @@ module Type {
   export type Boolean = Types.BooleanType;
   export type Nil = Types.NilType;
   export type Object = Types.ObjectType;
+  export type Property = Types.Property;
 
   export type Type = Types.Type;
 

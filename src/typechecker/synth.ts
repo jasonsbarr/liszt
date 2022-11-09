@@ -6,6 +6,9 @@ import { Property } from "./Types";
 import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
 import { propType } from "./propType";
 import { Identifier } from "../syntax/parser/ast/Identifier";
+import { AsExpression } from "../syntax/parser/ast/AsExpression";
+import { fromAnnotation } from "./fromAnnotation";
+import { check } from "./check";
 
 export const synth = (ast: ASTNode) => {
   switch (ast.kind) {
@@ -23,6 +26,8 @@ export const synth = (ast: ASTNode) => {
       return synthObject(ast as ObjectLiteral);
     case SyntaxNodes.MemberExpression:
       return synthMember(ast as MemberExpression);
+    case SyntaxNodes.AsExpression:
+      return synthAs(ast as AsExpression);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -65,5 +70,11 @@ const synthMember = (ast: MemberExpression) => {
     throw new Error(`No such property ${prop.name} on object`);
   }
 
+  return type;
+};
+
+const synthAs = (node: AsExpression) => {
+  const type = fromAnnotation(node.type.type);
+  check(node.expression, type);
   return type;
 };
