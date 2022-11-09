@@ -18,6 +18,10 @@ export class BoundProgramNode extends BoundASTNode {
     return this._children;
   }
 
+  public append(node: BoundASTNode) {
+    this._children.push(node);
+  }
+
   public toString() {
     return "BoundProgramNode";
   }
