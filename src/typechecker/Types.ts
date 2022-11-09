@@ -5,6 +5,10 @@ export type Property = {
 
 export abstract class BaseType {
   constructor(public name: string, public types: BaseType[] = []) {}
+
+  public toString() {
+    return this.name;
+  }
 }
 
 export class NumberType extends BaseType {
@@ -74,6 +78,13 @@ export class ObjectType extends BaseType {
 
   public static new(properties: Property[]) {
     return new ObjectType(properties);
+  }
+
+  public toString() {
+    const properties = this.properties
+      .map((prop) => `${prop.name}: ${prop.type}`)
+      .join(", ");
+    return `Object { ${properties} }`;
   }
 }
 
