@@ -102,6 +102,6 @@ export class Emitter {
   }
 
   private emitMemberExpression(node: BoundMemberExpression): string {
-    return `${this.emitNode(node.object)}.${this.emitNode(node.property)}`;
+    return `${this.emitNode(node.object)}["${this.emitNode(node.property)}"]`;
   }
 }
