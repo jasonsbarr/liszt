@@ -1,14 +1,24 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
-import { ProgramNode } from "../../syntax/parser/ast/ProgramNode";
+import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
 
-export class BoundProgramNode extends ProgramNode {
+export class BoundProgramNode extends BoundASTNode {
+  private _children: BoundASTNode[];
   constructor(start: SrcLoc, end: SrcLoc) {
-    super(start, end);
+    super(BoundNodes.BoundProgramNode, start, end);
     this.kind = BoundNodes.BoundProgramNode;
+    this._children = [];
   }
 
   public static new(start: SrcLoc, end: SrcLoc) {
     return new BoundProgramNode(start, end);
+  }
+
+  public get children() {
+    return this._children;
+  }
+
+  public toString() {
+    return "BoundProgramNode";
   }
 }
