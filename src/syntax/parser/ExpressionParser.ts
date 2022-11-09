@@ -1,5 +1,4 @@
 import { LexResult } from "../lexer/LexResult";
-import { SrcLoc } from "../lexer/SrcLoc";
 import { TokenNames } from "../lexer/TokenNames";
 import { TokenTypes } from "../lexer/TokenTypes";
 import { ASTNode } from "./ast/ASTNode";
@@ -13,7 +12,7 @@ import { ObjectLiteral } from "./ast/ObjectLiteral";
 import { ObjectProperty } from "./ast/ObjectProperty";
 import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
 import { StringLiteral } from "./ast/StringLiteral";
-import { LHVParser } from "./LHVParser";
+import { TypeAnnotationParser } from "./TypeAnnotationParser";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -35,7 +34,7 @@ const ledAttributes = {
 
 type led = keyof typeof ledAttributes;
 
-export abstract class ExpressionParser extends LHVParser {
+export abstract class ExpressionParser extends TypeAnnotationParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
