@@ -1,9 +1,9 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { Token } from "../../lexer/Token";
-import { PrimitiveNode } from "./PrimitiveNode";
+import { PrimitiveKeyword } from "./PrimitiveKeyword";
 import { SyntaxNodes } from "./SyntaxNodes";
 
-export class StringKeyword extends PrimitiveNode {
+export class StringKeyword extends PrimitiveKeyword {
   constructor(token: Token, start: SrcLoc) {
     super(SyntaxNodes.StringKeyword, token, start);
   }

@@ -14,5 +14,7 @@ export abstract class ASTNode {
 
   public abstract get children(): ASTNode[];
 
-  public abstract toString(): string;
+  public toString() {
+    return String(this.kind);
+  }
 }
