@@ -9,4 +9,5 @@ export enum SyntaxNodes {
   ParenthesizedExpression = "ParenthesizedExpression",
   ObjectLiteral = "ObjectLiteral",
   ObjectProperty = "ObjectProperty",
+  MemberExpression = "MemberExpression",
 }
