@@ -4,9 +4,9 @@ import { SyntaxNodes } from "./SyntaxNodes";
 export abstract class ASTNode {
   public kind: string;
   public start: SrcLoc;
-  public end?: SrcLoc;
+  public end: SrcLoc;
 
-  constructor(kind: SyntaxNodes, start: SrcLoc, end?: SrcLoc) {
+  constructor(kind: SyntaxNodes, start: SrcLoc, end: SrcLoc) {
     this.kind = kind;
     this.start = start;
     this.end = end;
