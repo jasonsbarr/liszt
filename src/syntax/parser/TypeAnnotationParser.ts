@@ -7,6 +7,7 @@ import { IntegerKeyword } from "./ast/IntegerKeyword";
 import { NilLiteral } from "./ast/NilLiteral";
 import { ObjectPropertyType } from "./ast/ObjectPropertyType";
 import { StringKeyword } from "./ast/StringKeyword";
+import { TypeAnnotation } from "./ast/TypeAnnotation";
 import { TypeLiteral } from "./ast/TypeLiteral";
 import { LHVParser } from "./LHVParser";
 
@@ -45,7 +46,12 @@ export class TypeAnnotationParser extends LHVParser {
     return StringKeyword.new(token, token.location);
   }
 
-  public parseTypeAnnotation() {
+  protected parseTypeAnnotation() {
+    const type = this.parseType();
+    return TypeAnnotation.new(type, type.start, type.end);
+  }
+
+  private parseType() {
     const token = this.reader.peek();
 
     switch (token.name) {
@@ -75,9 +81,20 @@ export class TypeAnnotationParser extends LHVParser {
     token = this.reader.peek();
 
     while (token.name !== TokenNames.RBrace) {
-      const propName = this.parseTypeAnnotation();
+      const st = token.location;
+
+      if (token.name !== TokenNames.Identifier) {
+        throw new Error(
+          `Type literal property name must be a valid identifier; ${token.name} given`
+        );
+      }
+
+      const propName = this.parseType() as Identifier;
       this.reader.skip(TokenNames.Colon);
-      const propType = this.parseTypeAnnotation();
+      const propType = this.parseType();
+      const en = propType.end;
+
+      properties.push(ObjectPropertyType.new(propName, propType, st, en));
       token = this.reader.next();
 
       if (token.name !== TokenNames.RBrace) {
