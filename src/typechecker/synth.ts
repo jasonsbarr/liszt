@@ -3,6 +3,9 @@ import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { Property } from "./Types";
+import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
+import { propType } from "./propType";
+import { Identifier } from "../syntax/parser/ast/Identifier";
 
 export const synth = (ast: ASTNode) => {
   switch (ast.kind) {
@@ -18,6 +21,8 @@ export const synth = (ast: ASTNode) => {
       return synthNil();
     case SyntaxNodes.ObjectLiteral:
       return synthObject(ast as ObjectLiteral);
+    case SyntaxNodes.MemberExpression:
+      return synthMember(ast as MemberExpression);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -35,4 +40,21 @@ const synthObject = (obj: ObjectLiteral) => {
     type: synth(prop.value),
   }));
   return Type.object(props);
+};
+
+const synthMember = (ast: MemberExpression) => {
+  const prop = ast.property;
+  const object = synth(ast.object);
+
+  if (!Type.isObject(object)) {
+    throw new Error(`MemberExpression expects an object; ${object} given`);
+  }
+
+  const type = propType(object, (prop as Identifier).name);
+
+  if (!type) {
+    throw new Error(`No such property ${(prop as Identifier).name} on object`);
+  }
+
+  return type;
 };

@@ -1,32 +1,27 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { ASTNode } from "../../syntax/parser/ast/ASTNode";
 import { MemberExpression } from "../../syntax/parser/ast/MemberExpression";
-import { bind } from "../bind";
 import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundMemberExpression extends BoundASTNode {
-  public object: BoundASTNode;
-  public property: BoundASTNode;
-
   constructor(
     public type: Type,
-    node: MemberExpression,
-    start: SrcLoc,
-    end: SrcLoc
+    public object: BoundASTNode,
+    public property: BoundASTNode,
+    node: MemberExpression
   ) {
-    super(BoundNodes.BoundMemberExpression, start, end);
-    this.object = bind(node.object);
-    this.property = bind(node.property);
+    super(BoundNodes.BoundMemberExpression, node.start, node.end);
   }
 
   public static new(
     type: Type,
-    node: MemberExpression,
-    start: SrcLoc,
-    end: SrcLoc
+    object: BoundASTNode,
+    property: BoundASTNode,
+    node: MemberExpression
   ) {
-    return new BoundMemberExpression(type, node, start, end);
+    return new BoundMemberExpression(type, object, property, node);
   }
 
   public get children() {
