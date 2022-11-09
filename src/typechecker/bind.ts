@@ -74,8 +74,8 @@ export const bind = (node: ASTNode, ty?: Type): BoundASTNode => {
 
       return BoundMemberExpression.new(
         pType,
-        bind(obj),
-        bind(prop),
+        bind(obj, synthObjType),
+        bind(prop, pType),
         node as MemberExpression
       );
     default:
