@@ -70,7 +70,7 @@ export class TypeChecker {
 
   private checkProgram(node: ProgramNode) {
     const nodes = node.children;
-    let boundProgram = BoundProgramNode.new(node.start, node.end!);
+    let boundProgram = BoundProgramNode.new(node.start, node.end);
 
     for (let node of nodes) {
       boundProgram.append(this.checkNode(node));

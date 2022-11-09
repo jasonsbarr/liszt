@@ -5,7 +5,7 @@ export abstract class BoundASTNode {
   constructor(
     public kind: BoundNodes,
     public start: SrcLoc,
-    public end?: SrcLoc
+    public end: SrcLoc
   ) {}
 
   public abstract get children(): BoundASTNode[];
