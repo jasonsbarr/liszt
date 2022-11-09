@@ -40,6 +40,11 @@ export abstract class ExpressionParser extends LHVParser {
     super(lexResult);
   }
 
+  private getLedPrecedence() {
+    const token = this.reader.peek();
+    return ledAttributes[token.name as led]?.prec ?? -1;
+  }
+
   private parseAtom(): ASTNode {
     const token = this.reader.peek();
     switch (token.type) {
@@ -81,12 +86,12 @@ export abstract class ExpressionParser extends LHVParser {
   private parseExpr(rbp: number = 0) {
     let left = this.parseAtom();
     let token = this.reader.peek();
-    let prec = ledAttributes[token.name as led]?.prec ?? -1;
+    let prec = this.getLedPrecedence();
 
     while (rbp < prec) {
       left = this.parseLed(left);
       token = this.reader.peek();
-      prec = ledAttributes[token.name as led]?.prec ?? -1;
+      prec = this.getLedPrecedence();
     }
 
     return left;
@@ -108,7 +113,7 @@ export abstract class ExpressionParser extends LHVParser {
   }
 
   private parseMemberExpression(left: ASTNode) {
-    const prec = ledAttributes[TokenNames.Dot]?.prec;
+    const prec = this.getLedPrecedence();
     this.reader.skip(TokenNames.Dot);
     const prop = this.parseExpression(prec);
 
