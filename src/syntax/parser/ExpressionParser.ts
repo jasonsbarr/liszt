@@ -30,11 +30,12 @@ type nud = keyof typeof nudAttributes;
 
 const ledAttributes = {
   [TokenNames.Dot]: { prec: 90, assoc: "left" },
+  [TokenNames.As]: { prec: 5, assoc: "left" },
 };
 
 type led = keyof typeof ledAttributes;
 
-export abstract class ExpressionParser extends TypeAnnotationParser {
+export class ExpressionParser extends TypeAnnotationParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
