@@ -1,5 +1,5 @@
-# Nyx Precursor
+# Fawkes Prototype
 
-Repo for trying out the code I will eventually write on camera for the Nyx Programming Language
+Repo for trying out the concepts I will eventually write code for on camera for the Fawkes Programming Language
 
 Written with TypeScript v4.8.4.
