@@ -1,3 +1,4 @@
+import { AsExpression } from "../syntax/parser/ast/AsExpression";
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
@@ -78,6 +79,11 @@ export const bind = (node: ASTNode, ty?: Type): BoundASTNode => {
         bind(prop, pType),
         node as MemberExpression
       );
+    case SyntaxNodes.AsExpression:
+      if (!ty) {
+        ty = synth(node);
+      }
+      return bind((node as AsExpression).expression, ty);
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
   }
