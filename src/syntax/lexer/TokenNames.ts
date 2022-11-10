@@ -21,6 +21,7 @@ export enum TokenNames {
   Dot = "Dot",
   Comma = "Comma",
   Equals = "Equals",
+  FatArrow = "FatArrow",
   As = "As",
   StringKeyword = "StringKeyword",
   IntegerKeyword = "IntegerKeyword",
