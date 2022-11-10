@@ -24,6 +24,8 @@ import { BoundIdentifier } from "./tree/BoundIdentifier";
 import { bind } from "./bind";
 import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
 import { AsExpression } from "../syntax/parser/ast/AsExpression";
+import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
+import { BoundParenthesizedExpression } from "./tree/BoundParenthesizedExpression";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -69,6 +71,10 @@ export class TypeChecker {
         return this.checkMemberExpression(node as MemberExpression);
       case SyntaxNodes.AsExpression:
         return this.checkAsExpression(node as AsExpression);
+      case SyntaxNodes.ParenthesizedExpression:
+        return this.checkParenthesizedExpression(
+          node as ParenthesizedExpression
+        );
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -132,5 +138,9 @@ export class TypeChecker {
   private checkAsExpression(node: AsExpression) {
     const synthType = synth(node);
     return bind(node, synthType);
+  }
+
+  private checkParenthesizedExpression(node: ParenthesizedExpression) {
+    return BoundParenthesizedExpression.new(node);
   }
 }

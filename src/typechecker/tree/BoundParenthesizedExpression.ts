@@ -10,6 +10,10 @@ export class BoundParenthesizedExpression extends BoundASTNode {
     this.expression = bind(node.expression);
   }
 
+  public static new(node: ParenthesizedExpression) {
+    return new BoundParenthesizedExpression(node);
+  }
+
   public get children() {
     return [this.expression];
   }
