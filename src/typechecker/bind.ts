@@ -39,11 +39,10 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       return BoundStringLiteral.new(node as StringLiteral);
     case SyntaxNodes.Identifier:
       if (!ty) {
-        throw new Error(
-          `No type given for identifier ${(node as Identifier).name}`
-        );
+        // ty cannot be undefined below because if so, get method throws error
+        ty = env.get((node as Identifier).name);
       }
-      return BoundIdentifier.new(ty, node as Identifier);
+      return BoundIdentifier.new(ty!, node as Identifier);
     case SyntaxNodes.ObjectProperty:
       synthType = synth((node as ObjectProperty).value, env);
       key = bind((node as ObjectProperty).key, env, synthType);
