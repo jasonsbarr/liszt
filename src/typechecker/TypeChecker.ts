@@ -23,6 +23,7 @@ import { BoundObjectProperty } from "./tree/BoundObjectProperty";
 import { BoundIdentifier } from "./tree/BoundIdentifier";
 import { bind } from "./bind";
 import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
+import { AsExpression } from "../syntax/parser/ast/AsExpression";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -66,6 +67,8 @@ export class TypeChecker {
         return this.checkObjectLiteral(node as ObjectLiteral);
       case SyntaxNodes.MemberExpression:
         return this.checkMemberExpression(node as MemberExpression);
+      case SyntaxNodes.AsExpression:
+        return this.checkAsExpression(node as AsExpression);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -123,6 +126,11 @@ export class TypeChecker {
     const synthType = synth(node);
     check(node, synthType);
 
+    return bind(node, synthType);
+  }
+
+  private checkAsExpression(node: AsExpression) {
+    const synthType = synth(node);
     return bind(node, synthType);
   }
 }
