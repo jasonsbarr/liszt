@@ -1,7 +1,8 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { PrettyPrintable } from "../../utils/PrettyPrintable";
 import { BoundNodes } from "./BoundNodes";
 
-export abstract class BoundASTNode {
+export abstract class BoundASTNode implements PrettyPrintable {
   constructor(
     public kind: BoundNodes,
     public start: SrcLoc,

@@ -1,7 +1,8 @@
+import { PrettyPrintable } from "../../../utils/PrettyPrintable";
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { SyntaxNodes } from "./SyntaxNodes";
 
-export abstract class ASTNode {
+export abstract class ASTNode implements PrettyPrintable {
   public kind: string;
   public start: SrcLoc;
   public end: SrcLoc;
