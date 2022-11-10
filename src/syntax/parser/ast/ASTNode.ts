@@ -13,7 +13,7 @@ export abstract class ASTNode implements PrettyPrintable {
     this.end = end;
   }
 
-  public abstract get children(): ASTNode[];
+  public abstract get children(): (ASTNode | ASTNode[])[];
 
   public toString() {
     return String(this.kind);

@@ -18,4 +18,6 @@ export enum SyntaxNodes {
   StringKeyword = "StringKeyword",
   TypeLiteral = "TypeLiteral",
   ObjectPropertyType = "ObjectPropertyType",
+  LambdaExpression = "LambdaExpression",
+  Parameter = "Parameter",
 }
