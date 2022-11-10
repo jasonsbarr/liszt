@@ -54,6 +54,12 @@ export const KEYWORDS = {
   float: TokenNames.FloatKeyword,
   boolean: TokenNames.BooleanKeyword,
   string: TokenNames.StringKeyword,
+  lambda: TokenNames.Lambda,
+  def: TokenNames.Def,
+  var: TokenNames.Var,
+  const: TokenNames.Const,
+  do: TokenNames.Do,
+  end: TokenNames.End,
 };
 
 export type kw = keyof typeof KEYWORDS;
