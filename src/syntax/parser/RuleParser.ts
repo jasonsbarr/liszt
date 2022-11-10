@@ -46,8 +46,10 @@ export class RuleParser extends ExpressionParser {
     this.reader.skip(TokenNames.RParen);
     token = this.reader.peek();
 
+    let ret: TypeAnnotation | undefined;
     if (token.name === TokenNames.Colon) {
       this.reader.skip(TokenNames.Colon);
+      ret = this.parseTypeAnnotation();
     }
 
     this.reader.skip(TokenNames.FatArrow);
@@ -55,7 +57,7 @@ export class RuleParser extends ExpressionParser {
     const body = this.parseExpression();
     const end = body.end;
 
-    return LambdaExpression.new(parameters, body, start, end);
+    return LambdaExpression.new(parameters, body, start, end, ret);
   }
 
   private parseParameter() {
