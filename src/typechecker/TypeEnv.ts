@@ -6,4 +6,6 @@ module TypeEnv {
   export const globals = new TypeEnv();
 }
 
+type TypeEnv = TypeEnv.TypeEnv;
+
 export { TypeEnv };
