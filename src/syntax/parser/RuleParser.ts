@@ -54,7 +54,7 @@ export class RuleParser extends ExpressionParser {
 
     this.reader.skip(TokenNames.FatArrow);
 
-    const body = this.parseExpression();
+    const body = this.parseRule();
     const end = body.end;
 
     return LambdaExpression.new(parameters, body, start, end, ret);
