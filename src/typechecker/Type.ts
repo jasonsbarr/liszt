@@ -12,6 +12,7 @@ module Type {
   export type Nil = Types.NilType;
   export type Object = Types.ObjectType;
   export type Property = Types.Property;
+  export type Function = Types.FunctionType;
 
   export type Type = Types.Type;
 
@@ -22,6 +23,7 @@ module Type {
   export const boolean = Constructors.boolean;
   export const nil = Constructors.nil;
   export const object = Constructors.object;
+  export const functionType = Constructors.functionType;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -31,6 +33,7 @@ module Type {
   export const isBoolean = Validators.isBoolean;
   export const isNil = Validators.isNil;
   export const isObject = Validators.isObject;
+  export const isFunction = Validators.isFunction;
 }
 
 type Type = Type.Type;
