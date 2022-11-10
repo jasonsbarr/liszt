@@ -41,7 +41,7 @@ export const isNanValue = (str: string) => /NaN/.test(str);
 
 export const isInfinity = (str: string) => /Infinity/.test(str);
 
-export const isOpChar = (c: string) => /[=]/.test(c);
+export const isOpChar = (c: string) => /[=>]/.test(c);
 
 export const KEYWORDS = {
   true: TokenNames.True,
