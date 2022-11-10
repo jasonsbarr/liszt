@@ -80,4 +80,6 @@ export const PUNC = {
 
 export type punc = keyof typeof PUNC;
 
+export const isOp = (str: string) => Object.keys(OPERATORS).includes(str);
+
 export const isPunc = (c: string) => Object.keys(PUNC).includes(c);

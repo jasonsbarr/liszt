@@ -19,10 +19,14 @@ import {
   isNewline,
   isNilLiteral,
   isOctInt,
+  isOp,
+  isOpChar,
   isPunc,
   isWhitespace,
   KEYWORDS,
   kw,
+  OPERATORS,
+  ops,
   punc,
   PUNC,
 } from "./helpers";
@@ -182,6 +186,24 @@ export class Lexer {
     }
   }
 
+  private readOp(trivia: string) {
+    const { pos, line, col } = this.input;
+    const op = this.input.readWhile(isOpChar);
+
+    if (isOp(op)) {
+      this.tokens.addOperatorToken(
+        OPERATORS[op as ops],
+        op,
+        pos,
+        line,
+        col,
+        trivia
+      );
+    } else {
+      throw new Error(`Invalid operator ${op}`);
+    }
+  }
+
   public tokenize() {
     let trivia = "";
 
@@ -218,6 +240,8 @@ export class Lexer {
       } else if (isIdStart(char)) {
         this.readIdentifier(trivia);
         trivia = "";
+      } else if (isOpChar(char)) {
+        this.readOp(trivia);
       } else if (isPunc(char)) {
         this.tokens.addPuncToken(
           PUNC[char as punc],

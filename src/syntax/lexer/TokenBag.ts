@@ -142,6 +142,25 @@ export class TokenBag {
     );
   }
 
+  public addOperatorToken(
+    name: TokenNames,
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.Operator,
+        name,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public addPuncToken(
     name: TokenNames,
     value: string,
