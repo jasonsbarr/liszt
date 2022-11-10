@@ -33,6 +33,6 @@ export class Parser extends RuleParser {
   }
 
   private parseToplevel() {
-    return this.parseExpression();
+    return this.parseRule();
   }
 }
