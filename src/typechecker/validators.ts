@@ -7,6 +7,7 @@ import {
   NilType,
   NumberType,
   ObjectType,
+  FunctionType,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -23,3 +24,5 @@ export const isBoolean = (t: Type): t is BooleanType => t.name === "Boolean";
 export const isNil = (t: Type): t is NilType => t.name === "Nil";
 
 export const isObject = (t: Type): t is ObjectType => t.name === "Object";
+
+export const isFunction = (t: Type): t is FunctionType => t.name === "Function";

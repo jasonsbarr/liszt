@@ -1,6 +1,7 @@
 import {
   BooleanType,
   FloatType,
+  FunctionType,
   IntegerType,
   NilType,
   ObjectType,
@@ -30,3 +31,6 @@ export const object = (
     );
   }
 };
+
+export const functionType = (args: Type[], ret: Type) =>
+  FunctionType.new(args, ret);
