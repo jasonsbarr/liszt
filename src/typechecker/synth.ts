@@ -11,6 +11,7 @@ import { fromAnnotation } from "./fromAnnotation";
 import { check } from "./check";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { TypeEnv } from "./TypeEnv";
+import { isSubtype } from "./isSubtype";
 
 export const synth = (ast: ASTNode, env: TypeEnv) => {
   switch (ast.kind) {
@@ -96,10 +97,21 @@ const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
       throw new Error(`No type annotation for parameter ${name}`);
     }
     const type = fromAnnotation(param.type);
+    // has extended lambdaEnvironment from caller
     env.set(name, type);
     return type;
   });
   const returnType: Type = synth(node.body, env);
+  let annotatedType: Type | undefined;
+
+  if (node.ret) {
+    annotatedType = fromAnnotation(node.ret);
+    if (!isSubtype(returnType, annotatedType)) {
+      throw new Error(
+        `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
+      );
+    }
+  }
 
   return Type.functionType(paramTypes, returnType);
 };

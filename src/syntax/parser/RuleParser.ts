@@ -44,6 +44,12 @@ export class RuleParser extends ExpressionParser {
     }
 
     this.reader.skip(TokenNames.RParen);
+    token = this.reader.peek();
+
+    if (token.name === TokenNames.Colon) {
+      this.reader.skip(TokenNames.Colon);
+    }
+
     this.reader.skip(TokenNames.FatArrow);
 
     const body = this.parseExpression();
