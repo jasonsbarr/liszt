@@ -1,10 +1,10 @@
-import { AnnotatedType } from "../syntax/parser/ast/AnnotatedType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { TypeAnnotation } from "../syntax/parser/ast/TypeAnnotation";
 import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
 import { Type } from "./Type";
 
-export const fromAnnotation = (type: AnnotatedType): Type => {
-  switch (type.kind) {
+export const fromAnnotation = (type: TypeAnnotation): Type => {
+  switch (type.type.kind) {
     case SyntaxNodes.IntegerKeyword:
       return Type.integer;
     case SyntaxNodes.FloatKeyword:
@@ -16,7 +16,7 @@ export const fromAnnotation = (type: AnnotatedType): Type => {
     case SyntaxNodes.NilLiteral:
       return Type.nil;
     case SyntaxNodes.TypeLiteral:
-      return generateObjectType(type as TypeLiteral);
+      return generateObjectType(type.type as TypeLiteral);
     default:
       throw new Error(`No type definition found for type ${type.kind}`);
   }
@@ -27,7 +27,7 @@ const generateObjectType = (type: TypeLiteral) => {
     (prop) =>
       ({
         name: prop.name,
-        type: fromAnnotation(prop.type),
+        type: fromAnnotation(prop),
       } as Type.Property)
   );
 

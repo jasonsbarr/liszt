@@ -5,5 +5,5 @@ import { fromAnnotation } from "./fromAnnotation";
 export const fromString = (input: string) => {
   const parser = new TypeAnnotationParser(tokenize(input));
   const annotation = parser.parseTypeAnnotation();
-  return fromAnnotation(annotation.type);
+  return fromAnnotation(annotation);
 };

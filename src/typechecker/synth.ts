@@ -80,11 +80,27 @@ const synthMember = (ast: MemberExpression, env: TypeEnv) => {
 };
 
 const synthAs = (node: AsExpression, _env: TypeEnv) => {
-  const type = fromAnnotation(node.type.type);
+  const type = fromAnnotation(node.type);
   check(node.expression, type);
   return type;
 };
 
-const synthIdentifier = (node: Identifier, env: TypeEnv) => {};
+const synthIdentifier = (node: Identifier, env: TypeEnv) => {
+  return env.get(node.name)!;
+};
 
-const synthLambda = (node: LambdaExpression, env: TypeEnv) => {};
+const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
+  const currentEnv = env.extend();
+  const paramTypes = node.params.map((param) => {
+    const name = param.name.name;
+    if (!param.type) {
+      throw new Error(`No type annotation for parameter ${name}`);
+    }
+    const type = fromAnnotation(param.type);
+    currentEnv.set(name, type);
+    return type;
+  });
+  const returnType: Type = synth(node.body, currentEnv);
+
+  return Type.functionType(paramTypes, returnType);
+};

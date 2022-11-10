@@ -26,6 +26,7 @@ import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
 import { AsExpression } from "../syntax/parser/ast/AsExpression";
 import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
 import { BoundParenthesizedExpression } from "./tree/BoundParenthesizedExpression";
+import { TypeEnv } from "./TypeEnv";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -38,9 +39,9 @@ export class TypeChecker {
     return new TypeChecker(tree);
   }
 
-  public check() {
+  public check(env = TypeEnv.globals) {
     const program = this.tree.root;
-    const boundProgram = this.checkNode(program);
+    const boundProgram = this.checkNode(program, env);
 
     return BoundTree.new(
       boundProgram as BoundProgramNode,
@@ -51,96 +52,100 @@ export class TypeChecker {
     );
   }
 
-  private checkNode(node: ASTNode) {
+  private checkNode(node: ASTNode, env: TypeEnv) {
     switch (node.kind) {
       case SyntaxNodes.ProgramNode:
-        return this.checkProgram(node as ProgramNode);
+        return this.checkProgram(node as ProgramNode, env);
       case SyntaxNodes.IntegerLiteral:
-        return this.checkIntegerLiteral(node as IntegerLiteral);
+        return this.checkIntegerLiteral(node as IntegerLiteral, env);
       case SyntaxNodes.FloatLiteral:
-        return this.checkFloatLiteral(node as FloatLiteral);
+        return this.checkFloatLiteral(node as FloatLiteral, env);
       case SyntaxNodes.StringLiteral:
-        return this.checkStringLiteral(node as StringLiteral);
+        return this.checkStringLiteral(node as StringLiteral, env);
       case SyntaxNodes.BooleanLiteral:
-        return this.checkBooleanLiteral(node as BooleanLiteral);
+        return this.checkBooleanLiteral(node as BooleanLiteral, env);
       case SyntaxNodes.NilLiteral:
-        return this.checkNilLiteral(node as NilLiteral);
+        return this.checkNilLiteral(node as NilLiteral, env);
       case SyntaxNodes.ObjectLiteral:
-        return this.checkObjectLiteral(node as ObjectLiteral);
+        return this.checkObjectLiteral(node as ObjectLiteral, env);
       case SyntaxNodes.MemberExpression:
-        return this.checkMemberExpression(node as MemberExpression);
+        return this.checkMemberExpression(node as MemberExpression, env);
       case SyntaxNodes.AsExpression:
-        return this.checkAsExpression(node as AsExpression);
+        return this.checkAsExpression(node as AsExpression, env);
       case SyntaxNodes.ParenthesizedExpression:
         return this.checkParenthesizedExpression(
-          node as ParenthesizedExpression
+          node as ParenthesizedExpression,
+          env
         );
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
   }
 
-  private checkProgram(node: ProgramNode) {
+  private checkProgram(node: ProgramNode, env: TypeEnv) {
     const nodes = node.children;
     let boundProgram = BoundProgramNode.new(node.start, node.end);
 
     for (let node of nodes) {
-      boundProgram.append(this.checkNode(node));
+      boundProgram.append(this.checkNode(node, env));
     }
 
     return boundProgram;
   }
 
-  private checkLiteral(node: ASTNode) {
-    const synthType = synth(node);
+  private checkLiteral(node: ASTNode, env: TypeEnv) {
+    const synthType = synth(node, env);
     check(node, synthType);
   }
 
-  private checkIntegerLiteral(node: IntegerLiteral) {
-    this.checkLiteral(node);
-    return bind(node);
+  private checkIntegerLiteral(node: IntegerLiteral, env: TypeEnv) {
+    this.checkLiteral(node, env);
+    return bind(node, env);
   }
 
-  private checkFloatLiteral(node: FloatLiteral) {
-    this.checkLiteral(node);
-    return bind(node);
+  private checkFloatLiteral(node: FloatLiteral, env: TypeEnv) {
+    this.checkLiteral(node, env);
+    return bind(node, env);
   }
 
-  private checkStringLiteral(node: StringLiteral) {
-    this.checkLiteral(node);
-    return bind(node);
+  private checkStringLiteral(node: StringLiteral, env: TypeEnv) {
+    this.checkLiteral(node, env);
+    return bind(node, env);
   }
 
-  private checkBooleanLiteral(node: BooleanLiteral) {
-    this.checkLiteral(node);
-    return bind(node);
+  private checkBooleanLiteral(node: BooleanLiteral, env: TypeEnv) {
+    this.checkLiteral(node, env);
+    return bind(node, env);
   }
 
-  private checkNilLiteral(node: NilLiteral) {
-    this.checkLiteral(node);
-    return bind(node);
+  private checkNilLiteral(node: NilLiteral, env: TypeEnv) {
+    this.checkLiteral(node, env);
+    return bind(node, env);
   }
 
-  private checkObjectLiteral(node: ObjectLiteral) {
-    const synthType = synth(node);
+  private checkObjectLiteral(node: ObjectLiteral, env: TypeEnv) {
+    const synthType = synth(node, env);
     check(node, synthType);
 
-    return bind(node, synthType);
+    return bind(node, env, synthType);
   }
 
-  private checkMemberExpression(node: MemberExpression) {
-    const synthType = synth(node);
+  private checkMemberExpression(node: MemberExpression, env: TypeEnv) {
+    const synthType = synth(node, env);
     check(node, synthType);
 
-    return bind(node, synthType);
+    return bind(node, env, synthType);
   }
 
-  private checkAsExpression(node: AsExpression) {
-    const synthType = synth(node);
-    return bind(node, synthType);
+  private checkAsExpression(node: AsExpression, env: TypeEnv) {
+    const synthType = synth(node, env);
+    return bind(node, env, synthType);
   }
 
-  private checkParenthesizedExpression(node: ParenthesizedExpression) {
-    return BoundParenthesizedExpression.new(node);
+  private checkParenthesizedExpression(
+    node: ParenthesizedExpression,
+    env: TypeEnv
+  ) {
+    return BoundParenthesizedExpression.new(node, env);
   }
 }
