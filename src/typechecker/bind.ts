@@ -4,6 +4,7 @@ import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
+import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
@@ -16,6 +17,7 @@ import { BoundBooleanLiteral } from "./tree/BoundBooleanLiteral";
 import { BoundFloatLiteral } from "./tree/BoundFloatLiteral";
 import { BoundIdentifier } from "./tree/BoundIdentifier";
 import { BoundIntegerLiteral } from "./tree/BoundIntegerLiteral";
+import { BoundLambdaExpression } from "./tree/BoundLambdaExpression";
 import { BoundMemberExpression } from "./tree/BoundMemberExpression";
 import { BoundObjectLiteral } from "./tree/BoundObjectLiteral";
 import { BoundObjectProperty } from "./tree/BoundObjectProperty";
@@ -64,9 +66,9 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       const obj = (node as MemberExpression).object;
       const prop = (node as MemberExpression).property as Identifier;
       const synthObjType = synth(obj, env);
-      const pType = propType(synthObjType as ObjectType, prop.name);
+      const propertyType = propType(synthObjType as ObjectType, prop.name);
 
-      if (!pType) {
+      if (!propertyType) {
         throw new Error(
           `Property ${
             (node as MemberExpression).property.name
@@ -75,9 +77,9 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
 
       return BoundMemberExpression.new(
-        pType,
+        propertyType,
         bind(obj, env, synthObjType),
-        bind(prop, env, pType),
+        bind(prop, env, propertyType),
         node as MemberExpression
       );
     case SyntaxNodes.AsExpression:
@@ -85,6 +87,15 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         ty = synth(node, env);
       }
       return bind((node as AsExpression).expression, env, ty);
+    case SyntaxNodes.LambdaExpression:
+      // gets extended lambdaEnvironment from type checker
+      const lambdaType = synth(node, env) as Type.Function;
+      const body = bind((node as LambdaExpression).body, env);
+      return BoundLambdaExpression.new(
+        node as LambdaExpression,
+        body,
+        lambdaType
+      );
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
   }

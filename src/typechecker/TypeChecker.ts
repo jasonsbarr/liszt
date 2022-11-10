@@ -27,6 +27,9 @@ import { AsExpression } from "../syntax/parser/ast/AsExpression";
 import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
 import { BoundParenthesizedExpression } from "./tree/BoundParenthesizedExpression";
 import { TypeEnv } from "./TypeEnv";
+import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
+import { Type } from "./Type";
+import { BoundLambdaExpression } from "./tree/BoundLambdaExpression";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -77,6 +80,8 @@ export class TypeChecker {
           node as ParenthesizedExpression,
           env
         );
+      case SyntaxNodes.LambdaExpression:
+        return this.checkLambdaExpression(node as LambdaExpression, env);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -147,5 +152,10 @@ export class TypeChecker {
     env: TypeEnv
   ) {
     return BoundParenthesizedExpression.new(node, env);
+  }
+
+  private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
+    const lambdaEnv = env.extend();
+    return bind(node, lambdaEnv);
   }
 }

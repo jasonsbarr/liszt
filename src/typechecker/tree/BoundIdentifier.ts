@@ -22,6 +22,6 @@ export class BoundIdentifier extends BoundASTNode {
   }
 
   public toString() {
-    return `BoundIdentifier ${this.name}`;
+    return `BoundIdentifier ${this.name}: ${this.type}`;
   }
 }

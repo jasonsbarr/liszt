@@ -86,21 +86,20 @@ const synthAs = (node: AsExpression, env: TypeEnv) => {
 };
 
 const synthIdentifier = (node: Identifier, env: TypeEnv) => {
-  return env.get(node.name)!;
+  return env.get(node.name)!; // guaranteed not undefined because get method will throw error
 };
 
 const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
-  const currentEnv = env.extend();
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
     if (!param.type) {
       throw new Error(`No type annotation for parameter ${name}`);
     }
     const type = fromAnnotation(param.type);
-    currentEnv.set(name, type);
+    env.set(name, type);
     return type;
   });
-  const returnType: Type = synth(node.body, currentEnv);
+  const returnType: Type = synth(node.body, env);
 
   return Type.functionType(paramTypes, returnType);
 };

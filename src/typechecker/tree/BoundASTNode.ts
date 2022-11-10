@@ -9,7 +9,7 @@ export abstract class BoundASTNode implements PrettyPrintable {
     public end: SrcLoc
   ) {}
 
-  public abstract get children(): BoundASTNode[];
+  public abstract get children(): (BoundASTNode | BoundASTNode[])[];
 
   public toString() {
     return String(this.kind);
