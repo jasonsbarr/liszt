@@ -3,6 +3,7 @@ import { BoundBooleanLiteral } from "../typechecker/tree/BoundBooleanLiteral";
 import { BoundFloatLiteral } from "../typechecker/tree/BoundFloatLiteral";
 import { BoundIdentifier } from "../typechecker/tree/BoundIdentifier";
 import { BoundIntegerLiteral } from "../typechecker/tree/BoundIntegerLiteral";
+import { BoundLambdaExpression } from "../typechecker/tree/BoundLambdaExpression";
 import { BoundMemberExpression } from "../typechecker/tree/BoundMemberExpression";
 import { BoundNilLiteral } from "../typechecker/tree/BoundNilLiteral";
 import { BoundNodes } from "../typechecker/tree/BoundNodes";
@@ -49,6 +50,8 @@ export class Emitter {
         return this.emitParenthesizedExpression(
           node as BoundParenthesizedExpression
         );
+      case BoundNodes.BoundLambdaExpression:
+        return this.emitLambdaExpression(node as BoundLambdaExpression);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -114,5 +117,14 @@ export class Emitter {
     node: BoundParenthesizedExpression
   ): string {
     return `(${this.emitNode(node.expression)})`;
+  }
+
+  private emitLambdaExpression(node: BoundLambdaExpression) {
+    let code = "(";
+    code += node.args.map((arg) => arg.name.name).join(", ");
+    code += ") => ";
+    code += this.emitNode(node.body);
+
+    return code;
   }
 }
