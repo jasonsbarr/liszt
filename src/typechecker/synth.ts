@@ -9,8 +9,10 @@ import { Identifier } from "../syntax/parser/ast/Identifier";
 import { AsExpression } from "../syntax/parser/ast/AsExpression";
 import { fromAnnotation } from "./fromAnnotation";
 import { check } from "./check";
+import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
+import { TypeEnv } from "./TypeEnv";
 
-export const synth = (ast: ASTNode) => {
+export const synth = (ast: ASTNode, env: TypeEnv) => {
   switch (ast.kind) {
     case SyntaxNodes.IntegerLiteral:
       return synthInteger();
@@ -23,11 +25,15 @@ export const synth = (ast: ASTNode) => {
     case SyntaxNodes.NilLiteral:
       return synthNil();
     case SyntaxNodes.ObjectLiteral:
-      return synthObject(ast as ObjectLiteral);
+      return synthObject(ast as ObjectLiteral, env);
     case SyntaxNodes.MemberExpression:
-      return synthMember(ast as MemberExpression);
+      return synthMember(ast as MemberExpression, env);
     case SyntaxNodes.AsExpression:
-      return synthAs(ast as AsExpression);
+      return synthAs(ast as AsExpression, env);
+    case SyntaxNodes.Identifier:
+      return synthIdentifier(ast as Identifier, env);
+    case SyntaxNodes.LambdaExpression:
+      return synthLambda(ast as LambdaExpression, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -39,15 +45,15 @@ const synthString = () => Type.string;
 const synthBoolean = () => Type.boolean;
 const synthNil = () => Type.nil;
 
-const synthObject = (obj: ObjectLiteral) => {
+const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {
   const props: Property[] = obj.properties.map((prop) => ({
     name: prop.key.name,
-    type: synth(prop.value),
+    type: synth(prop.value, env),
   }));
   return Type.object(props);
 };
 
-const synthMember = (ast: MemberExpression) => {
+const synthMember = (ast: MemberExpression, env: TypeEnv) => {
   const prop = ast.property;
 
   if (!(prop instanceof Identifier)) {
@@ -58,7 +64,7 @@ const synthMember = (ast: MemberExpression) => {
     );
   }
 
-  const object = synth(ast.object);
+  const object = synth(ast.object, env);
 
   if (!Type.isObject(object)) {
     throw new Error(`MemberExpression expects an object; ${object} given`);
@@ -73,8 +79,12 @@ const synthMember = (ast: MemberExpression) => {
   return type;
 };
 
-const synthAs = (node: AsExpression) => {
+const synthAs = (node: AsExpression, _env: TypeEnv) => {
   const type = fromAnnotation(node.type.type);
   check(node.expression, type);
   return type;
 };
+
+const synthIdentifier = (node: Identifier, env: TypeEnv) => {};
+
+const synthLambda = (node: LambdaExpression, env: TypeEnv) => {};
