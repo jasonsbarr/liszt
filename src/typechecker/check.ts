@@ -6,13 +6,14 @@ import { isSubtype } from "./isSubtype";
 import { propType } from "./propType";
 import { synth } from "./synth";
 import { Type } from "./Type";
+import { TypeEnv } from "./TypeEnv";
 
-export const check = (ast: ASTNode, t: Type) => {
+export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
   if (ast.kind === SyntaxNodes.ObjectLiteral && Type.isObject(t)) {
-    return checkObject(ast as ObjectLiteral, t);
+    return checkObject(ast as ObjectLiteral, t, env);
   }
 
-  const synthType = synth(ast);
+  const synthType = synth(ast, env);
 
   if (isSubtype(synthType, t)) return true;
 
@@ -25,7 +26,7 @@ type ObjectProps = {
   key: Identifier;
 };
 
-const checkObject = (ast: ObjectLiteral, type: Type.Object) => {
+const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
   const objProps: ObjectProps[] = ast.properties.map((prop) => {
     if (prop.key.kind !== SyntaxNodes.Identifier) {
       throw new Error(
@@ -48,7 +49,7 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object) => {
     const pType = propType(type, name);
 
     if (pType) {
-      check(expr, pType);
+      check(expr, pType, env);
     } else {
       throw new Error(`Property ${name} does not exist on type ${type}`);
     }

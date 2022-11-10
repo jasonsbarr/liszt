@@ -95,7 +95,7 @@ export class TypeChecker {
 
   private checkLiteral(node: ASTNode, env: TypeEnv) {
     const synthType = synth(node, env);
-    check(node, synthType);
+    check(node, synthType, env);
   }
 
   private checkIntegerLiteral(node: IntegerLiteral, env: TypeEnv) {
@@ -125,14 +125,14 @@ export class TypeChecker {
 
   private checkObjectLiteral(node: ObjectLiteral, env: TypeEnv) {
     const synthType = synth(node, env);
-    check(node, synthType);
+    check(node, synthType, env);
 
     return bind(node, env, synthType);
   }
 
   private checkMemberExpression(node: MemberExpression, env: TypeEnv) {
     const synthType = synth(node, env);
-    check(node, synthType);
+    check(node, synthType, env);
 
     return bind(node, env, synthType);
   }

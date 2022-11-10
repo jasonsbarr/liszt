@@ -79,9 +79,9 @@ const synthMember = (ast: MemberExpression, env: TypeEnv) => {
   return type;
 };
 
-const synthAs = (node: AsExpression, _env: TypeEnv) => {
+const synthAs = (node: AsExpression, env: TypeEnv) => {
   const type = fromAnnotation(node.type);
-  check(node.expression, type);
+  check(node.expression, type, env);
   return type;
 };
 
