@@ -24,8 +24,4 @@ export class BoundObjectLiteral extends BoundASTNode {
   public get children() {
     return this.properties;
   }
-
-  public toString() {
-    return "BoundObjectLiteral";
-  }
 }

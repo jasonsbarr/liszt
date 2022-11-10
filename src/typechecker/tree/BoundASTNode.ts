@@ -10,5 +10,7 @@ export abstract class BoundASTNode {
 
   public abstract get children(): BoundASTNode[];
 
-  public abstract toString(): string;
+  public toString() {
+    return String(this.kind);
+  }
 }

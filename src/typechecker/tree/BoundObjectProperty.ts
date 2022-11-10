@@ -25,8 +25,4 @@ export class BoundObjectProperty extends BoundASTNode {
   public get children() {
     return [this.key, this.value];
   }
-
-  public toString() {
-    return "BoundObjectProperty";
-  }
 }

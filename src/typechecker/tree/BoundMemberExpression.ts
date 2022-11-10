@@ -28,8 +28,4 @@ export class BoundMemberExpression extends BoundASTNode {
   public get children() {
     return [this.object, this.property];
   }
-
-  toString() {
-    return "MemberExpression";
-  }
 }
