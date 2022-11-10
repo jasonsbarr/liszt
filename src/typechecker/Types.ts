@@ -4,7 +4,7 @@ export type Property = {
 };
 
 export abstract class BaseType {
-  constructor(public name: string, public types: BaseType[] = []) {}
+  constructor(public name: string) {}
 
   public toString() {
     return this.name;
@@ -88,6 +88,22 @@ export class ObjectType extends BaseType {
   }
 }
 
+export class FunctionType extends BaseType {
+  constructor(public args: Type[], public ret: Type) {
+    super("Function");
+  }
+
+  public static new(args: Type[], ret: Type) {
+    return new FunctionType(args, ret);
+  }
+
+  public toString(): string {
+    return `Function (${this.args
+      .map((arg) => arg.toString())
+      .join(", ")}) => ${this.ret}`;
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -95,4 +111,5 @@ export type Type =
   | StringType
   | BooleanType
   | NilType
-  | ObjectType;
+  | ObjectType
+  | FunctionType;
