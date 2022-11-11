@@ -5,6 +5,7 @@ import { FloatKeyword } from "./ast/FloatKeyword";
 import { Identifier } from "./ast/Identifier";
 import { IntegerKeyword } from "./ast/IntegerKeyword";
 import { NilLiteral } from "./ast/NilLiteral";
+import { NumberKeyword } from "./ast/NumberKeyword";
 import { ObjectPropertyType } from "./ast/ObjectPropertyType";
 import { StringKeyword } from "./ast/StringKeyword";
 import { TypeAnnotation } from "./ast/TypeAnnotation";
@@ -41,6 +42,11 @@ export class TypeAnnotationParser extends LHVParser {
     return NilLiteral.new(token, token.location);
   }
 
+  private parseNumberKeyword() {
+    const token = this.reader.next();
+    return NumberKeyword.new(token, token.location);
+  }
+
   private parseStringKeyword() {
     const token = this.reader.next();
     return StringKeyword.new(token, token.location);
@@ -59,6 +65,8 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseIntegerKeyword();
       case TokenNames.FloatKeyword:
         return this.parseFloatKeyword();
+      case TokenNames.NumberKeyword:
+        return this.parseNumberKeyword();
       case TokenNames.BooleanKeyword:
         return this.parseBooleanKeyword();
       case TokenNames.StringKeyword:

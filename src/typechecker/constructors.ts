@@ -4,6 +4,7 @@ import {
   FunctionType,
   IntegerType,
   NilType,
+  NumberType,
   ObjectType,
   Property,
   StringType,
@@ -13,6 +14,8 @@ import {
 export const integer = IntegerType.new();
 
 export const float = FloatType.new();
+
+export const number = NumberType.new("Number");
 
 export const string = StringType.new();
 

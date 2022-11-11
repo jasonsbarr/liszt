@@ -108,6 +108,7 @@ export type Type =
   | IntegerType
   | FloatType
   | NumberType
+  | NumberType
   | StringType
   | BooleanType
   | NilType

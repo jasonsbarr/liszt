@@ -52,6 +52,7 @@ export const KEYWORDS = {
   as: TokenNames.As,
   integer: TokenNames.IntegerKeyword,
   float: TokenNames.FloatKeyword,
+  number: TokenNames.NumberKeyword,
   boolean: TokenNames.BooleanKeyword,
   string: TokenNames.StringKeyword,
   lambda: TokenNames.Lambda,

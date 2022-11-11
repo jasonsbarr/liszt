@@ -9,6 +9,8 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
       return Type.integer;
     case SyntaxNodes.FloatKeyword:
       return Type.float;
+    case SyntaxNodes.NumberKeyword:
+      return Type.number;
     case SyntaxNodes.BooleanKeyword:
       return Type.boolean;
     case SyntaxNodes.StringKeyword:

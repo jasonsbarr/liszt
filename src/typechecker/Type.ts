@@ -19,6 +19,7 @@ module Type {
   // constructors
   export const integer = Constructors.integer;
   export const float = Constructors.float;
+  export const number = Constructors.number;
   export const string = Constructors.string;
   export const boolean = Constructors.boolean;
   export const nil = Constructors.nil;

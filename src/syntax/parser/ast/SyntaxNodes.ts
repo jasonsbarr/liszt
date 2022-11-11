@@ -14,6 +14,7 @@ export enum SyntaxNodes {
   TypeAnnotation = "TypeAnnotation",
   IntegerKeyword = "IntegerKeyword",
   FloatKeyword = "FloatKeyword",
+  NumberKeyword = "NumberKeyword",
   BooleanKeyword = "BooleanKeyword",
   StringKeyword = "StringKeyword",
   TypeLiteral = "TypeLiteral",

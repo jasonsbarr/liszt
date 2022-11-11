@@ -15,7 +15,7 @@ export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
 export const isFloat = (t: Type): t is FloatType => t.name === "Float";
 
 export const isNumber = (t: Type): t is NumberType =>
-  isInteger(t) || isFloat(t);
+  isInteger(t) || isFloat(t as Type) || (t as Type).name === "Number";
 
 export const isString = (t: Type): t is StringType => t.name === "String";
 
