@@ -4,6 +4,7 @@ import { TokenTypes } from "../lexer/TokenTypes";
 import { AsExpression } from "./ast/AsExpression";
 import { ASTNode } from "./ast/ASTNode";
 import { BooleanLiteral } from "./ast/BooleanLiteral";
+import { CallExpression } from "./ast/CallExpression";
 import { FloatLiteral } from "./ast/FloatLiteral";
 import { Identifier } from "./ast/Identifier";
 import { IntegerLiteral } from "./ast/IntegerLiteral";
@@ -13,6 +14,7 @@ import { ObjectLiteral } from "./ast/ObjectLiteral";
 import { ObjectProperty } from "./ast/ObjectProperty";
 import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
 import { StringLiteral } from "./ast/StringLiteral";
+import { SyntaxNodes } from "./ast/SyntaxNodes";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
 
 const nudAttributes = {
@@ -31,6 +33,7 @@ type nud = keyof typeof nudAttributes;
 
 const ledAttributes = {
   [TokenNames.Dot]: { prec: 90, assoc: "left" },
+  [TokenNames.LParen]: { prec: 90, assoc: "left" },
   [TokenNames.As]: { prec: 5, assoc: "left" },
 };
 
@@ -93,6 +96,33 @@ export class ExpressionParser extends TypeAnnotationParser {
     }
   }
 
+  private parseCallExpression(left: ASTNode) {
+    if (left.kind === SyntaxNodes.LambdaExpression) {
+      throw new Error(
+        "Lambda expression must be wrapped in parentheses before immediately invoking it"
+      );
+    }
+
+    const start = left.start;
+    this.reader.skip(TokenNames.LParen);
+    let token = this.reader.peek();
+    let args: ASTNode[] = [];
+
+    while (token.name !== TokenNames.RParen) {
+      args.push(this.parseExpr());
+      token = this.reader.peek();
+
+      if (token.name !== TokenNames.RParen) {
+        this.reader.skip(TokenNames.Comma);
+        token = this.reader.peek();
+      }
+    }
+
+    const end = token.location;
+
+    return CallExpression.new(left, args, start, end);
+  }
+
   private parseExpr(rbp: number = 0) {
     let left = this.parseAtom();
     let prec = this.getLedPrecedence();
@@ -115,6 +145,8 @@ export class ExpressionParser extends TypeAnnotationParser {
     switch (token.name) {
       case TokenNames.Dot:
         return this.parseMemberExpression(left);
+      case TokenNames.LParen:
+        return this.parseCallExpression(left);
       case TokenNames.As:
         return this.parseAsExpression(left);
       default:

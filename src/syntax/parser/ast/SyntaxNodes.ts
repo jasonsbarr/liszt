@@ -21,4 +21,5 @@ export enum SyntaxNodes {
   ObjectPropertyType = "ObjectPropertyType",
   LambdaExpression = "LambdaExpression",
   Parameter = "Parameter",
+  CallExpression = "CallExpression",
 }
