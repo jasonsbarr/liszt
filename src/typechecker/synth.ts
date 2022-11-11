@@ -12,6 +12,8 @@ import { check } from "./check";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { TypeEnv } from "./TypeEnv";
 import { isSubtype } from "./isSubtype";
+import { CallExpression } from "../syntax/parser/ast/CallExpression";
+import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
 
 export const synth = (ast: ASTNode, env: TypeEnv) => {
   switch (ast.kind) {
@@ -33,8 +35,12 @@ export const synth = (ast: ASTNode, env: TypeEnv) => {
       return synthAs(ast as AsExpression, env);
     case SyntaxNodes.Identifier:
       return synthIdentifier(ast as Identifier, env);
+    case SyntaxNodes.ParenthesizedExpression:
+      return synthParenthesizedExpression(ast as ParenthesizedExpression, env);
     case SyntaxNodes.LambdaExpression:
       return synthLambda(ast as LambdaExpression, env);
+    case SyntaxNodes.CallExpression:
+      return synthCall(ast as CallExpression, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -90,6 +96,13 @@ const synthIdentifier = (node: Identifier, env: TypeEnv) => {
   return env.get(node.name)!; // guaranteed not undefined because get method will throw error
 };
 
+const synthParenthesizedExpression = (
+  node: ParenthesizedExpression,
+  env: TypeEnv
+): Type => {
+  return synth(node.expression, env);
+};
+
 const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
@@ -114,4 +127,24 @@ const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
   }
 
   return Type.functionType(paramTypes, returnType);
+};
+
+const synthCall = (node: CallExpression, env: TypeEnv): Type => {
+  const func: Type = synth(node.func, env);
+
+  if (!Type.isFunction(func)) {
+    throw new Error(`Call expression expects a function type, got ${func}`);
+  }
+
+  if (func.args.length !== node.args.length) {
+    throw new Error(
+      `Expected ${func.args.length} arguments, got ${node.args.length}`
+    );
+  }
+
+  func.args.forEach((argType, i) => {
+    check(node.args[i], argType, env);
+  });
+
+  return func.ret;
 };

@@ -30,6 +30,7 @@ import { TypeEnv } from "./TypeEnv";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { Type } from "./Type";
 import { BoundLambdaExpression } from "./tree/BoundLambdaExpression";
+import { CallExpression } from "../syntax/parser/ast/CallExpression";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -82,6 +83,8 @@ export class TypeChecker {
         );
       case SyntaxNodes.LambdaExpression:
         return this.checkLambdaExpression(node as LambdaExpression, env);
+      case SyntaxNodes.CallExpression:
+        return this.checkCallExpression(node as CallExpression, env);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -151,11 +154,16 @@ export class TypeChecker {
     node: ParenthesizedExpression,
     env: TypeEnv
   ) {
-    return BoundParenthesizedExpression.new(node, env);
+    return bind(node, env);
   }
 
   private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
     const lambdaEnv = env.extend();
     return bind(node, lambdaEnv);
+  }
+
+  private checkCallExpression(node: CallExpression, env: TypeEnv) {
+    const synthRetType = synth(node, env);
+    return bind(node, env, synthRetType);
   }
 }

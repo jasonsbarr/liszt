@@ -1,18 +1,14 @@
-import { ParenthesizedExpression } from "../../syntax/parser/ast/ParenthesizedExpression";
-import { bind } from "../bind";
-import { TypeEnv } from "../TypeEnv";
+import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundParenthesizedExpression extends BoundASTNode {
-  public expression: BoundASTNode;
-  constructor(node: ParenthesizedExpression, env: TypeEnv) {
-    super(BoundNodes.BoundParenthesizedExpression, node.start, node.end);
-    this.expression = bind(node.expression, env);
+  constructor(public expression: BoundASTNode, start: SrcLoc, end: SrcLoc) {
+    super(BoundNodes.BoundParenthesizedExpression, start, end);
   }
 
-  public static new(node: ParenthesizedExpression, env: TypeEnv) {
-    return new BoundParenthesizedExpression(node, env);
+  public static new(expression: BoundASTNode, start: SrcLoc, end: SrcLoc) {
+    return new BoundParenthesizedExpression(expression, start, end);
   }
 
   public get children() {

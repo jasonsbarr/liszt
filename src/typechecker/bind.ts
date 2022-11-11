@@ -1,6 +1,7 @@
 import { AsExpression } from "../syntax/parser/ast/AsExpression";
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
+import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
@@ -8,12 +9,14 @@ import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
+import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { propType } from "./propType";
 import { synth } from "./synth";
 import { BoundASTNode } from "./tree/BoundASTNode";
 import { BoundBooleanLiteral } from "./tree/BoundBooleanLiteral";
+import { BoundCallExpression } from "./tree/BoundCallExpression";
 import { BoundFloatLiteral } from "./tree/BoundFloatLiteral";
 import { BoundIdentifier } from "./tree/BoundIdentifier";
 import { BoundIntegerLiteral } from "./tree/BoundIntegerLiteral";
@@ -21,6 +24,7 @@ import { BoundLambdaExpression } from "./tree/BoundLambdaExpression";
 import { BoundMemberExpression } from "./tree/BoundMemberExpression";
 import { BoundObjectLiteral } from "./tree/BoundObjectLiteral";
 import { BoundObjectProperty } from "./tree/BoundObjectProperty";
+import { BoundParenthesizedExpression } from "./tree/BoundParenthesizedExpression";
 import { BoundStringLiteral } from "./tree/BoundStringLiteral";
 import { Type } from "./Type";
 import { TypeEnv } from "./TypeEnv";
@@ -86,14 +90,38 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         ty = synth(node, env);
       }
       return bind((node as AsExpression).expression, env, ty);
+    case SyntaxNodes.ParenthesizedExpression:
+      return BoundParenthesizedExpression.new(
+        bind((node as ParenthesizedExpression).expression, env),
+        node.start,
+        node.end
+      );
     case SyntaxNodes.LambdaExpression:
       // gets extended lambdaEnvironment from type checker
       const lambdaType = synth(node, env) as Type.Function;
-      const body = bind((node as LambdaExpression).body, env);
+      const lambdaBody = bind((node as LambdaExpression).body, env);
       return BoundLambdaExpression.new(
         node as LambdaExpression,
-        body,
+        lambdaBody,
         lambdaType
+      );
+    case SyntaxNodes.CallExpression:
+      const callArgs = (node as CallExpression).args.map((arg) =>
+        bind(arg, env)
+      );
+      const callFunc = bind((node as CallExpression).func, env);
+
+      if (!ty) {
+        // Shouldn't need this because TypeChecker should pass this in
+        ty = synth(node, env);
+      }
+
+      return BoundCallExpression.new(
+        callArgs,
+        callFunc,
+        ty,
+        node.start,
+        node.end
       );
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);

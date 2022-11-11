@@ -12,4 +12,5 @@ export enum BoundNodes {
   BoundParenthesizedExpression = "BoundParenthesizedExpression",
   BoundLambdaExpression = "BoundLambdaExpression",
   BoundParameter = "BoundParameter",
+  BoundCallExpression = "BoundCallExpression",
 }
