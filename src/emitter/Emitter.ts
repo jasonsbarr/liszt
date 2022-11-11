@@ -1,5 +1,7 @@
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
+import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { BoundBooleanLiteral } from "../typechecker/tree/BoundBooleanLiteral";
+import { BoundCallExpression } from "../typechecker/tree/BoundCallExpression";
 import { BoundFloatLiteral } from "../typechecker/tree/BoundFloatLiteral";
 import { BoundIdentifier } from "../typechecker/tree/BoundIdentifier";
 import { BoundIntegerLiteral } from "../typechecker/tree/BoundIntegerLiteral";
@@ -52,6 +54,8 @@ export class Emitter {
         );
       case BoundNodes.BoundLambdaExpression:
         return this.emitLambdaExpression(node as BoundLambdaExpression);
+      case BoundNodes.BoundCallExpression:
+        return this.emitCallExpression(node as BoundCallExpression);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -125,6 +129,12 @@ export class Emitter {
     code += ") => ";
     code += this.emitNode(node.body);
 
+    return code;
+  }
+
+  private emitCallExpression(node: CallExpression): string {
+    let code = `${this.emitNode(node.func)}`;
+    code += `(${node.args.map((arg) => this.emitNode(arg)).join(", ")})`;
     return code;
   }
 }
