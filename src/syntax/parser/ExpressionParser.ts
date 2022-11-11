@@ -125,6 +125,7 @@ export class ExpressionParser extends TypeAnnotationParser {
     }
 
     const end = token.location;
+    this.reader.skip(TokenNames.RParen);
 
     return CallExpression.new(left, args, start, end);
   }
