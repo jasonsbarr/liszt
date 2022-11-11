@@ -83,8 +83,6 @@ export class ExpressionParser extends TypeAnnotationParser {
         return Identifier.new(token, token.location);
       default: {
         switch (token.name) {
-          case TokenNames.LParen:
-            return this.parseParenthesizedExpression();
           case TokenNames.LBrace:
             return this.parseObjectLiteral();
           default:
@@ -184,12 +182,5 @@ export class ExpressionParser extends TypeAnnotationParser {
     const end = this.reader.next();
 
     return ObjectLiteral.new(properties, start.location, end.location);
-  }
-
-  private parseParenthesizedExpression() {
-    const start = this.reader.next();
-    const expr = this.parseExpression();
-    const end = this.reader.next();
-    return ParenthesizedExpression.new(expr, start.location, end.location);
   }
 }

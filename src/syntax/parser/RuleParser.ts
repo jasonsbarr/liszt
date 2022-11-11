@@ -6,6 +6,7 @@ import { ASTNode } from "./ast/ASTNode";
 import { Identifier } from "./ast/Identifier";
 import { LambdaExpression } from "./ast/LambdaExpression";
 import { Parameter } from "./ast/Parameter";
+import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
 import { TypeAnnotation } from "./ast/TypeAnnotation";
 import { ExpressionParser } from "./ExpressionParser";
 
@@ -87,11 +88,22 @@ export class RuleParser extends ExpressionParser {
     return Parameter.new(name, start, end, annotation);
   }
 
+  private parseParenthesizedExpression() {
+    const start = this.reader.next();
+    const expr: ASTNode = this.parseRule();
+    const end = this.reader.next();
+    return ParenthesizedExpression.new(expr, start.location, end.location);
+  }
+
   public parseRule() {
     const token = this.reader.peek();
 
     if (token.type === TokenTypes.Keyword) {
       return this.parseKeyword();
+    }
+
+    if (token.name === TokenNames.LParen) {
+      return this.parseParenthesizedExpression();
     }
 
     return this.parseExpression();
