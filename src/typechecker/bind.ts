@@ -12,6 +12,8 @@ import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
 import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { check } from "./check";
+import { isSubtype } from "./isSubtype";
 import { propType } from "./propType";
 import { synth } from "./synth";
 import { BoundASTNode } from "./tree/BoundASTNode";
@@ -79,8 +81,15 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         );
       }
 
+      // Should never happen
+      if (!isSubtype(ty!, propertyType)) {
+        throw new Error(
+          `Synthesized type ${ty} is not compatible with synthesized property type ${propertyType}`
+        );
+      }
+
       return BoundMemberExpression.new(
-        propertyType,
+        ty!, // is being passed in by TypeChecker
         bind(obj, env, synthObjType),
         bind(prop, env, propertyType),
         node as MemberExpression
