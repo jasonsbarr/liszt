@@ -1,5 +1,6 @@
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { Identifier } from "../syntax/parser/ast/Identifier";
+import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { isSubtype } from "./isSubtype";
@@ -11,6 +12,10 @@ import { TypeEnv } from "./TypeEnv";
 export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
   if (ast.kind === SyntaxNodes.ObjectLiteral && Type.isObject(t)) {
     return checkObject(ast as ObjectLiteral, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.LambdaExpression && Type.isFunction(t)) {
+    return checkFunction(ast as LambdaExpression, t, env);
   }
 
   const synthType = synth(ast, env);
@@ -56,4 +61,20 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
   });
 
   return true;
+};
+
+const checkFunction = (
+  node: LambdaExpression,
+  type: Type.Function,
+  env: TypeEnv
+): boolean => {
+  if (type.args.length !== node.params.length) {
+    throw new Error(`Expected ${type.args.length}, got ${node.params.length}`);
+  }
+
+  node.params.forEach((param, i) => {
+    env.set(param.name.name, type.args[i]);
+  });
+
+  return check(node.body, type.ret, env);
 };

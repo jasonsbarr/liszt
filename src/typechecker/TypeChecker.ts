@@ -159,7 +159,9 @@ export class TypeChecker {
 
   private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
     const lambdaEnv = env.extend();
-    return bind(node, lambdaEnv);
+    const lambdaType = synth(node, env) as Type.Function;
+    check(node, lambdaType, lambdaEnv);
+    return bind(node, lambdaEnv, lambdaType);
   }
 
   private checkCallExpression(node: CallExpression, env: TypeEnv) {
