@@ -100,8 +100,12 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
       return bind((node as AsExpression).expression, env, ty);
     case SyntaxNodes.ParenthesizedExpression:
+      if (!ty) {
+        ty = synth((node as ParenthesizedExpression).expression, env);
+      }
+
       return BoundParenthesizedExpression.new(
-        bind((node as ParenthesizedExpression).expression, env),
+        bind((node as ParenthesizedExpression).expression, env, ty),
         node.start,
         node.end
       );
