@@ -1,3 +1,4 @@
+import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
@@ -16,6 +17,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   if (ast.kind === SyntaxNodes.LambdaExpression && Type.isFunction(t)) {
     return checkFunction(ast as LambdaExpression, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.AssignmentExpression) {
+    return checkAssignment(ast as AssignmentExpression, t, env);
   }
 
   const synthType = synth(ast, env);
@@ -77,4 +82,19 @@ const checkFunction = (
   });
 
   return check(node.body, type.ret, env);
+};
+
+const checkAssignment = (
+  node: AssignmentExpression,
+  type: Type,
+  env: TypeEnv
+): boolean => {
+  if (node.left instanceof Identifier) {
+    // will throw if name is not already defined
+    let existsType = env.get(node.left.name)!;
+    return check(node.right, existsType, env);
+  }
+
+  // right now, it should never get here - will revisit when adding additional LHVs
+  return check(node.right, type, env);
 };
