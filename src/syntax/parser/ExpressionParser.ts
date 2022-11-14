@@ -41,6 +41,10 @@ const ledAttributes = {
   [TokenNames.As]: { prec: 5, assoc: "left" },
 };
 
+const assignmentOps = {
+  [TokenNames.Equals]: "Equals",
+};
+
 type led = keyof typeof ledAttributes;
 
 export class ExpressionParser extends TypeAnnotationParser {
@@ -60,6 +64,10 @@ export class ExpressionParser extends TypeAnnotationParser {
     const end = annotation.end;
 
     return AsExpression.new(left, annotation, start, end);
+  }
+
+  private parseAssign(left: ASTNode) {
+    let token = this.reader.next();
   }
 
   private parseAtom(): ASTNode {
@@ -143,7 +151,14 @@ export class ExpressionParser extends TypeAnnotationParser {
   }
 
   public parseExpression(rbp: number = 0) {
-    return this.parseExpr(rbp);
+    let expr = this.parseExpr(rbp);
+    let token = this.reader.peek();
+
+    if (token.name in assignmentOps) {
+      return this.parseAssign(expr);
+    }
+
+    return expr;
   }
 
   private parseLambda() {
