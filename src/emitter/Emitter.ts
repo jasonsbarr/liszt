@@ -1,5 +1,8 @@
+import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
+import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
+import { BoundAssignmentExpression } from "../typechecker/tree/BoundAssignmentExpression";
 import { BoundBooleanLiteral } from "../typechecker/tree/BoundBooleanLiteral";
 import { BoundCallExpression } from "../typechecker/tree/BoundCallExpression";
 import { BoundFloatLiteral } from "../typechecker/tree/BoundFloatLiteral";
@@ -14,6 +17,7 @@ import { BoundParenthesizedExpression } from "../typechecker/tree/BoundParenthes
 import { BoundProgramNode } from "../typechecker/tree/BoundProgramNode";
 import { BoundStringLiteral } from "../typechecker/tree/BoundStringLiteral";
 import { BoundTree } from "../typechecker/tree/BoundTree";
+import { BoundVariableDeclaration } from "../typechecker/tree/BoundVariableDeclaration";
 
 export class Emitter {
   constructor(public tree: BoundTree) {}
@@ -56,6 +60,10 @@ export class Emitter {
         return this.emitLambdaExpression(node as BoundLambdaExpression);
       case BoundNodes.BoundCallExpression:
         return this.emitCallExpression(node as BoundCallExpression);
+      case BoundNodes.BoundAssignmentExpression:
+        return this.emitAssignment(node as BoundAssignmentExpression);
+      case BoundNodes.BoundVariableDeclaration:
+        return this.emitVariableDeclaration(node as BoundVariableDeclaration);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -136,5 +144,19 @@ export class Emitter {
     let code = `${this.emitNode(node.func)}`;
     code += `(${node.args.map((arg) => this.emitNode(arg)).join(", ")})`;
     return code;
+  }
+
+  private emitAssignment(node: BoundAssignmentExpression): string {
+    return `${this.emitNode(node.left)} ${node.operator.value} ${this.emitNode(
+      node.right
+    )}`;
+  }
+
+  private emitVariableDeclaration(node: BoundVariableDeclaration): string {
+    if (node.constant) {
+      return `const ${this.emitNode(node.assignment)}`;
+    }
+
+    return `let ${this.emitNode(node.assignment)}`;
   }
 }

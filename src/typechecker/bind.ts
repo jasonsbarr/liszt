@@ -160,6 +160,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         return BoundAssignmentExpression.new(
           left,
           right,
+          node.operator,
           node.start,
           node.end,
           ty!

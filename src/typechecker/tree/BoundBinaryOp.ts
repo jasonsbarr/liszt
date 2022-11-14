@@ -1,4 +1,5 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { Token } from "../../syntax/lexer/Token";
 import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
@@ -7,6 +8,7 @@ export class BoundBinaryOp extends BoundASTNode {
   constructor(
     public left: BoundASTNode,
     public right: BoundASTNode,
+    public operator: Token,
     start: SrcLoc,
     end: SrcLoc,
     public type: Type,
@@ -18,12 +20,13 @@ export class BoundBinaryOp extends BoundASTNode {
   public static new(
     left: BoundASTNode,
     right: BoundASTNode,
+    operator: Token,
     start: SrcLoc,
     end: SrcLoc,
     type: Type,
     name?: BoundNodes
   ) {
-    return new BoundBinaryOp(left, right, start, end, type, name);
+    return new BoundBinaryOp(left, right, operator, start, end, type, name);
   }
 
   public get children() {
