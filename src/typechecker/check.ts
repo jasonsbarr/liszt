@@ -4,6 +4,7 @@ import { Identifier } from "../syntax/parser/ast/Identifier";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { isSubtype } from "./isSubtype";
 import { propType } from "./propType";
 import { synth } from "./synth";
@@ -21,6 +22,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   if (ast.kind === SyntaxNodes.AssignmentExpression) {
     return checkAssignment(ast as AssignmentExpression, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.VariableDeclaration) {
+    return checkVariableDeclaration(ast as VariableDeclaration, t, env);
   }
 
   const synthType = synth(ast, env);
@@ -98,4 +103,14 @@ const checkAssignment = (
   // right now, it should never get here - will revisit when adding additional LHVs
   // for now, this is just to make TypeScript happy
   return check(node.right, type, env);
+};
+
+// This should only matter for declarations with a type annotation
+const checkVariableDeclaration = (
+  node: VariableDeclaration,
+  type: Type,
+  env: TypeEnv
+): boolean => {
+  env.set((node.assignment.left as Identifier).name, type);
+  return check(node.assignment, type, env);
 };
