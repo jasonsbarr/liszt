@@ -161,6 +161,7 @@ export class ExpressionParser extends TypeAnnotationParser {
 
     let type: TypeAnnotation | undefined;
     if (token.name === TokenNames.Colon) {
+      this.reader.skip(TokenNames.Colon);
       type = this.parseTypeAnnotation();
     }
 
