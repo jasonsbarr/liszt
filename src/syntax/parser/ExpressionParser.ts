@@ -167,6 +167,7 @@ export class ExpressionParser extends TypeAnnotationParser {
     }
 
     if (token.name in assignmentOps) {
+      expr = this.parseLHV(expr);
       return this.parseAssign(expr, type);
     }
 
