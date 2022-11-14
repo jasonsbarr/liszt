@@ -163,9 +163,9 @@ export class ExpressionParser extends TypeAnnotationParser {
     if (token.name === TokenNames.Colon) {
       this.reader.skip(TokenNames.Colon);
       type = this.parseTypeAnnotation();
+      token = this.reader.peek();
     }
 
-    token = this.reader.peek();
     if (token.name in assignmentOps) {
       return this.parseAssign(expr, type);
     }
