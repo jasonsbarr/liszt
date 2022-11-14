@@ -76,6 +76,8 @@ export class TypeChecker {
         return this.checkNilLiteral(node as NilLiteral, env);
       case SyntaxNodes.ObjectLiteral:
         return this.checkObjectLiteral(node as ObjectLiteral, env);
+      case SyntaxNodes.Identifier:
+        return this.checkIdentifier(node as Identifier, env);
       case SyntaxNodes.MemberExpression:
         return this.checkMemberExpression(node as MemberExpression, env);
       case SyntaxNodes.AsExpression:
@@ -144,6 +146,10 @@ export class TypeChecker {
     check(node, synthType, env);
 
     return bind(node, env, synthType);
+  }
+
+  private checkIdentifier(node: Identifier, env: TypeEnv) {
+    return bind(node, env);
   }
 
   private checkMemberExpression(node: MemberExpression, env: TypeEnv) {
