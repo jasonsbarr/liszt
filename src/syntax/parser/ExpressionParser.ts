@@ -67,12 +67,12 @@ export class ExpressionParser extends TypeAnnotationParser {
     return AsExpression.new(left, annotation, start, end);
   }
 
-  private parseAssign(left: ASTNode) {
+  private parseAssign(left: ASTNode, type: TypeAnnotation | undefined) {
     let token = this.reader.next();
     const right: ASTNode = this.parseExpression();
     const start = left.start;
     const end = right.end;
-    return AssignmentExpression.new(left, right, token, start, end);
+    return AssignmentExpression.new(left, right, token, start, end, type);
   }
 
   private parseAtom(): ASTNode {
@@ -159,8 +159,13 @@ export class ExpressionParser extends TypeAnnotationParser {
     let expr = this.parseExpr(rbp);
     let token = this.reader.peek();
 
+    let type: TypeAnnotation | undefined;
+    if (token.name === TokenNames.Colon) {
+      type = this.parseTypeAnnotation();
+    }
+
     if (token.name in assignmentOps) {
-      return this.parseAssign(expr);
+      return this.parseAssign(expr, type);
     }
 
     return expr;

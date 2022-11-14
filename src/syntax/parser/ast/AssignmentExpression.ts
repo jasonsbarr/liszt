@@ -3,6 +3,7 @@ import { Token } from "../../lexer/Token";
 import { ASTNode } from "./ASTNode";
 import { BinaryOp } from "./BinaryOp";
 import { SyntaxNodes } from "./SyntaxNodes";
+import { TypeAnnotation } from "./TypeAnnotation";
 
 export class AssignmentExpression extends BinaryOp {
   constructor(
@@ -10,7 +11,8 @@ export class AssignmentExpression extends BinaryOp {
     right: ASTNode,
     operator: Token,
     start: SrcLoc,
-    end: SrcLoc
+    end: SrcLoc,
+    public type?: TypeAnnotation
   ) {
     super(left, right, operator, SyntaxNodes.AssignmentExpression, start, end);
   }
@@ -20,9 +22,10 @@ export class AssignmentExpression extends BinaryOp {
     right: ASTNode,
     operator: Token,
     start: SrcLoc,
-    end: SrcLoc
+    end: SrcLoc,
+    type?: TypeAnnotation
   ) {
-    return new AssignmentExpression(left, right, operator, start, end);
+    return new AssignmentExpression(left, right, operator, start, end, type);
   }
 
   public get children() {
