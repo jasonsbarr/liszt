@@ -56,7 +56,6 @@ export const KEYWORDS = {
   boolean: TokenNames.BooleanKeyword,
   string: TokenNames.StringKeyword,
   any: TokenNames.AnyKeyword,
-  lambda: TokenNames.Lambda,
   def: TokenNames.Def,
   var: TokenNames.Var,
   const: TokenNames.Const,
@@ -66,7 +65,11 @@ export const KEYWORDS = {
 
 export type kw = keyof typeof KEYWORDS;
 
-export const OPERATORS = { "=": TokenNames.Equals, "=>": TokenNames.FatArrow };
+export const OPERATORS = {
+  "=": TokenNames.Equals,
+  "=>": TokenNames.FatArrow,
+  lambda: TokenNames.Lambda,
+};
 
 export type ops = keyof typeof OPERATORS;
 

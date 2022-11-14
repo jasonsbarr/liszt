@@ -106,10 +106,7 @@ const synthParenthesizedExpression = (
 const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
-    if (!param.type) {
-      throw new Error(`No type annotation for parameter ${name}`);
-    }
-    const type = fromAnnotation(param.type);
+    const type = param?.type ? fromAnnotation(param.type) : Type.any;
     // has extended lambdaEnvironment from caller
     env.set(name, type);
     return type;

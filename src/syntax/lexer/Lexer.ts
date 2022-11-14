@@ -172,6 +172,15 @@ export class Lexer {
       this.tokens.addFloatToken(value, pos, line, col, trivia);
     } else if (isNilLiteral(value)) {
       this.tokens.addNilToken(pos, line, col, trivia);
+    } else if (isOp(value)) {
+      this.tokens.addOperatorToken(
+        OPERATORS[value as ops],
+        value,
+        pos,
+        line,
+        col,
+        trivia
+      );
     } else if (isKeyword(value)) {
       this.tokens.addKeywordToken(
         KEYWORDS[value as kw],
