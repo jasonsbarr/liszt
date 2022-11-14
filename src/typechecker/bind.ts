@@ -1,4 +1,5 @@
 import { AsExpression } from "../syntax/parser/ast/AsExpression";
+import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
@@ -12,10 +13,12 @@ import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
 import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { check } from "./check";
 import { isSubtype } from "./isSubtype";
 import { propType } from "./propType";
 import { synth } from "./synth";
+import { BoundAssignmentExpression } from "./tree/BoundAssignmentExpression";
 import { BoundASTNode } from "./tree/BoundASTNode";
 import { BoundBooleanLiteral } from "./tree/BoundBooleanLiteral";
 import { BoundCallExpression } from "./tree/BoundCallExpression";
@@ -28,6 +31,7 @@ import { BoundObjectLiteral } from "./tree/BoundObjectLiteral";
 import { BoundObjectProperty } from "./tree/BoundObjectProperty";
 import { BoundParenthesizedExpression } from "./tree/BoundParenthesizedExpression";
 import { BoundStringLiteral } from "./tree/BoundStringLiteral";
+import { BoundVariableDeclaration } from "./tree/BoundVariableDeclaration";
 import { Type } from "./Type";
 import { TypeEnv } from "./TypeEnv";
 import { ObjectType } from "./Types";
@@ -136,6 +140,39 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         node.start,
         node.end
       );
+    case SyntaxNodes.AssignmentExpression:
+      if (node instanceof AssignmentExpression) {
+        // Type checker always passes in the type here
+        const left = bind(node.left, env, ty!);
+        const right = bind(node.right, env, ty!);
+        return BoundAssignmentExpression.new(
+          left,
+          right,
+          node.start,
+          node.end,
+          ty!
+        );
+      }
+      // Should never happen
+      throw new Error("WTF");
+    case SyntaxNodes.VariableDeclaration:
+      if (node instanceof VariableDeclaration) {
+        // Type checker always passes in the type here
+        const assignment = bind(
+          node.assignment,
+          env,
+          ty!
+        ) as BoundAssignmentExpression;
+        return BoundVariableDeclaration.new(
+          assignment,
+          node.constant,
+          ty!,
+          node.start,
+          node.end
+        );
+      }
+      // Should never happen
+      throw new Error("Again, WTF?");
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
   }

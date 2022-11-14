@@ -31,6 +31,10 @@ import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { Type } from "./Type";
 import { BoundLambdaExpression } from "./tree/BoundLambdaExpression";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
+import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
+import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
+import { fromAnnotation } from "./fromAnnotation";
+import { Identifier } from "../syntax/parser/ast/Identifier";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -85,6 +89,10 @@ export class TypeChecker {
         return this.checkLambdaExpression(node as LambdaExpression, env);
       case SyntaxNodes.CallExpression:
         return this.checkCallExpression(node as CallExpression, env);
+      case SyntaxNodes.AssignmentExpression:
+        return this.checkAssignment(node as AssignmentExpression, env);
+      case SyntaxNodes.VariableDeclaration:
+        return this.checkVariableDeclaration(node as VariableDeclaration, env);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -167,5 +175,34 @@ export class TypeChecker {
   private checkCallExpression(node: CallExpression, env: TypeEnv) {
     const synthRetType = synth(node, env);
     return bind(node, env, synthRetType);
+  }
+
+  private checkAssignment(node: AssignmentExpression, env: TypeEnv) {
+    // there will only be a type annotation in a variable declaration
+    let type: Type;
+
+    if (node.type) {
+      type = fromAnnotation(node.type);
+      check(node.right, type, env);
+    } else {
+      type = synth(node.right, env);
+    }
+
+    return bind(node, env, type);
+  }
+
+  private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
+    let type: Type;
+
+    if (node.assignment.type) {
+      type = fromAnnotation(node.assignment.type);
+      check(node, type, env);
+    } else {
+      type = synth(node.assignment.right, env);
+    }
+
+    // Need to set the variable name and type BEFORE binding the assignment node
+    env.set((node.assignment.left as Identifier).name, type);
+    return bind(node, env, type);
   }
 }

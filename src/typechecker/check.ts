@@ -111,6 +111,5 @@ const checkVariableDeclaration = (
   type: Type,
   env: TypeEnv
 ): boolean => {
-  env.set((node.assignment.left as Identifier).name, type);
   return check(node.assignment, type, env);
 };
