@@ -265,7 +265,7 @@ export class ExpressionParser extends TypeAnnotationParser {
       );
     }
 
-    let name = this.parseExpression() as Identifier;
+    let name = this.parseExpr() as Identifier;
     let annotation: TypeAnnotation | undefined;
     const start = name.start;
     let end: SrcLoc;
