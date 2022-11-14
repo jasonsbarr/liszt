@@ -3,6 +3,7 @@ import { SrcLoc } from "../lexer/SrcLoc";
 import { TokenNames } from "../lexer/TokenNames";
 import { TokenTypes } from "../lexer/TokenTypes";
 import { AsExpression } from "./ast/AsExpression";
+import { AssignmentExpression } from "./ast/AssignmentExpression";
 import { ASTNode } from "./ast/ASTNode";
 import { BooleanLiteral } from "./ast/BooleanLiteral";
 import { CallExpression } from "./ast/CallExpression";
@@ -68,6 +69,10 @@ export class ExpressionParser extends TypeAnnotationParser {
 
   private parseAssign(left: ASTNode) {
     let token = this.reader.next();
+    const right: ASTNode = this.parseExpression();
+    const start = left.start;
+    const end = right.end;
+    return AssignmentExpression.new(left, right, token, start, end);
   }
 
   private parseAtom(): ASTNode {

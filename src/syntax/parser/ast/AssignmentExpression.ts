@@ -14,7 +14,7 @@ export class AssignmentExpression extends ASTNode {
     super(SyntaxNodes.AssignmentExpression, start, end);
   }
 
-  public new(
+  public static new(
     lhv: ASTNode,
     rhv: ASTNode,
     assignType: Token,
