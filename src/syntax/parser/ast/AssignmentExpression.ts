@@ -1,30 +1,31 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { Token } from "../../lexer/Token";
 import { ASTNode } from "./ASTNode";
+import { BinaryOp } from "./BinaryOp";
 import { SyntaxNodes } from "./SyntaxNodes";
 
-export class AssignmentExpression extends ASTNode {
+export class AssignmentExpression extends BinaryOp {
   constructor(
-    public lhv: ASTNode,
-    public rhv: ASTNode,
-    public assignType: Token,
+    left: ASTNode,
+    right: ASTNode,
+    operator: Token,
     start: SrcLoc,
     end: SrcLoc
   ) {
-    super(SyntaxNodes.AssignmentExpression, start, end);
+    super(left, right, operator, SyntaxNodes.AssignmentExpression, start, end);
   }
 
   public static new(
-    lhv: ASTNode,
-    rhv: ASTNode,
-    assignType: Token,
+    left: ASTNode,
+    right: ASTNode,
+    operator: Token,
     start: SrcLoc,
     end: SrcLoc
   ) {
-    return new AssignmentExpression(lhv, rhv, assignType, start, end);
+    return new AssignmentExpression(left, right, operator, start, end);
   }
 
   public get children() {
-    return [this.lhv, this.rhv];
+    return [this.left, this.right];
   }
 }

@@ -23,4 +23,5 @@ export enum SyntaxNodes {
   Parameter = "Parameter",
   CallExpression = "CallExpression",
   AssignmentExpression = "AssignmentExpression",
+  VariableDeclaration = "VariableDeclaration",
 }
