@@ -8,11 +8,11 @@ export class BinaryOp extends ASTNode {
     public left: ASTNode,
     public right: ASTNode,
     public operator: Token,
-    name: SyntaxNodes,
     start: SrcLoc,
-    end: SrcLoc
+    end: SrcLoc,
+    name?: SyntaxNodes
   ) {
-    super(name, start, end);
+    super(name ?? SyntaxNodes.BinaryOp, start, end);
   }
 
   public get children() {

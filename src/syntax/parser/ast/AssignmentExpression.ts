@@ -14,7 +14,7 @@ export class AssignmentExpression extends BinaryOp {
     end: SrcLoc,
     public type?: TypeAnnotation
   ) {
-    super(left, right, operator, SyntaxNodes.AssignmentExpression, start, end);
+    super(left, right, operator, start, end, SyntaxNodes.AssignmentExpression);
   }
 
   public static new(
