@@ -1,4 +1,5 @@
 import {
+  AnyType,
   BooleanType,
   FloatType,
   FunctionType,
@@ -37,3 +38,5 @@ export const object = (
 
 export const functionType = (args: Type[], ret: Type) =>
   FunctionType.new(args, ret);
+
+export const any = AnyType.new();

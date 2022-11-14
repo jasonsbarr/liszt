@@ -55,6 +55,7 @@ export const KEYWORDS = {
   number: TokenNames.NumberKeyword,
   boolean: TokenNames.BooleanKeyword,
   string: TokenNames.StringKeyword,
+  any: TokenNames.AnyKeyword,
   lambda: TokenNames.Lambda,
   def: TokenNames.Def,
   var: TokenNames.Var,

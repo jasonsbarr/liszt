@@ -8,6 +8,7 @@ import {
   NumberType,
   ObjectType,
   FunctionType,
+  AnyType,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -26,3 +27,5 @@ export const isNil = (t: Type): t is NilType => t.name === "Nil";
 export const isObject = (t: Type): t is ObjectType => t.name === "Object";
 
 export const isFunction = (t: Type): t is FunctionType => t.name === "Function";
+
+export const isAny = (t: Type): t is AnyType => t.name === "Any";

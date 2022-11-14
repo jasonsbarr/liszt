@@ -17,6 +17,7 @@ export enum SyntaxNodes {
   NumberKeyword = "NumberKeyword",
   BooleanKeyword = "BooleanKeyword",
   StringKeyword = "StringKeyword",
+  AnyKeyword = "AnyKeyword",
   TypeLiteral = "TypeLiteral",
   ObjectPropertyType = "ObjectPropertyType",
   LambdaExpression = "LambdaExpression",

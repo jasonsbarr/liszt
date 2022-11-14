@@ -13,6 +13,7 @@ module Type {
   export type Object = Types.ObjectType;
   export type Property = Types.Property;
   export type Function = Types.FunctionType;
+  export type Any = Types.AnyType;
 
   export type Type = Types.Type;
 
@@ -25,6 +26,7 @@ module Type {
   export const nil = Constructors.nil;
   export const object = Constructors.object;
   export const functionType = Constructors.functionType;
+  export const any = Constructors.any;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -35,6 +37,7 @@ module Type {
   export const isNil = Validators.isNil;
   export const isObject = Validators.isObject;
   export const isFunction = Validators.isFunction;
+  export const isAny = Validators.isAny;
 }
 
 type Type = Type.Type;

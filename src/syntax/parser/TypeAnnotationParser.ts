@@ -1,5 +1,6 @@
 import { LexResult } from "../lexer/LexResult";
 import { TokenNames } from "../lexer/TokenNames";
+import { AnyKeyword } from "./ast/AnyKeyword";
 import { BooleanKeyword } from "./ast/BooleanKeyword";
 import { FloatKeyword } from "./ast/FloatKeyword";
 import { Identifier } from "./ast/Identifier";
@@ -15,6 +16,11 @@ import { LHVParser } from "./LHVParser";
 export class TypeAnnotationParser extends LHVParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
+  }
+
+  private parseAnyKeyword() {
+    const token = this.reader.next();
+    return AnyKeyword.new(token, token.location);
   }
 
   private parseBooleanKeyword() {
@@ -77,6 +83,8 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseIdentifier();
       case TokenNames.LBrace:
         return this.parseTypeLiteral();
+      case TokenNames.AnyKeyword:
+        return this.parseAnyKeyword();
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }

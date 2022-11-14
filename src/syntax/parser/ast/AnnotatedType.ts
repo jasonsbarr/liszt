@@ -5,6 +5,7 @@ import { IntegerKeyword } from "./IntegerKeyword";
 import { NilLiteral } from "./NilLiteral";
 import { StringKeyword } from "./StringKeyword";
 import { TypeLiteral } from "./TypeLiteral";
+import { AnyKeyword } from "./AnyKeyword";
 
 export type AnnotatedType =
   | IntegerKeyword
@@ -13,4 +14,5 @@ export type AnnotatedType =
   | StringKeyword
   | NilLiteral
   | Identifier
-  | TypeLiteral;
+  | TypeLiteral
+  | AnyKeyword;

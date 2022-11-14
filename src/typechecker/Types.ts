@@ -84,7 +84,7 @@ export class ObjectType extends BaseType {
     const properties = this.properties
       .map((prop) => `${prop.name}: ${prop.type}`)
       .join(", ");
-    return `Object { ${properties} }`;
+    return `{ ${properties} }`;
   }
 }
 
@@ -98,9 +98,19 @@ export class FunctionType extends BaseType {
   }
 
   public toString(): string {
-    return `Function (${this.args
-      .map((arg) => arg.toString())
-      .join(", ")}) => ${this.ret}`;
+    return `(${this.args.map((arg) => arg.toString()).join(", ")}) => ${
+      this.ret
+    }`;
+  }
+}
+
+export class AnyType extends BaseType {
+  constructor() {
+    super("Any");
+  }
+
+  public static new() {
+    return new AnyType();
   }
 }
 
@@ -113,4 +123,5 @@ export type Type =
   | BooleanType
   | NilType
   | ObjectType
-  | FunctionType;
+  | FunctionType
+  | AnyType;
