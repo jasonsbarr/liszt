@@ -96,5 +96,6 @@ const checkAssignment = (
   }
 
   // right now, it should never get here - will revisit when adding additional LHVs
+  // for now, this is just to make TypeScript happy
   return check(node.right, type, env);
 };
