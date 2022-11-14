@@ -42,7 +42,7 @@ export class Env<T> {
     this._vars.set(name, value);
   }
 
-  private lookup(name: string) {
+  public lookup(name: string) {
     let scope: Env<T> | undefined = this;
 
     while (scope) {
