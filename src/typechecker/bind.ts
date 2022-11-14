@@ -111,7 +111,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       );
     case SyntaxNodes.LambdaExpression:
       // gets extended lambdaEnvironment from type checker
-      check(node, ty!, env);
+      check(node, env, ty!);
       const lambdaBody = bind((node as LambdaExpression).body, env);
       return BoundLambdaExpression.new(
         node as LambdaExpression,
