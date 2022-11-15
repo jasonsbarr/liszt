@@ -43,6 +43,7 @@ export class RuleParser extends ExpressionParser {
     let returnType: TypeAnnotation | undefined;
 
     this.reader.skip(TokenNames.Def);
+    const name = this.parseExpr() as Identifier;
     this.reader.skip(TokenNames.LParen);
     token = this.reader.peek();
 
@@ -62,7 +63,14 @@ export class RuleParser extends ExpressionParser {
     const body = this.parseBlock();
     const end = body.end;
 
-    return FunctionDeclaration.new(parameters, body, start, end, returnType);
+    return FunctionDeclaration.new(
+      name,
+      parameters,
+      body,
+      start,
+      end,
+      returnType
+    );
   }
 
   private parseKeyword(): ASTNode {
