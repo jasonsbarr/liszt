@@ -12,7 +12,7 @@ export class BinaryOperation extends ASTNode {
     end: SrcLoc,
     name?: SyntaxNodes
   ) {
-    super(name ?? SyntaxNodes.BinaryOp, start, end);
+    super(name ?? SyntaxNodes.BinaryOperation, start, end);
   }
 
   public get children() {

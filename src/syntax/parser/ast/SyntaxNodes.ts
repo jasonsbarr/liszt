@@ -23,7 +23,7 @@ export enum SyntaxNodes {
   LambdaExpression = "LambdaExpression",
   Parameter = "Parameter",
   CallExpression = "CallExpression",
-  BinaryOp = "BinaryOp",
+  BinaryOperation = "BinaryOperation",
   AssignmentExpression = "AssignmentExpression",
   VariableDeclaration = "VariableDeclaration",
   FunctionType = "FunctionType",
