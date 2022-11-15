@@ -3,9 +3,11 @@ import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { BoundAssignmentExpression } from "../typechecker/bound/BoundAssignmentExpression";
+import { BoundBlock } from "../typechecker/bound/BoundBlock";
 import { BoundBooleanLiteral } from "../typechecker/bound/BoundBooleanLiteral";
 import { BoundCallExpression } from "../typechecker/bound/BoundCallExpression";
 import { BoundFloatLiteral } from "../typechecker/bound/BoundFloatLiteral";
+import { BoundFunctionDeclaration } from "../typechecker/bound/BoundFunctionDeclaration";
 import { BoundIdentifier } from "../typechecker/bound/BoundIdentifier";
 import { BoundIntegerLiteral } from "../typechecker/bound/BoundIntegerLiteral";
 import { BoundLambdaExpression } from "../typechecker/bound/BoundLambdaExpression";
@@ -15,6 +17,7 @@ import { BoundNodes } from "../typechecker/bound/BoundNodes";
 import { BoundObjectLiteral } from "../typechecker/bound/BoundObjectLiteral";
 import { BoundParenthesizedExpression } from "../typechecker/bound/BoundParenthesizedExpression";
 import { BoundProgramNode } from "../typechecker/bound/BoundProgramNode";
+import { BoundReturnStatement } from "../typechecker/bound/BoundReturnStatement";
 import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
 import { BoundTree } from "../typechecker/bound/BoundTree";
 import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
@@ -64,6 +67,12 @@ export class Emitter {
         return this.emitAssignment(node as BoundAssignmentExpression);
       case BoundNodes.BoundVariableDeclaration:
         return this.emitVariableDeclaration(node as BoundVariableDeclaration);
+      case BoundNodes.BoundFunctionDeclaration:
+        return this.emitFunctionDeclaration(node as BoundFunctionDeclaration);
+      case BoundNodes.BoundBlock:
+        return this.emitBlock(node as BoundBlock);
+      case BoundNodes.BoundReturnStatement:
+        return this.emitReturnStatement(node as BoundReturnStatement);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -154,9 +163,39 @@ export class Emitter {
 
   private emitVariableDeclaration(node: BoundVariableDeclaration): string {
     if (node.constant) {
-      return `const ${this.emitNode(node.assignment)}`;
+      return `const ${this.emitNode(node.assignment)};\n`;
     }
 
-    return `let ${this.emitNode(node.assignment)}`;
+    return `let ${this.emitNode(node.assignment)};\n`;
+  }
+
+  private emitFunctionDeclaration(node: BoundFunctionDeclaration): string {
+    let code = `\nfunction ${node.name.name}(`;
+    code += node.parameters.map((p) => p.name.name).join(", ") + ") {\n";
+    code += `return ${this.emitBlock(node.body)}`;
+    code += "}\n\n";
+
+    return code;
+  }
+
+  private emitBlock(node: BoundBlock): string {
+    let code = "(function() {\n";
+    code += `${node.expressions
+      .map((expr, i, a) => {
+        if (expr.kind === BoundNodes.BoundReturnStatement) {
+          return this.emitNode(expr);
+        } else if (i === a.length - 1) {
+          return `return ${this.emitNode(expr)};`;
+        }
+        return this.emitNode(expr);
+      })
+      .join("")}`;
+    code += "\n})();\n";
+
+    return code;
+  }
+
+  private emitReturnStatement(node: BoundReturnStatement): string {
+    return `return ${this.emitNode(node.expression)};`;
   }
 }
