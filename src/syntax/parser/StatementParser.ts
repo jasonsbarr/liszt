@@ -46,11 +46,11 @@ const ledAttributes = {
   [TokenNames.As]: { prec: 5, assoc: "left" },
 };
 
+type led = keyof typeof ledAttributes;
+
 const assignmentOps = {
   [TokenNames.Equals]: "Equals",
 };
-
-type led = keyof typeof ledAttributes;
 
 export class StatementParser extends TypeAnnotationParser {
   constructor(lexResult: LexResult) {
