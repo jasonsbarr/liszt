@@ -206,9 +206,8 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
           name,
           boundParams,
           boundBody,
-          // guaranteed to be passed in from type checker
-          // will be a function type
-          ty!,
+          // ty guaranteed to be a function type passed in from type checker
+          (ty! as Type.Function).ret,
           node.start,
           node.end
         );
