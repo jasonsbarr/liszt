@@ -1,5 +1,6 @@
 import { LexResult } from "../lexer/LexResult";
 import { TokenNames } from "../lexer/TokenNames";
+import { AnnotatedType } from "./ast/AnnotatedType";
 import { AnyKeyword } from "./ast/AnyKeyword";
 import { BooleanKeyword } from "./ast/BooleanKeyword";
 import { FloatKeyword } from "./ast/FloatKeyword";
@@ -10,10 +11,12 @@ import { NilLiteral } from "./ast/NilLiteral";
 import { NumberKeyword } from "./ast/NumberKeyword";
 import { ObjectPropertyType } from "./ast/ObjectPropertyType";
 import { Parameter } from "./ast/Parameter";
+import { ParameterType } from "./ast/ParameterType";
 import { StringKeyword } from "./ast/StringKeyword";
 import { TypeAnnotation } from "./ast/TypeAnnotation";
 import { TypeLiteral } from "./ast/TypeLiteral";
 import { LHVParser } from "./LHVParser";
+import { SrcLoc } from "../lexer/SrcLoc";
 
 export class TypeAnnotationParser extends LHVParser {
   constructor(lexResult: LexResult) {
@@ -35,11 +38,11 @@ export class TypeAnnotationParser extends LHVParser {
     return FloatKeyword.new(token, token.location);
   }
 
-  private parseFunctionType() {
+  private parseFunctionType(): FunctionType {
     // syntax: (param: type, ...) => returnType
     let token = this.reader.peek();
     const start = token.location;
-    let parameters: Parameter[] = [];
+    let parameters: ParameterType[] = [];
 
     this.reader.skip(TokenNames.LParen);
     token = this.reader.peek();
@@ -55,10 +58,10 @@ export class TypeAnnotationParser extends LHVParser {
 
       const param = this.parseType() as Identifier;
       this.reader.skip(TokenNames.Colon);
-      const paramType = this.parseTypeAnnotation();
+      const paramType = this.parseType();
       const en = paramType.end;
 
-      parameters.push(Parameter.new(param, st, en, paramType));
+      parameters.push(ParameterType.new(param, st, en, paramType));
       token = this.reader.peek();
 
       if (token.name !== TokenNames.RParen) {
@@ -70,8 +73,8 @@ export class TypeAnnotationParser extends LHVParser {
     this.reader.skip(TokenNames.RParen);
     this.reader.skip(TokenNames.FatArrow);
 
-    const returnType: TypeAnnotation = this.parseTypeAnnotation();
-    const end = returnType.end;
+    const returnType: AnnotatedType = this.parseType();
+    const end: SrcLoc = returnType.end;
 
     return FunctionType.new(parameters, returnType, start, end);
   }

@@ -1,13 +1,13 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
+import { AnnotatedType } from "./AnnotatedType";
 import { ASTNode } from "./ASTNode";
-import { Parameter } from "./Parameter";
+import { ParameterType } from "./ParameterType";
 import { SyntaxNodes } from "./SyntaxNodes";
-import { TypeAnnotation } from "./TypeAnnotation";
 
 export class FunctionType extends ASTNode {
   constructor(
-    public parameters: Parameter[],
-    public returnType: TypeAnnotation,
+    public parameters: ParameterType[],
+    public returnType: AnnotatedType,
     start: SrcLoc,
     end: SrcLoc
   ) {
@@ -15,8 +15,8 @@ export class FunctionType extends ASTNode {
   }
 
   public static new(
-    parameters: Parameter[],
-    returnType: TypeAnnotation,
+    parameters: ParameterType[],
+    returnType: AnnotatedType,
     start: SrcLoc,
     end: SrcLoc
   ) {
@@ -24,6 +24,12 @@ export class FunctionType extends ASTNode {
   }
 
   public get children() {
-    return [this.parameters, this.returnType];
+    return [];
+  }
+
+  toString(): string {
+    return `(${this.parameters
+      .map((p) => p.name + ":" + p.type.toString())
+      .join(", ")} => ${this.returnType.toString()})`;
   }
 }
