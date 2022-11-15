@@ -60,6 +60,7 @@ export const KEYWORDS = {
   var: TokenNames.Var,
   const: TokenNames.Const,
   end: TokenNames.End,
+  return: TokenNames.Return,
 };
 
 export type kw = keyof typeof KEYWORDS;

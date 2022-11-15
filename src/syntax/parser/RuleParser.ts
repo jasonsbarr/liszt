@@ -10,6 +10,7 @@ import { FunctionType } from "./ast/FunctionType";
 import { Identifier } from "./ast/Identifier";
 import { Parameter } from "./ast/Parameter";
 import { ParameterType } from "./ast/ParameterType";
+import { ReturnStatement } from "./ast/ReturnStatement";
 import { TypeAnnotation } from "./ast/TypeAnnotation";
 import { VariableDeclaration } from "./ast/VariableDeclaration";
 import { ExpressionParser } from "./ExpressionParser";
@@ -34,6 +35,36 @@ export class RuleParser extends ExpressionParser {
     const end = token.location;
 
     return Block.new(exprs, start, end);
+  }
+
+  private parseFuncParameter() {
+    const token = this.reader.peek();
+
+    if (token.type !== TokenTypes.Identifier) {
+      throw new Error(
+        `Parameter name must be valid identifier; ${token.name} given`
+      );
+    }
+
+    let name = this.parseExpr() as Identifier;
+    const start = name.start;
+
+    this.reader.skip(TokenNames.Colon);
+
+    const annotation = this.parseTypeAnnotation();
+    const end = annotation.end;
+
+    return Parameter.new(name, start, end, annotation);
+  }
+
+  public parseRule() {
+    const token = this.reader.peek();
+
+    if (token.type === TokenTypes.Keyword) {
+      return this.parseKeyword();
+    }
+
+    return this.parseExpression();
   }
 
   private parseFunctionDeclaration() {
@@ -88,39 +119,23 @@ export class RuleParser extends ExpressionParser {
         return this.parseVariableDeclaration(true);
       case TokenNames.Def:
         return this.parseFunctionDeclaration();
+      case TokenNames.Return:
+        return this.parseReturnStatement();
       default:
         throw new Error(`Parse rule not found for token name ${token.name}`);
     }
   }
 
-  private parseFuncParameter() {
+  private parseReturnStatement() {
     const token = this.reader.peek();
+    const start = token.location;
 
-    if (token.type !== TokenTypes.Identifier) {
-      throw new Error(
-        `Parameter name must be valid identifier; ${token.name} given`
-      );
-    }
+    this.reader.skip(TokenNames.Return);
 
-    let name = this.parseExpr() as Identifier;
-    const start = name.start;
+    const expression = this.parseExpression();
+    const end = expression.end;
 
-    this.reader.skip(TokenNames.Colon);
-
-    const annotation = this.parseTypeAnnotation();
-    const end = annotation.end;
-
-    return Parameter.new(name, start, end, annotation);
-  }
-
-  public parseRule() {
-    const token = this.reader.peek();
-
-    if (token.type === TokenTypes.Keyword) {
-      return this.parseKeyword();
-    }
-
-    return this.parseExpression();
+    return ReturnStatement.new(expression, start, end);
   }
 
   private parseVariableDeclaration(constant: boolean) {

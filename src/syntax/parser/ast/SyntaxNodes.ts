@@ -29,4 +29,5 @@ export enum SyntaxNodes {
   FunctionType = "FunctionType",
   Block = "Block",
   FunctionDeclaration = "FunctionDeclaration",
+  ReturnStatement = "ReturnStatement",
 }

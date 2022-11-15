@@ -33,7 +33,7 @@ export enum TokenNames {
   Def = "Def",
   Var = "Var",
   Const = "Const",
-  Do = "Do",
   End = "End",
+  Return = "Return",
   EOF = "EOF",
 }
