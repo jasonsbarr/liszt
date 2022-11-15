@@ -167,7 +167,9 @@ const synthBlock = (node: Block, env: TypeEnv): Type => {
 };
 
 const synthVariableDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
-  return synth(node.assignment.right, env);
+  const type = synth(node.assignment.right, env);
+  env.set((node.assignment.left as Identifier).name, type);
+  return type;
 };
 
 const synthFunctionDeclaration = (node: FunctionDeclaration, env: TypeEnv) => {
