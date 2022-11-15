@@ -25,6 +25,7 @@ import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression"
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { fromAnnotation } from "./fromAnnotation";
 import { Identifier } from "../syntax/parser/ast/Identifier";
+import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -85,6 +86,8 @@ export class TypeChecker {
         return this.checkAssignment(node as AssignmentExpression, env);
       case SyntaxNodes.VariableDeclaration:
         return this.checkVariableDeclaration(node as VariableDeclaration, env);
+      case SyntaxNodes.FunctionDeclaration:
+        return this.checkFunctionDeclaration(node as FunctionDeclaration, env);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -201,5 +204,13 @@ export class TypeChecker {
     // Need to set the variable name and type BEFORE binding the assignment node
     env.set((node.assignment.left as Identifier).name, type);
     return bind(node, env, type);
+  }
+
+  private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
+    const funcEnv = env.extend();
+    const funcType = synth(node, env) as Type.Function;
+    check(node, funcType, funcEnv);
+    env.set(node.name.name, funcType);
+    return bind(node, funcEnv, funcType);
   }
 }

@@ -196,7 +196,11 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         // gets extended environment from type checker
         const name = bind(node.name, env, ty!) as BoundIdentifier;
         const boundParams = node.params.map((p) => BoundParameter.new(p));
-        const boundBody = bind(node.body, env) as BoundBlock;
+        const boundBody = bind(
+          node.body,
+          env,
+          (ty! as Type.Function).ret
+        ) as BoundBlock;
 
         return BoundFunctionDeclaration.new(
           name,
