@@ -125,7 +125,7 @@ export class StatementParser extends TypeAnnotationParser {
     let exprs: ASTNode[] = [];
 
     while (token.name !== TokenNames.End) {
-      let expr = this.parseRule();
+      let expr = this.parseStatement();
       exprs.push(expr);
       token = this.reader.peek();
     }
@@ -383,6 +383,13 @@ export class StatementParser extends TypeAnnotationParser {
     return Parameter.new(name, start, end, annotation);
   }
 
+  private parseParenthesizedExpression() {
+    const start = this.reader.next();
+    const expr = this.parseExpression();
+    const end = this.reader.next();
+    return ParenthesizedExpression.new(expr, start.location, end.location);
+  }
+
   // Should fix this to only allow in a function declaration body
   private parseReturnStatement() {
     const token = this.reader.peek();
@@ -396,7 +403,7 @@ export class StatementParser extends TypeAnnotationParser {
     return ReturnStatement.new(expression, start, end);
   }
 
-  public parseRule() {
+  public parseStatement() {
     const token = this.reader.peek();
 
     if (token.type === TokenTypes.Keyword) {
@@ -404,13 +411,6 @@ export class StatementParser extends TypeAnnotationParser {
     }
 
     return this.parseExpression();
-  }
-
-  private parseParenthesizedExpression() {
-    const start = this.reader.next();
-    const expr = this.parseExpression();
-    const end = this.reader.next();
-    return ParenthesizedExpression.new(expr, start.location, end.location);
   }
 
   private parseVariableDeclaration(constant: boolean) {
