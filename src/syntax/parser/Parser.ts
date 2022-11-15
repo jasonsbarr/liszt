@@ -1,9 +1,9 @@
 import { LexResult } from "../lexer/LexResult";
 import { ProgramNode } from "./ast/ProgramNode";
 import { SyntaxTree } from "./ast/SyntaxTree";
-import { RuleParser } from "./RuleParser";
+import { StatementParser } from "./StatementParser";
 
-export class Parser extends RuleParser {
+export class Parser extends StatementParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
