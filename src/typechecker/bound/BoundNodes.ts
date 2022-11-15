@@ -18,4 +18,5 @@ export enum BoundNodes {
   BoundVariableDeclaration = "BoundVariableDeclaration",
   BoundFunctionDeclaration = "BoundFunctionDeclaration",
   BoundReturnStatement = "BoundReturnStatement",
+  BoundBlock = "BoundBlock",
 }
