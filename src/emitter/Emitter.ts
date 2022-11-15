@@ -2,22 +2,22 @@ import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression"
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
-import { BoundAssignmentExpression } from "../typechecker/tree/BoundAssignmentExpression";
-import { BoundBooleanLiteral } from "../typechecker/tree/BoundBooleanLiteral";
-import { BoundCallExpression } from "../typechecker/tree/BoundCallExpression";
-import { BoundFloatLiteral } from "../typechecker/tree/BoundFloatLiteral";
-import { BoundIdentifier } from "../typechecker/tree/BoundIdentifier";
-import { BoundIntegerLiteral } from "../typechecker/tree/BoundIntegerLiteral";
-import { BoundLambdaExpression } from "../typechecker/tree/BoundLambdaExpression";
-import { BoundMemberExpression } from "../typechecker/tree/BoundMemberExpression";
-import { BoundNilLiteral } from "../typechecker/tree/BoundNilLiteral";
-import { BoundNodes } from "../typechecker/tree/BoundNodes";
-import { BoundObjectLiteral } from "../typechecker/tree/BoundObjectLiteral";
-import { BoundParenthesizedExpression } from "../typechecker/tree/BoundParenthesizedExpression";
-import { BoundProgramNode } from "../typechecker/tree/BoundProgramNode";
-import { BoundStringLiteral } from "../typechecker/tree/BoundStringLiteral";
-import { BoundTree } from "../typechecker/tree/BoundTree";
-import { BoundVariableDeclaration } from "../typechecker/tree/BoundVariableDeclaration";
+import { BoundAssignmentExpression } from "../typechecker/bound/BoundAssignmentExpression";
+import { BoundBooleanLiteral } from "../typechecker/bound/BoundBooleanLiteral";
+import { BoundCallExpression } from "../typechecker/bound/BoundCallExpression";
+import { BoundFloatLiteral } from "../typechecker/bound/BoundFloatLiteral";
+import { BoundIdentifier } from "../typechecker/bound/BoundIdentifier";
+import { BoundIntegerLiteral } from "../typechecker/bound/BoundIntegerLiteral";
+import { BoundLambdaExpression } from "../typechecker/bound/BoundLambdaExpression";
+import { BoundMemberExpression } from "../typechecker/bound/BoundMemberExpression";
+import { BoundNilLiteral } from "../typechecker/bound/BoundNilLiteral";
+import { BoundNodes } from "../typechecker/bound/BoundNodes";
+import { BoundObjectLiteral } from "../typechecker/bound/BoundObjectLiteral";
+import { BoundParenthesizedExpression } from "../typechecker/bound/BoundParenthesizedExpression";
+import { BoundProgramNode } from "../typechecker/bound/BoundProgramNode";
+import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
+import { BoundTree } from "../typechecker/bound/BoundTree";
+import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
 
 export class Emitter {
   constructor(public tree: BoundTree) {}

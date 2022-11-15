@@ -1,4 +1,4 @@
-import { BoundTree } from "../typechecker/tree/BoundTree";
+import { BoundTree } from "../typechecker/bound/BoundTree";
 import { Emitter } from "./Emitter";
 
 export const emit = (tree: BoundTree) => {
