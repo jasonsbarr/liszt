@@ -75,7 +75,7 @@ export class ExpressionParser extends TypeAnnotationParser {
     return AssignmentExpression.new(left, right, token, start, end, type);
   }
 
-  private parseAtom(): ASTNode {
+  protected parseAtom(): ASTNode {
     const token = this.reader.peek();
     switch (token.type) {
       case TokenTypes.Integer:

@@ -43,13 +43,18 @@ export class RuleParser extends ExpressionParser {
     let returnType: TypeAnnotation | undefined;
 
     this.reader.skip(TokenNames.Def);
-    const name = this.parseExpr() as Identifier;
+    const name = this.parseAtom() as Identifier;
     this.reader.skip(TokenNames.LParen);
     token = this.reader.peek();
 
     while (token.name !== TokenNames.RParen) {
       parameters.push(this.parseFuncParameter());
       token = this.reader.peek();
+
+      if (token.name !== TokenNames.RParen) {
+        this.reader.skip(TokenNames.Comma);
+        token = this.reader.peek();
+      }
     }
 
     this.reader.skip(TokenNames.RParen);
@@ -93,7 +98,7 @@ export class RuleParser extends ExpressionParser {
 
     if (token.type !== TokenTypes.Identifier) {
       throw new Error(
-        `Parameter name must be valid identifier; ${token.type} given`
+        `Parameter name must be valid identifier; ${token.name} given`
       );
     }
 
