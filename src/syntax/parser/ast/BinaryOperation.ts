@@ -3,7 +3,7 @@ import { Token } from "../../lexer/Token";
 import { ASTNode } from "./ASTNode";
 import { SyntaxNodes } from "./SyntaxNodes";
 
-export class BinaryOp extends ASTNode {
+export class BinaryOperation extends ASTNode {
   constructor(
     public left: ASTNode,
     public right: ASTNode,

@@ -1,11 +1,11 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { Token } from "../../lexer/Token";
 import { ASTNode } from "./ASTNode";
-import { BinaryOp } from "./BinaryOp";
+import { BinaryOperation } from "./BinaryOperation";
 import { SyntaxNodes } from "./SyntaxNodes";
 import { TypeAnnotation } from "./TypeAnnotation";
 
-export class AssignmentExpression extends BinaryOp {
+export class AssignmentExpression extends BinaryOperation {
   constructor(
     left: ASTNode,
     right: ASTNode,
