@@ -143,7 +143,7 @@ export class ExpressionParser extends TypeAnnotationParser {
     return CallExpression.new(left, args, start, end);
   }
 
-  private parseExpr(rbp: number = 0) {
+  protected parseExpr(rbp: number = 0) {
     let left = this.parseAtom();
     let prec = this.getLedPrecedence();
 
