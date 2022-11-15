@@ -3,11 +3,13 @@ import { TokenNames } from "../lexer/TokenNames";
 import { AnyKeyword } from "./ast/AnyKeyword";
 import { BooleanKeyword } from "./ast/BooleanKeyword";
 import { FloatKeyword } from "./ast/FloatKeyword";
+import { FunctionType } from "./ast/FunctionType";
 import { Identifier } from "./ast/Identifier";
 import { IntegerKeyword } from "./ast/IntegerKeyword";
 import { NilLiteral } from "./ast/NilLiteral";
 import { NumberKeyword } from "./ast/NumberKeyword";
 import { ObjectPropertyType } from "./ast/ObjectPropertyType";
+import { Parameter } from "./ast/Parameter";
 import { StringKeyword } from "./ast/StringKeyword";
 import { TypeAnnotation } from "./ast/TypeAnnotation";
 import { TypeLiteral } from "./ast/TypeLiteral";
@@ -31,6 +33,47 @@ export class TypeAnnotationParser extends LHVParser {
   private parseFloatKeyword() {
     const token = this.reader.next();
     return FloatKeyword.new(token, token.location);
+  }
+
+  private parseFunctionType() {
+    // syntax: (param: type, ...) => returnType
+    let token = this.reader.peek();
+    const start = token.location;
+    let parameters: Parameter[] = [];
+
+    this.reader.skip(TokenNames.LParen);
+    token = this.reader.peek();
+
+    while (token.name !== TokenNames.RParen) {
+      let st = token.location;
+
+      if (token.name !== TokenNames.Identifier) {
+        throw new Error(
+          `Function parameters must be valid identifiers; ${token.name} given`
+        );
+      }
+
+      const param = this.parseType() as Identifier;
+      this.reader.skip(TokenNames.Colon);
+      const paramType = this.parseTypeAnnotation();
+      const en = paramType.end;
+
+      parameters.push(Parameter.new(param, st, en, paramType));
+      token = this.reader.peek();
+
+      if (token.name !== TokenNames.RParen) {
+        this.reader.skip(TokenNames.Comma);
+        token = this.reader.peek();
+      }
+    }
+
+    this.reader.skip(TokenNames.RParen);
+    this.reader.skip(TokenNames.FatArrow);
+
+    const returnType: TypeAnnotation = this.parseTypeAnnotation();
+    const end = returnType.end;
+
+    return FunctionType.new(parameters, returnType, start, end);
   }
 
   private parseIdentifier() {
@@ -85,6 +128,8 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseTypeLiteral();
       case TokenNames.AnyKeyword:
         return this.parseAnyKeyword();
+      case TokenNames.LParen:
+        return this.parseFunctionType();
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }

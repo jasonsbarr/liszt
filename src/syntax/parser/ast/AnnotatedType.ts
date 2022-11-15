@@ -6,6 +6,7 @@ import { NilLiteral } from "./NilLiteral";
 import { StringKeyword } from "./StringKeyword";
 import { TypeLiteral } from "./TypeLiteral";
 import { AnyKeyword } from "./AnyKeyword";
+import { FunctionType } from "./FunctionType";
 
 export type AnnotatedType =
   | IntegerKeyword
@@ -15,4 +16,5 @@ export type AnnotatedType =
   | NilLiteral
   | Identifier
   | TypeLiteral
-  | AnyKeyword;
+  | AnyKeyword
+  | FunctionType;
