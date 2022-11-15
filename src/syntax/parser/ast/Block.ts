@@ -3,7 +3,7 @@ import { ASTNode } from "./ASTNode";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class Block extends ASTNode {
-  constructor(public exprs: ASTNode[], start: SrcLoc, end: SrcLoc) {
+  constructor(public expressions: ASTNode[], start: SrcLoc, end: SrcLoc) {
     super(SyntaxNodes.Block, start, end);
   }
 
@@ -12,6 +12,6 @@ export class Block extends ASTNode {
   }
 
   public get children() {
-    return this.exprs;
+    return this.expressions;
   }
 }

@@ -2,11 +2,13 @@ import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundBlock } from "./BoundBlock";
+import { BoundIdentifier } from "./BoundIdentifier";
 import { BoundNodes } from "./BoundNodes";
 import { BoundParameter } from "./BoundParameter";
 
 export class BoundFunctionDeclaration extends BoundASTNode {
   constructor(
+    public name: BoundIdentifier,
     public parameters: BoundParameter[],
     public body: BoundBlock,
     public returnType: Type,
@@ -17,6 +19,7 @@ export class BoundFunctionDeclaration extends BoundASTNode {
   }
 
   public static new(
+    name: BoundIdentifier,
     parameters: BoundParameter[],
     body: BoundBlock,
     returnType: Type,
@@ -24,6 +27,7 @@ export class BoundFunctionDeclaration extends BoundASTNode {
     end: SrcLoc
   ) {
     return new BoundFunctionDeclaration(
+      name,
       parameters,
       body,
       returnType,

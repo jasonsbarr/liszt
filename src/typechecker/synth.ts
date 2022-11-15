@@ -159,7 +159,7 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
 };
 
 const synthBlock = (node: Block, env: TypeEnv): Type => {
-  const returnType = node.exprs.reduce((_: Type, curr: ASTNode) => {
+  const returnType = node.expressions.reduce((_: Type, curr: ASTNode) => {
     return synth(curr, env);
   }, Type.any as Type);
 

@@ -131,7 +131,7 @@ const checkVariableDeclaration = (
 
 // checks return type only
 const checkBlock = (node: Block, type: Type, env: TypeEnv): boolean => {
-  const exprs = node.exprs;
+  const exprs = node.expressions;
 
   for (let expr of exprs) {
     if (expr.kind === SyntaxNodes.ReturnStatement) {

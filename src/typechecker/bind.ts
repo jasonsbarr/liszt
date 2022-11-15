@@ -14,7 +14,6 @@ import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpre
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
-import { check } from "./check";
 import { isSubtype } from "./isSubtype";
 import { propType } from "./propType";
 import { synth } from "./synth";
@@ -35,6 +34,12 @@ import { BoundVariableDeclaration } from "./bound/BoundVariableDeclaration";
 import { Type } from "./Type";
 import { TypeEnv } from "./TypeEnv";
 import { ObjectType } from "./Types";
+import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
+import { BoundFunctionDeclaration } from "./bound/BoundFunctionDeclaration";
+import { BoundParameter } from "./bound/BoundParameter";
+import { BoundBlock } from "./bound/BoundBlock";
+import { Block } from "../syntax/parser/ast/Block";
+import { BoundReturnStatement } from "./bound/BoundReturnStatement";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -185,6 +190,49 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
       // Should never happen
       throw new Error("Again, WTF?");
+    case SyntaxNodes.FunctionDeclaration:
+      if (node instanceof FunctionDeclaration) {
+        // gets extended environment from type checker
+        const name = bind(node.name, env, ty!) as BoundIdentifier;
+        const boundParams = node.params.map((p) => BoundParameter.new(p));
+        const boundBody = bind(node.body, env) as BoundBlock;
+
+        return BoundFunctionDeclaration.new(
+          name,
+          boundParams,
+          boundBody,
+          // guaranteed to be passed in from type checker
+          // will be a function type
+          ty!,
+          node.start,
+          node.end
+        );
+      }
+      // Should never happen
+      throw new Error("WTF, indeed?");
+    case SyntaxNodes.Block:
+      if (node instanceof Block) {
+        const exprs = node.expressions;
+        const boundExprs = exprs.map((expr, i, a) => {
+          let type = synth(expr, env);
+
+          if (expr.kind === SyntaxNodes.ReturnStatement || i === a.length - 1) {
+            // ty will be passed in from the type checker
+            if (!isSubtype(type, ty!)) {
+              throw new Error(`Cannot use ${type} as a subtype of ${ty}`);
+            }
+          }
+
+          return bind(expr, env, type);
+        });
+
+        return BoundBlock.new(boundExprs, ty!, node.start, node.end);
+      }
+      throw new Error("WTAF");
+    case SyntaxNodes.ReturnStatement:
+      // ty will be passed in from type checker
+      const boundExpr = bind(node, env, ty!);
+      return BoundReturnStatement.new(boundExpr, ty!, node.start, node.end);
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
   }
