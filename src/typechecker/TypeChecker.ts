@@ -211,6 +211,6 @@ export class TypeChecker {
     const funcType = synth(node, funcEnv) as Type.Function;
     check(node, funcType, funcEnv);
     env.set(node.name.name, funcType);
-    return bind(node, env, funcType);
+    return bind(node, funcEnv, funcType);
   }
 }

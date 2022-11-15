@@ -198,5 +198,6 @@ const synthFunctionDeclaration = (node: FunctionDeclaration, env: TypeEnv) => {
 };
 
 const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
-  return synth(node.expression, env);
+  const val = synth(node.expression, env);
+  return val;
 };
