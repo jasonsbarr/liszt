@@ -11,17 +11,28 @@ const EVAL = (input: string) => {
 const PRINT = console.log;
 
 export const repl = () => {
+  let input = "";
+
   while (true) {
+    input += READ();
+
+    if (input === "") {
+      break;
+    }
+
     try {
-      let input = READ();
-
-      if (input === "") {
-        break;
-      }
-
       PRINT(EVAL(input));
+      input = "";
     } catch (e: any) {
-      console.log(chalk.redBright(e.message));
+      if (
+        (e.message as string).includes(
+          "Unrecognized token (type: EOFToken, name: EOF)"
+        )
+      ) {
+        input += "\n";
+        continue;
+      }
+      console.log(chalk.redBright(e.stack));
     }
   }
 };
