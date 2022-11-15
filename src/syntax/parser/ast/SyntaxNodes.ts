@@ -27,4 +27,5 @@ export enum SyntaxNodes {
   AssignmentExpression = "AssignmentExpression",
   VariableDeclaration = "VariableDeclaration",
   FunctionType = "FunctionType",
+  Block = "Block",
 }
