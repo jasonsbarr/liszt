@@ -40,6 +40,7 @@ import { BoundParameter } from "./bound/BoundParameter";
 import { BoundBlock } from "./bound/BoundBlock";
 import { Block } from "../syntax/parser/ast/Block";
 import { BoundReturnStatement } from "./bound/BoundReturnStatement";
+import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -231,7 +232,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       throw new Error("WTAF");
     case SyntaxNodes.ReturnStatement:
       // ty will be passed in from type checker
-      const boundExpr = bind(node, env, ty!);
+      const boundExpr = bind((node as ReturnStatement).expression, env, ty!);
       return BoundReturnStatement.new(boundExpr, ty!, node.start, node.end);
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
