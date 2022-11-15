@@ -47,6 +47,12 @@ export const synth = (ast: ASTNode, env: TypeEnv): Type => {
       return synthCall(ast as CallExpression, env);
     case SyntaxNodes.Block:
       return synthBlock(ast as Block, env);
+    case SyntaxNodes.VariableDeclaration:
+      return synthVariableDeclaration(ast as VariableDeclaration, env);
+    case SyntaxNodes.FunctionDeclaration:
+      return synthFunctionDeclaration(ast as FunctionDeclaration, env);
+    case SyntaxNodes.ReturnStatement:
+      return synthReturnStatement(ast as ReturnStatement, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -160,14 +166,35 @@ const synthBlock = (node: Block, env: TypeEnv): Type => {
   return returnType;
 };
 
-const synthVariableDeclaration = (
-  node: VariableDeclaration,
-  env: TypeEnv
-) => {};
+const synthVariableDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
+  return synth(node.assignment.right, env);
+};
 
-const synthFunctionDeclaration = (
-  node: FunctionDeclaration,
-  env: TypeEnv
-) => {};
+const synthFunctionDeclaration = (node: FunctionDeclaration, env: TypeEnv) => {
+  const paramTypes = node.params.map((p) => {
+    const name = p.name.name;
+    // function declaration params will always have a type annotation
+    const type = fromAnnotation(p.type!);
 
-const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {};
+    env.set(name, type);
+    return type;
+  });
+
+  const returnType = synth(node.body, env);
+  let annotatedType: Type | undefined;
+
+  if (node.ret) {
+    annotatedType = fromAnnotation(node.ret);
+    if (!isSubtype(returnType, annotatedType)) {
+      throw new Error(
+        `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
+      );
+    }
+  }
+
+  return Type.functionType(paramTypes, returnType);
+};
+
+const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
+  return synth(node.expression, env);
+};

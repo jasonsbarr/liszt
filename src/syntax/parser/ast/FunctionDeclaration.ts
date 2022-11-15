@@ -9,7 +9,7 @@ import { Identifier } from "./Identifier";
 export class FunctionDeclaration extends ASTNode {
   constructor(
     public name: Identifier,
-    public parameters: Parameter[],
+    public params: Parameter[],
     public body: Block,
     start: SrcLoc,
     end: SrcLoc,
@@ -20,16 +20,16 @@ export class FunctionDeclaration extends ASTNode {
 
   public static new(
     name: Identifier,
-    parameters: Parameter[],
+    params: Parameter[],
     body: Block,
     start: SrcLoc,
     end: SrcLoc,
     ret?: TypeAnnotation
   ) {
-    return new FunctionDeclaration(name, parameters, body, start, end, ret);
+    return new FunctionDeclaration(name, params, body, start, end, ret);
   }
 
   public get children() {
-    return [this.parameters, this.body];
+    return [this.params, this.body];
   }
 }
