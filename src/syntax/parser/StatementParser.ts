@@ -383,6 +383,7 @@ export class StatementParser extends TypeAnnotationParser {
     return Parameter.new(name, start, end, annotation);
   }
 
+  // Should fix this to only allow in a function declaration body
   private parseReturnStatement() {
     const token = this.reader.peek();
     const start = token.location;

@@ -1,8 +1,11 @@
 import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
 import { ASTNode } from "../syntax/parser/ast/ASTNode";
+import { Block } from "../syntax/parser/ast/Block";
+import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
+import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { isSubtype } from "./isSubtype";
@@ -26,6 +29,18 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   if (ast.kind === SyntaxNodes.VariableDeclaration) {
     return checkVariableDeclaration(ast as VariableDeclaration, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.FunctionDeclaration && Type.isFunction(t)) {
+    return checkFunction(ast as FunctionDeclaration, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.Block) {
+    return checkBlock(ast as Block, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.ReturnStatement) {
+    return checkReturnStatement(ast as ReturnStatement, t, env);
   }
 
   const synthType = synth(ast, env);
@@ -74,7 +89,7 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
 };
 
 const checkFunction = (
-  node: LambdaExpression,
+  node: LambdaExpression | FunctionDeclaration,
   type: Type.Function,
   env: TypeEnv
 ): boolean => {
@@ -112,4 +127,24 @@ const checkVariableDeclaration = (
   env: TypeEnv
 ): boolean => {
   return check(node.assignment, type, env);
+};
+
+// checks return type only
+const checkBlock = (node: Block, type: Type, env: TypeEnv): boolean => {
+  const exprs = node.exprs;
+
+  for (let expr of exprs) {
+    if (expr.kind === SyntaxNodes.ReturnStatement) {
+      if (!check(expr, type, env)) return false;
+    }
+  }
+  return check(exprs[exprs.length - 1], type, env);
+};
+
+const checkReturnStatement = (
+  node: ReturnStatement,
+  type: Type,
+  env: TypeEnv
+): boolean => {
+  return check(node.expression, type, env);
 };
