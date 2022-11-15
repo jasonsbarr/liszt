@@ -16,4 +16,6 @@ export enum BoundNodes {
   BoundBinaryOp = "BoundBinaryOp",
   BoundAssignmentExpression = "BoundAssignmentExpression",
   BoundVariableDeclaration = "BoundVariableDeclaration",
+  BoundFunctionDeclaration = "BoundFunctionDeclaration",
+  BoundReturnStatement = "BoundReturnStatement",
 }
