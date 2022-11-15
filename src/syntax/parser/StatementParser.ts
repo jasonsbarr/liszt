@@ -79,7 +79,7 @@ export class StatementParser extends TypeAnnotationParser {
     return AssignmentExpression.new(left, right, token, start, end, type);
   }
 
-  protected parseAtom(): ASTNode {
+  private parseAtom(): ASTNode {
     const token = this.reader.peek();
     switch (token.type) {
       case TokenTypes.Integer:
@@ -164,7 +164,7 @@ export class StatementParser extends TypeAnnotationParser {
     return CallExpression.new(left, args, start, end);
   }
 
-  protected parseExpr(rbp: number = 0) {
+  private parseExpr(rbp: number = 0) {
     let left = this.parseAtom();
     let prec = this.getLedPrecedence();
 
