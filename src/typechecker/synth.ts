@@ -14,8 +14,12 @@ import { TypeEnv } from "./TypeEnv";
 import { isSubtype } from "./isSubtype";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
+import { Block } from "../syntax/parser/ast/Block";
+import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
+import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
+import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 
-export const synth = (ast: ASTNode, env: TypeEnv) => {
+export const synth = (ast: ASTNode, env: TypeEnv): Type => {
   switch (ast.kind) {
     case SyntaxNodes.IntegerLiteral:
       return synthInteger();
@@ -41,6 +45,8 @@ export const synth = (ast: ASTNode, env: TypeEnv) => {
       return synthLambda(ast as LambdaExpression, env);
     case SyntaxNodes.CallExpression:
       return synthCall(ast as CallExpression, env);
+    case SyntaxNodes.Block:
+      return synthBlock(ast as Block, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -145,3 +151,23 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
 
   return func.ret;
 };
+
+const synthBlock = (node: Block, env: TypeEnv): Type => {
+  const returnType = node.exprs.reduce((_: Type, curr: ASTNode) => {
+    return synth(curr, env);
+  }, Type.any as Type);
+
+  return returnType;
+};
+
+const synthVariableDeclaration = (
+  node: VariableDeclaration,
+  env: TypeEnv
+) => {};
+
+const synthFunctionDeclaration = (
+  node: FunctionDeclaration,
+  env: TypeEnv
+) => {};
+
+const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {};
