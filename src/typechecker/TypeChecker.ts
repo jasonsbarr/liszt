@@ -181,11 +181,26 @@ export class TypeChecker {
     // there will only be a type annotation in a variable declaration
     let type: Type;
 
+    let constant = false;
+    if (node.left instanceof Identifier) {
+      constant = node.left.constant;
+
+      // if this is a variable declaration, it won't be set in the environment yet
+      if (
+        env.has(node.left.name) &&
+        env.get(node.left.name)?.constant === true
+      ) {
+        throw new Error(
+          `Illegal assignment to constant variable ${node.left.name}`
+        );
+      }
+    }
+
     if (node.type) {
       type = fromAnnotation(node.type);
       check(node.right, type, env);
     } else {
-      type = synth(node.right, env);
+      type = synth(node.right, env, constant);
     }
 
     return bind(node, env, type);

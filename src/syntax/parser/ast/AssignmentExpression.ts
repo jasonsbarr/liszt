@@ -12,6 +12,7 @@ export class AssignmentExpression extends BinaryOperation {
     operator: Token,
     start: SrcLoc,
     end: SrcLoc,
+    public constant?: boolean,
     public type?: TypeAnnotation
   ) {
     super(left, right, operator, start, end, SyntaxNodes.AssignmentExpression);
@@ -23,9 +24,18 @@ export class AssignmentExpression extends BinaryOperation {
     operator: Token,
     start: SrcLoc,
     end: SrcLoc,
+    constant?: boolean,
     type?: TypeAnnotation
   ) {
-    return new AssignmentExpression(left, right, operator, start, end, type);
+    return new AssignmentExpression(
+      left,
+      right,
+      operator,
+      start,
+      end,
+      constant,
+      type
+    );
   }
 
   public get children() {

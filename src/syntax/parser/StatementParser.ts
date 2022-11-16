@@ -71,12 +71,25 @@ export class StatementParser extends TypeAnnotationParser {
     return AsExpression.new(left, annotation, start, end);
   }
 
-  private parseAssign(left: ASTNode, type: TypeAnnotation | undefined) {
+  private parseAssign(left: ASTNode, type?: TypeAnnotation, constant = false) {
     let token = this.reader.next();
     const right: ASTNode = this.parseExpression();
     const start = left.start;
     const end = right.end;
-    return AssignmentExpression.new(left, right, token, start, end, type);
+
+    if (left instanceof Identifier) {
+      left.constant = constant;
+    }
+
+    return AssignmentExpression.new(
+      left,
+      right,
+      token,
+      start,
+      end,
+      constant,
+      type
+    );
   }
 
   private parseAtom(): ASTNode {
@@ -162,9 +175,13 @@ export class StatementParser extends TypeAnnotationParser {
     return CallExpression.new(left, args, start, end);
   }
 
-  private parseExpr(rbp: number = 0) {
+  private parseExpr(rbp: number = 0, { constant = false } = {}) {
     let left = this.parseAtom();
     let prec = this.getLedPrecedence();
+
+    if (left instanceof Identifier) {
+      left.constant = constant;
+    }
 
     while (rbp < prec) {
       left = this.parseLed(left);
@@ -174,8 +191,8 @@ export class StatementParser extends TypeAnnotationParser {
     return left;
   }
 
-  public parseExpression(rbp: number = 0) {
-    let expr = this.parseExpr(rbp);
+  public parseExpression(rbp: number = 0, { constant = false } = {}) {
+    let expr = this.parseExpr(rbp, { constant });
     let token = this.reader.peek();
 
     let type: TypeAnnotation | undefined;
@@ -416,12 +433,17 @@ export class StatementParser extends TypeAnnotationParser {
   private parseVariableDeclaration(constant: boolean) {
     const token = this.reader.next();
     const start = token.location;
-    const assignment = this.parseExpression();
+    const assignment = this.parseExpression() as AssignmentExpression;
+    assignment.constant = constant;
 
     if (!(assignment instanceof AssignmentExpression)) {
       throw new Error(
         `Variable declaration must have an assignment as its expression`
       );
+    }
+
+    if (assignment.left instanceof Identifier) {
+      assignment.left.constant = constant;
     }
 
     const end = assignment.end;
