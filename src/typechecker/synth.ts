@@ -56,7 +56,7 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthBlock(ast as Block, env);
     case SyntaxNodes.VariableDeclaration:
       if ((ast as VariableDeclaration).constant) {
-        return synthConstantDefinition(ast as VariableDeclaration, env);
+        return synthConstantDeclaration(ast as VariableDeclaration, env);
       }
       return synthVariableDeclaration(ast as VariableDeclaration, env);
     case SyntaxNodes.FunctionDeclaration:
@@ -202,7 +202,7 @@ const synthVariableDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   return type;
 };
 
-const synthConstantDefinition = (node: VariableDeclaration, env: TypeEnv) => {
+const synthConstantDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   const type = synthSingleton(node, env);
   env.set((node.assignment.left as Identifier).name, type);
   return type;
