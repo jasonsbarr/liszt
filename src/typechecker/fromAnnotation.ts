@@ -57,7 +57,9 @@ const generateFunctionType = (type: FunctionType) => {
 const generateSingletonType = (type: SingletonType) => {
   const token = type.token;
   const value =
-    token.name === TokenNames.Integer || TokenNames.Float
+    token.name === TokenNames.Integer
+      ? BigInt(token.value)
+      : TokenNames.Float
       ? Number(token.value)
       : token.name === TokenNames.True
       ? true
