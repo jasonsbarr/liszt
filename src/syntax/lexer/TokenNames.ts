@@ -35,5 +35,6 @@ export enum TokenNames {
   Const = "Const",
   End = "End",
   Return = "Return",
+  Type = "Type",
   EOF = "EOF",
 }
