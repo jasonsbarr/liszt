@@ -1,15 +1,7 @@
-# Fawkes Prototype
+# Chopin Programming Language
 
-Repo for trying out the concepts I will eventually write code for on camera for the Fawkes Programming Language
+Programming language that seeks to incorporate the best aspects of both functional and object oriented programming
+
+This repo may end up being a prototype as I'm experimenting with bidirectional type checking.
 
 Written with TypeScript v4.8.4.
-
-## Episodes
-
-Note that when I actually film the series episodes may contain more or less content than what's listed here.
-
-- Episode 01: setting up and compiling integers
-- Episode 02: primitive types and object literals
-- Episode 03: parsing type annotations and checking as expressions
-- Episode 04: Lambdas, call expressions, and variables
-- Episode 05: Function definitions with block bodies and return statements, plus multiline REPL input
