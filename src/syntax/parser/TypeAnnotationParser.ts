@@ -89,6 +89,8 @@ export class TypeAnnotationParser extends LHVParser {
     return IntegerKeyword.new(token, token.location);
   }
 
+  private parseIntegerSingleton() {}
+
   private parseNilLiteral() {
     const token = this.reader.next();
     return NilLiteral.new(token, token.location);
@@ -133,6 +135,11 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseAnyKeyword();
       case TokenNames.LParen:
         return this.parseFunctionType();
+      case TokenNames.Integer:
+      case TokenNames.Float:
+      case TokenNames.String:
+      case TokenNames.True:
+      case TokenNames.False:
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }
