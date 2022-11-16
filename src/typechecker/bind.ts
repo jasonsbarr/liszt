@@ -148,15 +148,17 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
     case SyntaxNodes.AssignmentExpression:
       if (node instanceof AssignmentExpression) {
         // Type checker always passes in the type here
-        const isDefined = env.lookup((node.left as Identifier).name);
+        if (node.left instanceof Identifier) {
+          const isDefined = env.lookup((node.left as Identifier).name);
 
-        if (isDefined) {
-          const checkType = env.get((node.left as Identifier).name)!;
+          if (isDefined) {
+            const checkType = env.get((node.left as Identifier).name)!;
 
-          if (!isSubtype(ty!, checkType)) {
-            throw new Error(
-              `Cannot assign value of type ${ty} to variable of type ${checkType}`
-            );
+            if (!isSubtype(ty!, checkType)) {
+              throw new Error(
+                `Cannot assign value of type ${ty} to variable of type ${checkType}`
+              );
+            }
           }
         }
 
