@@ -19,7 +19,15 @@ export const isSubtype = (t1: Type, t2: Type): boolean => {
       t1.args.every((a, i) => isSubtype(t2.args[i], a)) &&
       isSubtype(t1.ret, t2.ret)
     );
+  } else if (Type.isSingleton(t1)) {
+    if (Type.isSingleton(t2)) {
+      return t1.value === t2.value;
+    } else {
+      return isSubtype(t1.base, t2);
+    }
   } else if (Type.isAny(t1)) {
     return true;
-  } else return false;
+  } else {
+    return false;
+  }
 };
