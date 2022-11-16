@@ -24,17 +24,18 @@ import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
+import { TokenNames } from "../syntax/lexer/TokenNames";
 
-export const synth = (ast: ASTNode, env: TypeEnv): Type => {
+export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
     case SyntaxNodes.IntegerLiteral:
-      return synthInteger();
+      return synthInteger(ast as IntegerLiteral, constant);
     case SyntaxNodes.FloatLiteral:
-      return synthFloat();
+      return synthFloat(ast as FloatLiteral, constant);
     case SyntaxNodes.StringLiteral:
-      return synthString();
+      return synthString(ast as StringLiteral, constant);
     case SyntaxNodes.BooleanLiteral:
-      return synthBoolean();
+      return synthBoolean(ast as BooleanLiteral, constant);
     case SyntaxNodes.NilLiteral:
       return synthNil();
     case SyntaxNodes.ObjectLiteral:
@@ -67,10 +68,30 @@ export const synth = (ast: ASTNode, env: TypeEnv): Type => {
   }
 };
 
-const synthInteger = () => Type.integer;
-const synthFloat = () => Type.float;
-const synthString = () => Type.string;
-const synthBoolean = () => Type.boolean;
+const synthInteger = (node: IntegerLiteral, constant: boolean) => {
+  if (constant) {
+    return Type.singleton(BigInt(node.token.value));
+  }
+  return Type.integer(false);
+};
+const synthFloat = (node: FloatLiteral, constant: boolean) => {
+  if (constant) {
+    return Type.singleton(Number(node.token.value));
+  }
+  return Type.float(false);
+};
+const synthString = (node: StringLiteral, constant: boolean) => {
+  if (constant) {
+    return Type.singleton(node.token.value);
+  }
+  return Type.string(false);
+};
+const synthBoolean = (node: BooleanLiteral, constant: boolean) => {
+  if (constant) {
+    return Type.singleton(node.token.name === TokenNames.True ? true : false);
+  }
+  return Type.boolean(false);
+};
 const synthNil = () => Type.nil;
 
 const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {

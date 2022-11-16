@@ -13,23 +13,24 @@ import {
   Type,
 } from "./Types";
 
-export const integer = IntegerType.new();
+export const integer = (constant = false) => IntegerType.new(constant);
 
-export const float = FloatType.new();
+export const float = (constant = false) => FloatType.new(constant);
 
-export const number = NumberType.new("Number");
+export const number = (constant = false) => NumberType.new(constant);
 
-export const string = StringType.new();
+export const string = (constant = false) => StringType.new(constant);
 
-export const boolean = BooleanType.new();
+export const boolean = (constant = false) => BooleanType.new(constant);
 
 export const nil = NilType.new();
 
 export const object = (
-  properties: Property[] | { [name: string]: Type }
+  properties: Property[] | { [name: string]: Type },
+  constant = false
 ): ObjectType => {
   if (Array.isArray(properties)) {
-    return ObjectType.new(properties);
+    return ObjectType.new(properties, constant);
   } else {
     return object(
       Object.entries(properties).map(([name, type]) => ({ name, type }))

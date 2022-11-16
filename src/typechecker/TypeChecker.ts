@@ -198,7 +198,7 @@ export class TypeChecker {
       type = fromAnnotation(node.assignment.type);
       check(node, type, env);
     } else {
-      type = synth(node.assignment.right, env);
+      type = synth(node.assignment.right, env, node.constant);
     }
 
     // Need to set the variable name and type BEFORE binding the assignment node

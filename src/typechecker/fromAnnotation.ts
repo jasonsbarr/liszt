@@ -9,15 +9,15 @@ import { Type } from "./Type";
 export const fromAnnotation = (type: TypeAnnotation): Type => {
   switch (type.type.kind) {
     case SyntaxNodes.IntegerKeyword:
-      return Type.integer;
+      return Type.integer(false);
     case SyntaxNodes.FloatKeyword:
-      return Type.float;
+      return Type.float(false);
     case SyntaxNodes.NumberKeyword:
-      return Type.number;
+      return Type.number(false);
     case SyntaxNodes.BooleanKeyword:
-      return Type.boolean;
+      return Type.boolean(false);
     case SyntaxNodes.StringKeyword:
-      return Type.string;
+      return Type.string(false);
     case SyntaxNodes.NilLiteral:
       return Type.nil;
     case SyntaxNodes.AnyKeyword:
