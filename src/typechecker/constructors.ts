@@ -8,6 +8,7 @@ import {
   NumberType,
   ObjectType,
   Property,
+  SingletonType,
   StringType,
   Type,
 } from "./Types";
@@ -40,3 +41,17 @@ export const functionType = (args: Type[], ret: Type) =>
   FunctionType.new(args, ret);
 
 export const any = AnyType.new();
+
+export const singleton = (value: boolean | number | string) => {
+  switch (typeof value) {
+    case "boolean":
+      return SingletonType.new(BooleanType, value);
+    case "string":
+      return SingletonType.new(StringType, value);
+    case "number":
+      if (Number.isInteger(value)) {
+        return SingletonType.new(IntegerType, value);
+      }
+      return SingletonType.new(FloatType, value);
+  }
+};

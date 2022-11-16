@@ -114,6 +114,30 @@ export class AnyType extends BaseType {
   }
 }
 
+export class SingletonType extends BaseType {
+  constructor(
+    public base: PrimitiveType,
+    public value: string | number | boolean
+  ) {
+    super("Singleton");
+  }
+
+  public static new(base: PrimitiveType, value: string | number | boolean) {
+    return new SingletonType(base, value);
+  }
+
+  public toString() {
+    return this.base.name === "String" ? `"${this.value}"` : `${this.value}`;
+  }
+}
+
+type PrimitiveType =
+  | IntegerType
+  | FloatType
+  | NumberType
+  | StringType
+  | BooleanType;
+
 export type Type =
   | IntegerType
   | FloatType
@@ -124,4 +148,5 @@ export type Type =
   | NilType
   | ObjectType
   | FunctionType
-  | AnyType;
+  | AnyType
+  | SingletonType;
