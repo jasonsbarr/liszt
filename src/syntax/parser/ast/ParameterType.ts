@@ -1,15 +1,15 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
-import { AnnotatedType } from "./AnnotatedType";
 import { ASTNode } from "./ASTNode";
 import { Identifier } from "./Identifier";
 import { SyntaxNodes } from "./SyntaxNodes";
+import { TypeAnnotation } from "./TypeAnnotation";
 
 export class ParameterType extends ASTNode {
   constructor(
     public name: Identifier,
     start: SrcLoc,
     end: SrcLoc,
-    public type: AnnotatedType
+    public type: TypeAnnotation
   ) {
     super(SyntaxNodes.Parameter, start, end);
   }
@@ -18,7 +18,7 @@ export class ParameterType extends ASTNode {
     name: Identifier,
     start: SrcLoc,
     end: SrcLoc,
-    type: AnnotatedType
+    type: TypeAnnotation
   ) {
     return new ParameterType(name, start, end, type);
   }

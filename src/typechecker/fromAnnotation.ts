@@ -1,3 +1,4 @@
+import { FunctionType } from "../syntax/parser/ast/FunctionType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { TypeAnnotation } from "../syntax/parser/ast/TypeAnnotation";
 import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
@@ -21,8 +22,10 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
       return Type.any;
     case SyntaxNodes.TypeLiteral:
       return generateObjectType(type.type as TypeLiteral);
+    case SyntaxNodes.FunctionType:
+      return generateFunctionType(type.type as FunctionType);
     default:
-      throw new Error(`No type definition found for type ${type.kind}`);
+      throw new Error(`No type definition found for type ${type.type.kind}`);
   }
 };
 
@@ -36,4 +39,13 @@ const generateObjectType = (type: TypeLiteral) => {
   );
 
   return Type.object(props);
+};
+
+const generateFunctionType = (type: FunctionType) => {
+  const args = type.parameters.map((p) => {
+    return fromAnnotation(p.type);
+  });
+  const ret = fromAnnotation(type.returnType);
+
+  return Type.functionType(args, ret);
 };

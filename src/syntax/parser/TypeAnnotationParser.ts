@@ -58,7 +58,7 @@ export class TypeAnnotationParser extends LHVParser {
 
       const param = this.parseType() as Identifier;
       this.reader.skip(TokenNames.Colon);
-      const paramType = this.parseType();
+      const paramType = this.parseTypeAnnotation();
       const en = paramType.end;
 
       parameters.push(ParameterType.new(param, st, en, paramType));
@@ -73,7 +73,7 @@ export class TypeAnnotationParser extends LHVParser {
     this.reader.skip(TokenNames.RParen);
     this.reader.skip(TokenNames.FatArrow);
 
-    const returnType: AnnotatedType = this.parseType();
+    const returnType = this.parseTypeAnnotation();
     const end: SrcLoc = returnType.end;
 
     return FunctionType.new(parameters, returnType, start, end);

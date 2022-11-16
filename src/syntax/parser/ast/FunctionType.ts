@@ -1,13 +1,13 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
-import { AnnotatedType } from "./AnnotatedType";
 import { ASTNode } from "./ASTNode";
 import { ParameterType } from "./ParameterType";
 import { SyntaxNodes } from "./SyntaxNodes";
+import { TypeAnnotation } from "./TypeAnnotation";
 
 export class FunctionType extends ASTNode {
   constructor(
     public parameters: ParameterType[],
-    public returnType: AnnotatedType,
+    public returnType: TypeAnnotation,
     start: SrcLoc,
     end: SrcLoc
   ) {
@@ -16,7 +16,7 @@ export class FunctionType extends ASTNode {
 
   public static new(
     parameters: ParameterType[],
-    returnType: AnnotatedType,
+    returnType: TypeAnnotation,
     start: SrcLoc,
     end: SrcLoc
   ) {

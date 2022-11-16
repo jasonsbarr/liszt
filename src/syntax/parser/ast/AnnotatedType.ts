@@ -7,10 +7,12 @@ import { StringKeyword } from "./StringKeyword";
 import { TypeLiteral } from "./TypeLiteral";
 import { AnyKeyword } from "./AnyKeyword";
 import { FunctionType } from "./FunctionType";
+import { NumberKeyword } from "./NumberKeyword";
 
 export type AnnotatedType =
   | IntegerKeyword
   | FloatKeyword
+  | NumberKeyword
   | BooleanKeyword
   | StringKeyword
   | NilLiteral
