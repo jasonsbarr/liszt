@@ -187,7 +187,7 @@ export class TypeChecker {
 
       // if this is a variable declaration, it won't be set in the environment yet
       if (
-        env.has(node.left.name) &&
+        env.lookup(node.left.name) &&
         env.get(node.left.name)?.constant === true
       ) {
         throw new Error(
@@ -211,7 +211,7 @@ export class TypeChecker {
 
     if (node.assignment.left instanceof Identifier) {
       const name = node.assignment.left.name;
-      if (env.has(name)) {
+      if (env.lookup(name)) {
         throw new Error(`Variable ${name} has already been declared`);
       }
     }
