@@ -20,11 +20,11 @@ import { ParenthesizedExpression } from "./ast/ParenthesizedExpression";
 import { StringLiteral } from "./ast/StringLiteral";
 import { SyntaxNodes } from "./ast/SyntaxNodes";
 import { TypeAnnotation } from "./ast/TypeAnnotation";
-import { TypeAnnotationParser } from "./TypeAnnotationParser";
 import { Block } from "./ast/Block";
 import { FunctionDeclaration } from "./ast/FunctionDeclaration";
 import { ReturnStatement } from "./ast/ReturnStatement";
 import { VariableDeclaration } from "./ast/VariableDeclaration";
+import { TypeParser } from "./TypeParser";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -52,7 +52,7 @@ const assignmentOps = {
   [TokenNames.Equals]: "Equals",
 };
 
-export class StatementParser extends TypeAnnotationParser {
+export class StatementParser extends TypeParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
