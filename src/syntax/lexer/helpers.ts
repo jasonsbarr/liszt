@@ -61,6 +61,7 @@ export const KEYWORDS = {
   const: TokenNames.Const,
   end: TokenNames.End,
   return: TokenNames.Return,
+  lambda: TokenNames.Lambda,
 };
 
 export type kw = keyof typeof KEYWORDS;
@@ -68,7 +69,6 @@ export type kw = keyof typeof KEYWORDS;
 export const OPERATORS = {
   "=": TokenNames.Equals,
   "=>": TokenNames.FatArrow,
-  lambda: TokenNames.Lambda,
 };
 
 export type ops = keyof typeof OPERATORS;

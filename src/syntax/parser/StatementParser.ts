@@ -108,8 +108,6 @@ export class StatementParser extends TypeAnnotationParser {
             return this.parseParenthesizedExpression();
           case TokenNames.LBrace:
             return this.parseObjectLiteral();
-          case TokenNames.Lambda:
-            return this.parseLambda();
           default:
             throw new Error(
               `Unrecognized token (type: ${token.type}, name: ${token.name})`
@@ -261,6 +259,8 @@ export class StatementParser extends TypeAnnotationParser {
     const token = this.reader.peek();
 
     switch (token.name) {
+      case TokenNames.Lambda:
+        return this.parseLambda();
       case TokenNames.Var:
         return this.parseVariableDeclaration(false);
       case TokenNames.Const:
