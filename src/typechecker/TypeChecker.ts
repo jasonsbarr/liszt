@@ -209,6 +209,13 @@ export class TypeChecker {
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
     let type: Type;
 
+    if (node.assignment.left instanceof Identifier) {
+      const name = node.assignment.left.name;
+      if (env.has(name)) {
+        throw new Error(`Variable ${name} has already been declared`);
+      }
+    }
+
     if (node.assignment.type) {
       type = fromAnnotation(node.assignment.type);
       check(node, type, env);
