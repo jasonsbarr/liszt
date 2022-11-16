@@ -1,4 +1,6 @@
+import { TokenNames } from "../syntax/lexer/TokenNames";
 import { FunctionType } from "../syntax/parser/ast/FunctionType";
+import { SingletonType } from "../syntax/parser/ast/SingletonType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { TypeAnnotation } from "../syntax/parser/ast/TypeAnnotation";
 import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
@@ -24,6 +26,8 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
       return generateObjectType(type.type as TypeLiteral);
     case SyntaxNodes.FunctionType:
       return generateFunctionType(type.type as FunctionType);
+    case SyntaxNodes.SingletonType:
+      return generateSingletonType(type.type as SingletonType);
     default:
       throw new Error(`No type definition found for type ${type.type.kind}`);
   }
@@ -48,4 +52,18 @@ const generateFunctionType = (type: FunctionType) => {
   const ret = fromAnnotation(type.returnType);
 
   return Type.functionType(args, ret);
+};
+
+const generateSingletonType = (type: SingletonType) => {
+  const token = type.token;
+  const value =
+    token.name === TokenNames.Integer || TokenNames.Float
+      ? Number(token.value)
+      : token.name === TokenNames.True
+      ? true
+      : token.name === TokenNames.False
+      ? false
+      : // must be a string value
+        token.value;
+  return Type.singleton(value);
 };
