@@ -17,6 +17,7 @@ import { TypeAnnotation } from "./ast/TypeAnnotation";
 import { TypeLiteral } from "./ast/TypeLiteral";
 import { LHVParser } from "./LHVParser";
 import { SrcLoc } from "../lexer/SrcLoc";
+import { SingletonType } from "./ast/SingletonType";
 
 export class TypeAnnotationParser extends LHVParser {
   constructor(lexResult: LexResult) {
@@ -33,9 +34,19 @@ export class TypeAnnotationParser extends LHVParser {
     return BooleanKeyword.new(token, token.location);
   }
 
+  private parseBooleanSingleton() {
+    const token = this.reader.next();
+    return SingletonType.new("Boolean", token, token.location);
+  }
+
   private parseFloatKeyword() {
     const token = this.reader.next();
     return FloatKeyword.new(token, token.location);
+  }
+
+  private parseFloatSingleton() {
+    const token = this.reader.next();
+    return SingletonType.new("Float", token, token.location);
   }
 
   private parseFunctionType(): FunctionType {
@@ -89,7 +100,10 @@ export class TypeAnnotationParser extends LHVParser {
     return IntegerKeyword.new(token, token.location);
   }
 
-  private parseIntegerSingleton() {}
+  private parseIntegerSingleton() {
+    const token = this.reader.next();
+    return SingletonType.new("Integer", token, token.location);
+  }
 
   private parseNilLiteral() {
     const token = this.reader.next();
@@ -104,6 +118,11 @@ export class TypeAnnotationParser extends LHVParser {
   private parseStringKeyword() {
     const token = this.reader.next();
     return StringKeyword.new(token, token.location);
+  }
+
+  private parseStringSingleton() {
+    const token = this.reader.next();
+    return SingletonType.new("String", token, token.location);
   }
 
   public parseTypeAnnotation() {
@@ -136,10 +155,14 @@ export class TypeAnnotationParser extends LHVParser {
       case TokenNames.LParen:
         return this.parseFunctionType();
       case TokenNames.Integer:
+        return this.parseIntegerSingleton();
       case TokenNames.Float:
+        return this.parseFloatSingleton();
       case TokenNames.String:
+        return this.parseStringSingleton();
       case TokenNames.True:
       case TokenNames.False:
+        return this.parseBooleanSingleton();
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }
