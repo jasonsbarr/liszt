@@ -130,18 +130,18 @@ export class StatementParser extends TypeAnnotationParser {
     }
   }
 
-  private parseBlock(): Block {
+  private parseBlock(endToken: TokenNames): Block {
     let token = this.reader.peek();
     const start = token.location;
     let exprs: ASTNode[] = [];
 
-    while (token.name !== TokenNames.End) {
+    while (token.name !== endToken) {
       let expr = this.parseStatement();
       exprs.push(expr);
       token = this.reader.peek();
     }
 
-    this.reader.skip(TokenNames.End);
+    this.reader.skip(endToken);
     const end = token.location;
 
     return Block.new(exprs, start, end);
@@ -259,7 +259,7 @@ export class StatementParser extends TypeAnnotationParser {
       returnType = this.parseTypeAnnotation();
     }
 
-    const body = this.parseBlock();
+    const body = this.parseBlock(TokenNames.End);
     const end = body.end;
 
     return FunctionDeclaration.new(
