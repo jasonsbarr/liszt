@@ -5,7 +5,7 @@ export type Property = {
 };
 
 export abstract class BaseType {
-  constructor(public name: string, public constant: boolean) {}
+  constructor(public name: string, public constant = false) {}
 
   public toString() {
     return this.name;
@@ -13,7 +13,7 @@ export abstract class BaseType {
 }
 
 export class NumberType extends BaseType {
-  constructor(name: string, constant: boolean) {
+  constructor(name: string, constant = false) {
     super(name, constant);
   }
 
@@ -23,41 +23,41 @@ export class NumberType extends BaseType {
 }
 
 export class IntegerType extends NumberType {
-  constructor(constant: boolean) {
+  constructor(constant = false) {
     super("Integer", constant);
   }
 
-  public static new(constant: boolean) {
+  public static new(constant = false) {
     return new IntegerType(constant);
   }
 }
 
 export class FloatType extends NumberType {
-  constructor(constant: boolean) {
+  constructor(constant = false) {
     super("Float", constant);
   }
 
-  public static new(constant: boolean) {
+  public static new(constant = false) {
     return new FloatType(constant);
   }
 }
 
 export class StringType extends BaseType {
-  constructor(constant: boolean) {
+  constructor(constant = false) {
     super("String", constant);
   }
 
-  public static new(constant: boolean) {
+  public static new(constant = false) {
     return new StringType(constant);
   }
 }
 
 export class BooleanType extends BaseType {
-  constructor(constant: boolean) {
+  constructor(constant = false) {
     super("Boolean", constant);
   }
 
-  public static new(constant: boolean) {
+  public static new(constant = false) {
     return new BooleanType(constant);
   }
 }
@@ -73,11 +73,11 @@ export class NilType extends BaseType {
 }
 
 export class ObjectType extends BaseType {
-  constructor(public properties: Property[], constant: boolean) {
+  constructor(public properties: Property[], constant = false) {
     super("Object", constant);
   }
 
-  public static new(properties: Property[], constant: boolean) {
+  public static new(properties: Property[], constant = false) {
     return new ObjectType(properties, constant);
   }
 
@@ -117,14 +117,22 @@ export class AnyType extends BaseType {
 
 export class SingletonType extends BaseType {
   constructor(
-    public base: IntegerType | FloatType | BooleanType | StringType,
+    public base:
+      | typeof IntegerType
+      | typeof FloatType
+      | typeof StringType
+      | typeof BooleanType,
     public value: string | number | bigint | boolean
   ) {
     super("Singleton", true);
   }
 
   public static new(
-    base: IntegerType | FloatType | BooleanType | StringType,
+    base:
+      | typeof IntegerType
+      | typeof FloatType
+      | typeof StringType
+      | typeof BooleanType,
     value: string | number | bigint | boolean
   ) {
     return new SingletonType(base, value);

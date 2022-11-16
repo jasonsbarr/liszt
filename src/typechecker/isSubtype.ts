@@ -23,7 +23,10 @@ export const isSubtype = (t1: Type, t2: Type): boolean => {
     if (Type.isSingleton(t2)) {
       return t1.value === t2.value;
     } else {
-      return isSubtype(t1.base, t2);
+      // hack because I can't get TS to let me use classes as values
+      // in the Type constructor if I cast this as Type.Singleton,
+      // even if I use typeof [TypeName] for my constructor arguments
+      return isSubtype((t1 as any).base, t2);
     }
   } else if (Type.isAny(t1)) {
     return true;
