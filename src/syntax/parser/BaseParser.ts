@@ -14,7 +14,7 @@ export abstract class BaseParser {
     this.diagnostics = DiagnosticBag.new();
   }
 
-  protected or(...parsers: (() => ASTNode)[]) {
+  protected or(...parsers: (() => ASTNode)[]): ASTNode {
     const current = this.reader.pos;
 
     for (let parser of parsers) {
@@ -24,5 +24,9 @@ export abstract class BaseParser {
         this.reader.pos = current;
       }
     }
+
+    throw new Error(
+      `No valid syntax found for ${this.reader.peek().name} token`
+    );
   }
 }
