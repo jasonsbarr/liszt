@@ -1,4 +1,5 @@
 import vm from "vm";
+import os from "os";
 import readlineSync from "readline-sync";
 import chalk from "chalk";
 import { compile } from "./compile";
@@ -29,10 +30,12 @@ export const repl = () => {
           "Unrecognized token (type: EOFToken, name: EOF)"
         )
       ) {
-        input += "\n";
+        input += os.EOL;
         continue;
+      } else {
+        input = "";
+        console.log(chalk.redBright(e.stack));
       }
-      console.log(chalk.redBright(e.stack));
     }
   }
 };
