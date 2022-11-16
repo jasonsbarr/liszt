@@ -42,7 +42,7 @@ export const functionType = (args: Type[], ret: Type) =>
 
 export const any = AnyType.new();
 
-export const singleton = (value: boolean | number | string) => {
+export const singleton = (value: boolean | number | bigint | string) => {
   switch (typeof value) {
     case "boolean":
       return SingletonType.new(BooleanType, value);
@@ -53,5 +53,7 @@ export const singleton = (value: boolean | number | string) => {
         return SingletonType.new(IntegerType, value);
       }
       return SingletonType.new(FloatType, value);
+    case "bigint":
+      return SingletonType.new(IntegerType, value);
   }
 };

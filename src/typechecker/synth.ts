@@ -18,6 +18,7 @@ import { Block } from "../syntax/parser/ast/Block";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
+import { SingletonType } from "../syntax/parser/ast/SingletonType";
 
 export const synth = (ast: ASTNode, env: TypeEnv): Type => {
   switch (ast.kind) {
@@ -53,6 +54,18 @@ export const synth = (ast: ASTNode, env: TypeEnv): Type => {
       return synthFunctionDeclaration(ast as FunctionDeclaration, env);
     case SyntaxNodes.ReturnStatement:
       return synthReturnStatement(ast as ReturnStatement, env);
+    case SyntaxNodes.SingletonType: {
+      switch ((ast as SingletonType).type) {
+        case "Boolean":
+          return synthBooleanLiteral(ast as SingletonType, env);
+        case "Integer":
+          return synthIntegerLiteral(ast as SingletonType, env);
+        case "Float":
+          return synthFloatLiteral(ast as SingletonType, env);
+        case "String":
+          return synthStringLiteral(ast as SingletonType, env);
+      }
+    }
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -200,4 +213,21 @@ const synthFunctionDeclaration = (node: FunctionDeclaration, env: TypeEnv) => {
 const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
   const val = synth(node.expression, env);
   return val;
+};
+
+const synthBooleanLiteral = (node: SingletonType, env: TypeEnv) => {
+  const value = node.token.value;
+  return Type.singleton(value === "true" ? true : false);
+};
+
+const synthIntegerLiteral = (node: SingletonType, env: TypeEnv) => {
+  return Type.singleton(BigInt(node.token.value));
+};
+
+const synthFloatLiteral = (node: SingletonType, env: TypeEnv) => {
+  return Type.singleton(Number(node.token.value));
+};
+
+const synthStringLiteral = (node: SingletonType, env: TypeEnv) => {
+  return Type.singleton(node.token.value);
 };

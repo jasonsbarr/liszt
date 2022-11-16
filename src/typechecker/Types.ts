@@ -117,12 +117,15 @@ export class AnyType extends BaseType {
 export class SingletonType extends BaseType {
   constructor(
     public base: PrimitiveType,
-    public value: string | number | boolean
+    public value: string | number | bigint | boolean
   ) {
     super("Singleton");
   }
 
-  public static new(base: PrimitiveType, value: string | number | boolean) {
+  public static new(
+    base: PrimitiveType,
+    value: string | number | bigint | boolean
+  ) {
     return new SingletonType(base, value);
   }
 
