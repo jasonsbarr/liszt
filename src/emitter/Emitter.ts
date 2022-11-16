@@ -119,9 +119,9 @@ export class Emitter {
 
     code += node.properties
       .map(({ key, value }) => {
-        return `${this.emitIdentifier(key as BoundIdentifier)}: ${this.emitNode(
-          value
-        )}`;
+        return `["${this.emitIdentifier(
+          key as BoundIdentifier
+        )}"]: ${this.emitNode(value)}`;
       })
       .join(", ");
 
