@@ -179,8 +179,6 @@ export class TypeChecker {
 
   private checkAssignment(node: AssignmentExpression, env: TypeEnv) {
     // there will only be a type annotation in a variable declaration
-    let type: Type;
-
     let constant = false;
     if (node.left instanceof Identifier) {
       constant = node.left.constant;
@@ -196,19 +194,18 @@ export class TypeChecker {
       }
     }
 
+    const type = node.type
+      ? fromAnnotation(node.type)
+      : synth(node.right, env, constant);
+
     if (node.type) {
-      type = fromAnnotation(node.type);
       check(node.right, type, env);
-    } else {
-      type = synth(node.right, env, constant);
     }
 
     return bind(node, env, type);
   }
 
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
-    let type: Type;
-
     if (node.assignment.left instanceof Identifier) {
       const name = node.assignment.left.name;
       if (env.lookup(name)) {
@@ -216,15 +213,17 @@ export class TypeChecker {
       }
     }
 
+    const type = node.assignment.type
+      ? fromAnnotation(node.assignment.type)
+      : synth(node.assignment.right, env, node.constant);
+
+    // Need to set the variable name and type BEFORE checking and binding the assignment node
+    env.set((node.assignment.left as Identifier).name, type);
+
     if (node.assignment.type) {
-      type = fromAnnotation(node.assignment.type);
       check(node, type, env);
-    } else {
-      type = synth(node.assignment.right, env, node.constant);
     }
 
-    // Need to set the variable name and type BEFORE binding the assignment node
-    env.set((node.assignment.left as Identifier).name, type);
     return bind(node, env, type);
   }
 
