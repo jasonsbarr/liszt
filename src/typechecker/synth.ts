@@ -19,6 +19,11 @@ import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { SingletonType } from "../syntax/parser/ast/SingletonType";
+import { PrimitiveNode } from "../syntax/parser/ast/PrimitiveNode";
+import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
+import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
+import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
+import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 
 export const synth = (ast: ASTNode, env: TypeEnv): Type => {
   switch (ast.kind) {
@@ -49,23 +54,14 @@ export const synth = (ast: ASTNode, env: TypeEnv): Type => {
     case SyntaxNodes.Block:
       return synthBlock(ast as Block, env);
     case SyntaxNodes.VariableDeclaration:
+      if ((ast as VariableDeclaration).constant) {
+        return synthConstantDefinition(ast as VariableDeclaration, env);
+      }
       return synthVariableDeclaration(ast as VariableDeclaration, env);
     case SyntaxNodes.FunctionDeclaration:
       return synthFunctionDeclaration(ast as FunctionDeclaration, env);
     case SyntaxNodes.ReturnStatement:
       return synthReturnStatement(ast as ReturnStatement, env);
-    case SyntaxNodes.SingletonType: {
-      switch ((ast as SingletonType).type) {
-        case "Boolean":
-          return synthBooleanLiteral(ast as SingletonType, env);
-        case "Integer":
-          return synthIntegerLiteral(ast as SingletonType, env);
-        case "Float":
-          return synthFloatLiteral(ast as SingletonType, env);
-        case "String":
-          return synthStringLiteral(ast as SingletonType, env);
-      }
-    }
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -185,6 +181,12 @@ const synthVariableDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   return type;
 };
 
+const synthConstantDefinition = (node: VariableDeclaration, env: TypeEnv) => {
+  const type = synthSingleton(node, env);
+  env.set((node.assignment.left as Identifier).name, type);
+  return type;
+};
+
 const synthFunctionDeclaration = (node: FunctionDeclaration, env: TypeEnv) => {
   const paramTypes = node.params.map((p) => {
     const name = p.name.name;
@@ -215,19 +217,35 @@ const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
   return val;
 };
 
-const synthBooleanLiteral = (node: SingletonType, _env: TypeEnv) => {
+const synthSingleton = (node: VariableDeclaration, env: TypeEnv) => {
+  const value = node.assignment.right;
+  switch (value.kind) {
+    case SyntaxNodes.IntegerLiteral:
+      return synthIntegerLiteral(value as IntegerLiteral, env);
+    case SyntaxNodes.FloatLiteral:
+      return synthFloatLiteral(value as FloatLiteral, env);
+    case SyntaxNodes.BooleanLiteral:
+      return synthBooleanLiteral(value as BooleanLiteral, env);
+    case SyntaxNodes.StringLiteral:
+      return synthStringLiteral(value as StringLiteral, env);
+    default:
+      return synth(node.assignment.right, env);
+  }
+};
+
+const synthBooleanLiteral = (node: BooleanLiteral, _env: TypeEnv) => {
   const value = node.token.value;
   return Type.singleton(value === "true" ? true : false);
 };
 
-const synthIntegerLiteral = (node: SingletonType, _env: TypeEnv) => {
+const synthIntegerLiteral = (node: IntegerLiteral, _env: TypeEnv) => {
   return Type.singleton(BigInt(node.token.value));
 };
 
-const synthFloatLiteral = (node: SingletonType, _env: TypeEnv) => {
+const synthFloatLiteral = (node: FloatLiteral, _env: TypeEnv) => {
   return Type.singleton(Number(node.token.value));
 };
 
-const synthStringLiteral = (node: SingletonType, _env: TypeEnv) => {
+const synthStringLiteral = (node: StringLiteral, _env: TypeEnv) => {
   return Type.singleton(node.token.value);
 };
