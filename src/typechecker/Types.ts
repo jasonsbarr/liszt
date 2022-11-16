@@ -1,6 +1,7 @@
 export type Property = {
   name: string;
   type: Type;
+  const?: boolean;
 };
 
 export abstract class BaseType {
