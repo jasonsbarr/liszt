@@ -15,7 +15,7 @@ export const isSubtype = (t1: Type, t2: Type): boolean => {
     });
   } else if (Type.isFunction(t1) && Type.isFunction(t2)) {
     return (
-      t1.args.length === t2.args.length &&
+      t1.args.length <= t2.args.length &&
       t1.args.every((a, i) => isSubtype(t2.args[i], a)) &&
       isSubtype(t1.ret, t2.ret)
     );
