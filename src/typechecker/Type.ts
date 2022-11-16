@@ -14,6 +14,7 @@ module Type {
   export type Property = Types.Property;
   export type Function = Types.FunctionType;
   export type Any = Types.AnyType;
+  export type Singleton = Types.SingletonType;
 
   export type Type = Types.Type;
 
@@ -27,6 +28,7 @@ module Type {
   export const object = Constructors.object;
   export const functionType = Constructors.functionType;
   export const any = Constructors.any;
+  export const singleton = Constructors.singleton;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -38,6 +40,7 @@ module Type {
   export const isObject = Validators.isObject;
   export const isFunction = Validators.isFunction;
   export const isAny = Validators.isAny;
+  export const isSingleton = Validators.isSingleton;
 }
 
 type Type = Type.Type;
