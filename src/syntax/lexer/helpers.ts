@@ -62,6 +62,7 @@ export const KEYWORDS = {
   end: TokenNames.End,
   return: TokenNames.Return,
   lambda: TokenNames.Lambda,
+  λ: TokenNames.Lambda,
 };
 
 export type kw = keyof typeof KEYWORDS;
