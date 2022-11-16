@@ -215,19 +215,19 @@ const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
   return val;
 };
 
-const synthBooleanLiteral = (node: SingletonType, env: TypeEnv) => {
+const synthBooleanLiteral = (node: SingletonType, _env: TypeEnv) => {
   const value = node.token.value;
   return Type.singleton(value === "true" ? true : false);
 };
 
-const synthIntegerLiteral = (node: SingletonType, env: TypeEnv) => {
+const synthIntegerLiteral = (node: SingletonType, _env: TypeEnv) => {
   return Type.singleton(BigInt(node.token.value));
 };
 
-const synthFloatLiteral = (node: SingletonType, env: TypeEnv) => {
+const synthFloatLiteral = (node: SingletonType, _env: TypeEnv) => {
   return Type.singleton(Number(node.token.value));
 };
 
-const synthStringLiteral = (node: SingletonType, env: TypeEnv) => {
+const synthStringLiteral = (node: SingletonType, _env: TypeEnv) => {
   return Type.singleton(node.token.value);
 };
