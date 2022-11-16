@@ -22,7 +22,10 @@ export const repl = () => {
     }
 
     try {
-      PRINT(EVAL(input));
+      let value: any = EVAL(input);
+
+      if (value == null) PRINT(chalk.gray("nil"));
+      else PRINT(value);
       input = "";
     } catch (e: any) {
       if (
