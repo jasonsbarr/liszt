@@ -135,18 +135,18 @@ export class StatementParser extends TypeAnnotationParser {
     }
   }
 
-  private parseBlock(endToken: TokenNames): Block {
+  private parseBlock(): Block {
     let token = this.reader.peek();
     const start = token.location;
     let exprs: ASTNode[] = [];
 
-    while (token.name !== endToken) {
+    while (token.name !== TokenNames.End) {
       let expr = this.parseStatement();
       exprs.push(expr);
       token = this.reader.peek();
     }
 
-    this.reader.skip(endToken);
+    this.reader.skip(TokenNames.End);
     const end = token.location;
 
     return Block.new(exprs, start, end);
