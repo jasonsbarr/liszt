@@ -44,6 +44,12 @@ export class TypeChecker {
   public check(env = TypeEnv.globals) {
     const program = this.tree.root;
     const moduleEnv = env.extend(`module${scopes++}`);
+
+    // first pass is to populate environments so valid forward references will resolve
+    this.checkNode(program, moduleEnv);
+    isSecondPass = true;
+    scopes = 1;
+
     const boundProgram = this.checkNode(program, moduleEnv);
 
     return BoundTree.new(
