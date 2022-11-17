@@ -5,23 +5,23 @@ import { BinaryOperation } from "./BinaryOperation";
 import { SyntaxNodes } from "./SyntaxNodes";
 import { TypeAnnotation } from "./TypeAnnotation";
 
-export class AssignmentExpression extends BinaryOperation {
+export class AssignmentExpression extends ASTNode {
   constructor(
-    left: ASTNode,
-    right: ASTNode,
-    operator: Token,
+    public left: ASTNode,
+    public right: ASTNode,
+    public operator: string,
     start: SrcLoc,
     end: SrcLoc,
     public constant?: boolean,
     public type?: TypeAnnotation
   ) {
-    super(left, right, operator, start, end, SyntaxNodes.AssignmentExpression);
+    super(SyntaxNodes.AssignmentExpression, start, end);
   }
 
   public static new(
     left: ASTNode,
     right: ASTNode,
-    operator: Token,
+    operator: string,
     start: SrcLoc,
     end: SrcLoc,
     constant?: boolean,

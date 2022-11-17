@@ -156,7 +156,7 @@ export class Emitter {
   }
 
   private emitAssignment(node: BoundAssignmentExpression): string {
-    return `${this.emitNode(node.left)} ${node.operator.value} ${this.emitNode(
+    return `${this.emitNode(node.left)} ${node.operator} ${this.emitNode(
       node.right
     )}`;
   }

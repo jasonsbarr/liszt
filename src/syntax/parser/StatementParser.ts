@@ -110,7 +110,7 @@ export class StatementParser extends TypeAnnotationParser {
     return AssignmentExpression.new(
       left,
       right,
-      token,
+      token.value,
       start,
       end,
       constant,

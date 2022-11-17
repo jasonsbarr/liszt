@@ -5,30 +5,22 @@ import { BoundASTNode } from "./BoundASTNode";
 import { BoundBinaryOp } from "./BoundBinaryOp";
 import { BoundNodes } from "./BoundNodes";
 
-export class BoundAssignmentExpression extends BoundBinaryOp {
+export class BoundAssignmentExpression extends BoundASTNode {
   constructor(
-    left: BoundASTNode,
-    right: BoundASTNode,
-    operator: Token,
+    public left: BoundASTNode,
+    public right: BoundASTNode,
+    public operator: string,
     start: SrcLoc,
     end: SrcLoc,
-    type: Type
+    public type: Type
   ) {
-    super(
-      left,
-      right,
-      operator,
-      start,
-      end,
-      type,
-      BoundNodes.BoundAssignmentExpression
-    );
+    super(BoundNodes.BoundAssignmentExpression, start, end);
   }
 
   public static new(
     left: BoundASTNode,
     right: BoundASTNode,
-    operator: Token,
+    operator: string,
     start: SrcLoc,
     end: SrcLoc,
     type: Type
@@ -41,5 +33,9 @@ export class BoundAssignmentExpression extends BoundBinaryOp {
       end,
       type
     );
+  }
+
+  public get children() {
+    return [this.left, this.right];
   }
 }
