@@ -59,6 +59,7 @@ export class TypeChecker {
     scopes = 1;
 
     const boundProgram = this.checkNode(program, env);
+    isSecondPass = false;
 
     return BoundTree.new(
       boundProgram as BoundProgramNode,
@@ -167,7 +168,10 @@ export class TypeChecker {
         let varTypeInCurrentScope: Type | undefined = env.get(node.name);
         let currentScope: TypeEnv | undefined = env;
 
-        while (Type.isUNDEFINED(varTypeInCurrentScope)) {
+        while (
+          Type.isUNDEFINED(varTypeInCurrentScope) ||
+          isUndefinedFunction(varTypeInCurrentScope as Type.Function)
+        ) {
           env.delete(node.name);
           currentScope = env.parent;
           varTypeInCurrentScope = currentScope?.get(node.name);
@@ -315,17 +319,19 @@ export class TypeChecker {
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
     const name = node.name.name;
 
-    if (
-      env.has(name) &&
-      !Type.isUNDEFINED(env.get(name)) &&
-      !isUndefinedFunction(env.get(name) as Type.Function)
-    ) {
-      throw new Error(
-        `Identifier ${name} has already been declared in the current scope`
-      );
-    }
-    console.log(!isSecondPass);
-    const scopeName = `${name}${scopes++}`;
+    // if (
+    //   env.has(name) &&
+    //   !Type.isUNDEFINED(env.get(name)) &&
+    //   !isUndefinedFunction(env.get(name) as Type.Function) &&
+    //   !isSecondPass
+    // ) {
+    //   console.log(env.get(name));
+    //   throw new Error(
+    //     `Identifier ${name} has already been declared in the current scope`
+    //   );
+    // }
+
+    const scopeName = `${name}`;
     const funcEnv = !isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
