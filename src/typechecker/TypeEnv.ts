@@ -3,7 +3,7 @@ import { Type } from "./Type";
 
 module TypeEnv {
   export class TypeEnv extends Env<Type> {}
-  export const globals = new TypeEnv();
+  export const globals = new TypeEnv("global");
 }
 
 type TypeEnv = TypeEnv.TypeEnv;
