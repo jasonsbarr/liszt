@@ -25,6 +25,7 @@ import { FunctionDeclaration } from "./ast/FunctionDeclaration";
 import { ReturnStatement } from "./ast/ReturnStatement";
 import { VariableDeclaration } from "./ast/VariableDeclaration";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
+import { BinaryOperation } from "./ast/BinaryOperation";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -80,6 +81,11 @@ export class StatementParser extends TypeAnnotationParser {
   private getLedPrecedence() {
     const token = this.reader.peek();
     return ledAttributes[token.name as led]?.prec ?? -1;
+  }
+
+  private getLedAssociativity() {
+    const token = this.reader.peek();
+    return ledAttributes[token.name as led]?.assoc ?? "left";
   }
 
   private parseAsExpression(left: ASTNode) {
@@ -153,6 +159,23 @@ export class StatementParser extends TypeAnnotationParser {
         }
       }
     }
+  }
+
+  private parseBinaryOperation(left: ASTNode) {
+    const token = this.reader.peek();
+    const start = token.location;
+    const precedence = this.getLedPrecedence();
+    const assoc = this.getLedAssociativity();
+
+    // need to advance the token stream
+    this.reader.next();
+
+    const right = this.parseExpression(
+      precedence - (assoc === "right" ? 1 : 0)
+    );
+    const end = right.end;
+
+    return BinaryOperation.new(left, right, token.value, start, end);
   }
 
   private parseBlock(): Block {
@@ -358,6 +381,21 @@ export class StatementParser extends TypeAnnotationParser {
         return this.parseCallExpression(left);
       case TokenNames.As:
         return this.parseAsExpression(left);
+      case TokenNames.Or:
+      case TokenNames.And:
+      case TokenNames.DoubleEqual:
+      case TokenNames.NotEqual:
+      case TokenNames.LT:
+      case TokenNames.LTE:
+      case TokenNames.GT:
+      case TokenNames.GTE:
+      case TokenNames.Plus:
+      case TokenNames.Minus:
+      case TokenNames.Times:
+      case TokenNames.Div:
+      case TokenNames.Mod:
+      case TokenNames.Exp:
+        return this.parseBinaryOperation(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }

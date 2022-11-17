@@ -48,5 +48,6 @@ export enum TokenNames {
   End = "End",
   Return = "Return",
   Type = "Type",
+  Self = "Self",
   EOF = "EOF",
 }
