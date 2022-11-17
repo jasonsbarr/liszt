@@ -155,7 +155,6 @@ export class TypeChecker {
   }
 
   private checkIdentifier(node: Identifier, env: TypeEnv) {
-    console.log(env.parent);
     try {
       let type: Type = env.get(node.name);
 
