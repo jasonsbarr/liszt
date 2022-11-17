@@ -29,7 +29,7 @@ export const isHexChar = (c: string) => /[0-9a-zA-Z]/.test(c);
 
 export const isIdStart = (c: string) => /[\p{L}_\$]/u.test(c);
 
-export const isIdChar = (c: string) => /[\p{L}\p{N}_\$\?!']/u.test(c);
+export const isIdChar = (c: string) => /[\p{L}\p{N}_\$']/u.test(c);
 
 export const isKeyword = (str: string) => str in KEYWORDS;
 
@@ -75,10 +75,12 @@ export const OPERATORS = {
   "*": TokenNames.Times,
   "/": TokenNames.Div,
   "%": TokenNames.Mod,
+  "**": TokenNames.Exp,
   and: TokenNames.And,
   or: TokenNames.Or,
   not: TokenNames.Not,
-  "==": TokenNames.DoubleEquals,
+  "==": TokenNames.DoubleEqual,
+  "!=": TokenNames.NotEqual,
   is: TokenNames.Is,
   "<": TokenNames.LT,
   "<=": TokenNames.LTE,

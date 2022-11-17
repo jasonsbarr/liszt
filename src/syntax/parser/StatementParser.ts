@@ -36,14 +36,34 @@ const nudAttributes = {
   [TokenNames.False]: { prec: 0, assoc: "none" },
   [TokenNames.Nil]: { prec: 0, assoc: "none" },
   [TokenNames.Identifier]: { prec: 0, assoc: "none" },
+  // I don't think associativity really matters for these unary operations
+  [TokenNames.Plus]: { prec: 60, assoc: "right" },
+  [TokenNames.Minus]: { prec: 60, assoc: "right" },
+  [TokenNames.Not]: { prec: 60, assoc: "right" },
+  [TokenNames.TypeOf]: { prec: 60, assoc: "right" },
 };
 
 type nud = keyof typeof nudAttributes;
 
 const ledAttributes = {
+  [TokenNames.Or]: { prec: 15, assoc: "left" },
+  [TokenNames.And]: { prec: 20, assoc: "left" },
+  [TokenNames.Is]: { prec: 30, assoc: "left" },
+  [TokenNames.NotEqual]: { prec: 30, assoc: "left" },
+  [TokenNames.DoubleEqual]: { prec: 30, assoc: "left" },
+  [TokenNames.GTE]: { prec: 35, assoc: "left" },
+  [TokenNames.GT]: { prec: 35, assoc: "left" },
+  [TokenNames.LTE]: { prec: 35, assoc: "left" },
+  [TokenNames.LT]: { prec: 35, assoc: "left" },
+  [TokenNames.As]: { prec: 40, assoc: "left" },
+  [TokenNames.Plus]: { prec: 40, assoc: "left" },
+  [TokenNames.Minus]: { prec: 40, assoc: "left" },
+  [TokenNames.Times]: { prec: 40, assoc: "left" },
+  [TokenNames.Div]: { prec: 45, assoc: "left" },
+  [TokenNames.Mod]: { prec: 45, assoc: "left" },
+  [TokenNames.Exp]: { prec: 50, assoc: "left" },
   [TokenNames.Dot]: { prec: 90, assoc: "left" },
-  [TokenNames.LParen]: { prec: 90, assoc: "left" },
-  [TokenNames.As]: { prec: 5, assoc: "left" },
+  [TokenNames.LParen]: { prec: 100, assoc: "left" },
 };
 
 type led = keyof typeof ledAttributes;
