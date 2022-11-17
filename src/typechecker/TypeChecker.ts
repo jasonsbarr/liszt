@@ -26,6 +26,10 @@ import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { fromAnnotation } from "./fromAnnotation";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
+import {
+  isUndefinedFunction,
+  UNDEFINED_FUNCTION,
+} from "../utils/UndefinedFunction";
 
 let isSecondPass = false;
 let scopes = 0;
@@ -229,8 +233,24 @@ export class TypeChecker {
   }
 
   private checkCallExpression(node: CallExpression, env: TypeEnv) {
-    const synthRetType = synth(node, env);
-    return bind(node, env, synthRetType);
+    try {
+      return bind(node, env, synth(node, env));
+    } catch (e: any) {
+      if (!isSecondPass && node.func instanceof Identifier) {
+        env.set(node.func.name, UNDEFINED_FUNCTION(node.start));
+
+        return bind(node, env, synth(node, env));
+      } else if (
+        isSecondPass &&
+        isUndefinedFunction(synth(node, env) as Type.Function)
+      ) {
+        throw new Error(
+          `Function ${(node.func as Identifier).name} is not defined`
+        );
+      } else {
+        throw e;
+      }
+    }
   }
 
   private checkAssignment(node: AssignmentExpression, env: TypeEnv) {
