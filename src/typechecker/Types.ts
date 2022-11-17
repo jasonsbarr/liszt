@@ -1,3 +1,5 @@
+import { SrcLoc } from "../syntax/lexer/SrcLoc";
+
 export type Property = {
   name: string;
   type: Type;
@@ -152,6 +154,16 @@ export class SingletonType extends BaseType {
 
   public toString() {
     return this.base.name === "String" ? `"${this.value}"` : `${this.value}`;
+  }
+}
+
+export class UNDEFINED extends BaseType {
+  constructor(public location: SrcLoc) {
+    super("UNDEFINED", false, false);
+  }
+
+  public static new(location: SrcLoc) {
+    return new UNDEFINED(location);
   }
 }
 
