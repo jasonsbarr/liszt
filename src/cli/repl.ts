@@ -4,7 +4,7 @@ import readlineSync from "readline-sync";
 import chalk from "chalk";
 import { compile } from "./compile";
 
-const READ = () => readlineSync.question("liszt> ");
+const READ = (prompt: string) => readlineSync.question(prompt);
 const EVAL = (input: string) => {
   const code = compile(input);
   return vm.runInThisContext(code);
@@ -13,9 +13,10 @@ const PRINT = console.log;
 
 export const repl = () => {
   let input = "";
+  let prompt = "liszt> ";
 
   while (true) {
-    input += READ();
+    input += READ(prompt);
 
     if (input === "") {
       break;
@@ -27,6 +28,7 @@ export const repl = () => {
       if (value == null) PRINT(chalk.gray("nil"));
       else PRINT(value);
       input = "";
+      prompt = "liszt> ";
     } catch (e: any) {
       if (
         (e.message as string).includes(
@@ -34,9 +36,11 @@ export const repl = () => {
         )
       ) {
         input += os.EOL;
+        prompt = "......  ";
         continue;
       } else {
         input = "";
+        prompt = "liszt> ";
         console.log(chalk.redBright(e.stack));
       }
     }
