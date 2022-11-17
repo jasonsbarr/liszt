@@ -5,7 +5,11 @@ export type Property = {
 };
 
 export abstract class BaseType {
-  constructor(public name: string, public constant = false) {}
+  constructor(
+    public name: string,
+    public constant = false,
+    public nullable = false
+  ) {}
 
   public toString() {
     return this.name;
@@ -13,52 +17,52 @@ export abstract class BaseType {
 }
 
 export class NumberType extends BaseType {
-  constructor(name: string, constant = false) {
-    super(name, constant);
+  constructor(name: string, constant = false, nullable = false) {
+    super(name, constant, nullable);
   }
 
-  public static new(constant: boolean) {
-    return new NumberType("Number", constant);
+  public static new(constant: boolean, nullable = false) {
+    return new NumberType("Number", constant, nullable);
   }
 }
 
 export class IntegerType extends NumberType {
-  constructor(constant = false) {
-    super("Integer", constant);
+  constructor(constant = false, nullable = false) {
+    super("Integer", constant, nullable);
   }
 
-  public static new(constant = false) {
-    return new IntegerType(constant);
+  public static new(constant = false, nullable = false) {
+    return new IntegerType(constant, nullable);
   }
 }
 
 export class FloatType extends NumberType {
-  constructor(constant = false) {
-    super("Float", constant);
+  constructor(constant = false, nullable = false) {
+    super("Float", constant, nullable);
   }
 
-  public static new(constant = false) {
-    return new FloatType(constant);
+  public static new(constant = false, nullable = false) {
+    return new FloatType(constant, nullable);
   }
 }
 
 export class StringType extends BaseType {
-  constructor(constant = false) {
-    super("String", constant);
+  constructor(constant = false, nullable = false) {
+    super("String", constant, nullable);
   }
 
-  public static new(constant = false) {
-    return new StringType(constant);
+  public static new(constant = false, nullable = false) {
+    return new StringType(constant, nullable);
   }
 }
 
 export class BooleanType extends BaseType {
-  constructor(constant = false) {
-    super("Boolean", constant);
+  constructor(constant = false, nullable = false) {
+    super("Boolean", constant, nullable);
   }
 
-  public static new(constant = false) {
-    return new BooleanType(constant);
+  public static new(constant = false, nullable = false) {
+    return new BooleanType(constant, nullable);
   }
 }
 
@@ -73,25 +77,33 @@ export class NilType extends BaseType {
 }
 
 export class ObjectType extends BaseType {
-  constructor(public properties: Property[], constant = false) {
-    super("Object", constant);
+  constructor(
+    public properties: Property[],
+    constant = false,
+    nullable = false
+  ) {
+    super("Object", constant, nullable);
   }
 
-  public static new(properties: Property[], constant = false) {
-    return new ObjectType(properties, constant);
+  public static new(
+    properties: Property[],
+    constant = false,
+    nullable = false
+  ) {
+    return new ObjectType(properties, constant, nullable);
   }
 
   public toString() {
     const properties = this.properties
       .map((prop) => `${prop.name}: ${prop.type}`)
       .join(", ");
-    return `{ ${properties} }`;
+    return `{ ${properties + this.nullable ? "?" : ""} }`;
   }
 }
 
 export class FunctionType extends BaseType {
   constructor(public args: Type[], public ret: Type) {
-    super("Function", true);
+    super("Function", true, false);
   }
 
   public static new(args: Type[], ret: Type) {
@@ -106,12 +118,12 @@ export class FunctionType extends BaseType {
 }
 
 export class AnyType extends BaseType {
-  constructor() {
-    super("Any", false);
+  constructor(nullable = false) {
+    super("Any", false, nullable);
   }
 
-  public static new() {
-    return new AnyType();
+  public static new(nullable = false) {
+    return new AnyType(nullable);
   }
 }
 
@@ -124,7 +136,7 @@ export class SingletonType extends BaseType {
       | typeof BooleanType,
     public value: string | number | bigint | boolean
   ) {
-    super("Singleton", true);
+    super("Singleton", true, false);
   }
 
   public static new(
