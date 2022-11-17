@@ -24,7 +24,7 @@ import { Block } from "./ast/Block";
 import { FunctionDeclaration } from "./ast/FunctionDeclaration";
 import { ReturnStatement } from "./ast/ReturnStatement";
 import { VariableDeclaration } from "./ast/VariableDeclaration";
-import { TypeParser } from "./TypeParser";
+import { TypeAnnotationParser } from "./TypeAnnotationParser";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -52,7 +52,7 @@ const assignmentOps = {
   [TokenNames.Equals]: "Equals",
 };
 
-export class StatementParser extends TypeParser {
+export class StatementParser extends TypeAnnotationParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
