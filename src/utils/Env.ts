@@ -1,10 +1,11 @@
 export class Env<T> {
   private _vars = new Map<string, T>();
+  private _children: Array<Env<T>> = [];
 
-  constructor(public parent?: Env<T>) {}
+  constructor(public name: string, public parent?: Env<T>) {}
 
-  public static new<T>(parent?: Env<T>) {
-    return new Env<T>(parent);
+  public static new<T>(name: string, parent?: Env<T>) {
+    return new Env<T>(name, parent);
   }
 
   public get vars() {
@@ -19,8 +20,12 @@ export class Env<T> {
     return Array.from(this.vars.keys());
   }
 
-  public extend(): Env<T> {
-    return Env.new(this);
+  public extend(name: string): Env<T> {
+    const env = Env.new(name, this);
+
+    this._children.push(env);
+
+    return env;
   }
 
   public get(name: string) {
