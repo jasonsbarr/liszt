@@ -291,7 +291,7 @@ export class StatementParser extends TypeAnnotationParser {
     }
   }
 
-  private parseLambda() {
+  private parseLambda = () => {
     let token = this.reader.next();
     const start = token.location;
 
@@ -323,7 +323,7 @@ export class StatementParser extends TypeAnnotationParser {
     const end = body.end;
 
     return LambdaExpression.new(parameters, body, start, end, ret);
-  }
+  };
 
   private parseLed(left: ASTNode) {
     let token = this.reader.peek();
@@ -399,12 +399,12 @@ export class StatementParser extends TypeAnnotationParser {
     return Parameter.new(name, start, end, annotation);
   }
 
-  private parseParenthesizedExpression() {
+  private parseParenthesizedExpression = () => {
     const start = this.reader.next();
     const expr = this.parseExpression();
     const end = this.reader.next();
     return ParenthesizedExpression.new(expr, start.location, end.location);
-  }
+  };
 
   // Should fix this to only allow in a function declaration body
   private parseReturnStatement() {
