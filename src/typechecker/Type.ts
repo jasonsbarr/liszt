@@ -15,6 +15,7 @@ module Type {
   export type Function = Types.FunctionType;
   export type Any = Types.AnyType;
   export type Singleton = Types.SingletonType;
+  export type UNDEFINED = Types.UNDEFINED;
 
   export type Type = Types.Type;
 
@@ -29,6 +30,7 @@ module Type {
   export const functionType = Constructors.functionType;
   export const any = Constructors.any;
   export const singleton = Constructors.singleton;
+  export const undefinedType = Constructors.undefinedType;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -41,6 +43,7 @@ module Type {
   export const isFunction = Validators.isFunction;
   export const isAny = Validators.isAny;
   export const isSingleton = Validators.isSingleton;
+  export const isUNDEFINED = Validators.isUNDEFINED;
 }
 
 type Type = Type.Type;

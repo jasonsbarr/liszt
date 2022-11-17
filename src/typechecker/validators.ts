@@ -10,6 +10,7 @@ import {
   FunctionType,
   AnyType,
   SingletonType,
+  UNDEFINED,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -33,3 +34,5 @@ export const isAny = (t: Type): t is AnyType => t.name === "Any";
 
 export const isSingleton = (t: Type): t is SingletonType =>
   t.name === "Singleton";
+
+export const isUNDEFINED = (t: Type): t is UNDEFINED => t.name === "UNDEFINED";

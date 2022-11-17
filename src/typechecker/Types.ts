@@ -178,4 +178,5 @@ export type Type =
   | ObjectType
   | FunctionType
   | AnyType
-  | SingletonType;
+  | SingletonType
+  | UNDEFINED;

@@ -1,3 +1,4 @@
+import { SrcLoc } from "../syntax/lexer/SrcLoc";
 import {
   AnyType,
   BooleanType,
@@ -11,6 +12,7 @@ import {
   SingletonType,
   StringType,
   Type,
+  UNDEFINED,
 } from "./Types";
 
 export const integer = (constant = false) => IntegerType.new(constant);
@@ -58,3 +60,5 @@ export const singleton = (value: boolean | number | bigint | string) => {
       return SingletonType.new(IntegerType, value);
   }
 };
+
+export const undefinedType = (location: SrcLoc) => UNDEFINED.new(location);
