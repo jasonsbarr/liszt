@@ -29,6 +29,10 @@ import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 
 let isSecondPass = false;
 let scopes = 0;
+// make sure moduleEnv is only defined once
+const moduleEnv =
+  TypeEnv.globals.getChildEnv("module0") ??
+  TypeEnv.globals.extend(`module${scopes++}`);
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -41,16 +45,15 @@ export class TypeChecker {
     return new TypeChecker(tree);
   }
 
-  public check(env = TypeEnv.globals) {
+  public check(env = moduleEnv) {
     const program = this.tree.root;
-    const moduleEnv = env.extend(`module${scopes++}`);
 
     // first pass is to populate environments so valid forward references will resolve
-    this.checkNode(program, moduleEnv);
+    this.checkNode(program, env);
     isSecondPass = true;
     scopes = 1;
 
-    const boundProgram = this.checkNode(program, moduleEnv);
+    const boundProgram = this.checkNode(program, env);
 
     return BoundTree.new(
       boundProgram as BoundProgramNode,
@@ -152,6 +155,7 @@ export class TypeChecker {
   }
 
   private checkIdentifier(node: Identifier, env: TypeEnv) {
+    console.log(env.parent);
     try {
       let type: Type = env.get(node.name);
 
