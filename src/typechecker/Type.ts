@@ -44,6 +44,8 @@ module Type {
   export const isAny = Validators.isAny;
   export const isSingleton = Validators.isSingleton;
   export const isUNDEFINED = Validators.isUNDEFINED;
+  export const isFalsy = Validators.isFalsy;
+  export const isTruthy = Validators.isTruthy;
 }
 
 type Type = Type.Type;
