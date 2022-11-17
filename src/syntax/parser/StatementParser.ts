@@ -264,7 +264,7 @@ export class StatementParser extends TypeAnnotationParser {
       returnType = this.parseTypeAnnotation();
     }
 
-    const body = this.parseBlock(TokenNames.End);
+    const body = this.parseBlock();
     const end = body.end;
 
     return FunctionDeclaration.new(
