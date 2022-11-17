@@ -36,7 +36,3 @@ export const isSingleton = (t: Type): t is SingletonType =>
   t.name === "Singleton";
 
 export const isUNDEFINED = (t: Type): t is UNDEFINED => t.name === "UNDEFINED";
-
-export const isFalsy = (value: unknown) => value === false || value == null;
-
-export const isTruthy = (value: unknown) => !isFalsy(value);
