@@ -30,6 +30,7 @@ import {
   isUndefinedFunction,
   UNDEFINED_FUNCTION,
 } from "../utils/UndefinedFunction";
+import { BoundCallExpression } from "./bound/BoundCallExpression";
 
 let isSecondPass = false;
 let scopes = 0;
@@ -237,7 +238,8 @@ export class TypeChecker {
       return bind(node, env, synth(node, env));
     } catch (e: any) {
       if (!isSecondPass && node.func instanceof Identifier) {
-        env.set(node.func.name, UNDEFINED_FUNCTION(node.start));
+        const args = node.args.map((arg) => synth(arg, env));
+        env.set(node.func.name, UNDEFINED_FUNCTION(args, node.start));
 
         return bind(node, env, synth(node, env));
       } else if (
@@ -313,7 +315,11 @@ export class TypeChecker {
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
     const name = node.name.name;
 
-    if (env.has(name) && !Type.isUNDEFINED(env.get(name))) {
+    if (
+      env.has(name) &&
+      !Type.isUNDEFINED(env.get(name)) &&
+      !isUndefinedFunction(env.get(name) as Type.Function)
+    ) {
       throw new Error(
         `Identifier ${name} has already been declared in the current scope`
       );
@@ -328,9 +334,28 @@ export class TypeChecker {
       throw new Error(`Could not resolve environment ${scopeName}`);
     }
 
-    const funcType = synth(node, funcEnv) as Type.Function;
-    check(node, funcType, funcEnv);
-    env.set(name, funcType);
-    return bind(node, funcEnv, funcType);
+    try {
+      const funcType = synth(node, funcEnv) as Type.Function;
+      check(node, funcType, funcEnv);
+      env.set(name, funcType);
+      return bind(node, funcEnv, funcType);
+    } catch (e: any) {
+      if (!isSecondPass) {
+        for (let expr of node.body.expressions) {
+          if (expr.kind === SyntaxNodes.CallExpression) {
+            // undefined function will be set in the environment here
+            this.checkCallExpression(
+              expr as CallExpression,
+              funcEnv
+            ) as BoundCallExpression;
+          }
+        }
+        const funcType = synth(node, funcEnv) as Type.Function;
+        check(node, funcType, funcEnv);
+        env.set(name, funcType);
+        return bind(node, funcEnv, funcType);
+      }
+      throw e;
+    }
   }
 }
