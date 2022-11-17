@@ -29,7 +29,6 @@ export enum TokenNames {
   FloatKeyword = "FloatKeyword",
   BooleanKeyword = "BooleanKeyword",
   AnyKeyword = "AnyKeyword",
-  Lambda = "Lambda",
   Def = "Def",
   Var = "Var",
   Const = "Const",

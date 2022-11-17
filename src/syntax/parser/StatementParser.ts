@@ -120,7 +120,7 @@ export class StatementParser extends TypeAnnotationParser {
       default: {
         switch (token.name) {
           case TokenNames.LParen:
-            return this.parseParenthesizedExpression();
+            return this.or(this.parseLambda, this.parseParenthesizedExpression);
           case TokenNames.LBrace:
             return this.parseObjectLiteral();
           default:
@@ -278,8 +278,6 @@ export class StatementParser extends TypeAnnotationParser {
     const token = this.reader.peek();
 
     switch (token.name) {
-      case TokenNames.Lambda:
-        return this.parseLambda();
       case TokenNames.Var:
         return this.parseVariableDeclaration(false);
       case TokenNames.Const:
@@ -297,7 +295,6 @@ export class StatementParser extends TypeAnnotationParser {
     let token = this.reader.next();
     const start = token.location;
 
-    this.reader.skip(TokenNames.LParen);
     token = this.reader.peek();
     let parameters: Parameter[] = [];
 

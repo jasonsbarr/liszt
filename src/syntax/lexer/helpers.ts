@@ -62,8 +62,6 @@ export const KEYWORDS = {
   do: TokenNames.Do,
   end: TokenNames.End,
   return: TokenNames.Return,
-  lambda: TokenNames.Lambda,
-  λ: TokenNames.Lambda,
   type: TokenNames.Type,
 };
 
