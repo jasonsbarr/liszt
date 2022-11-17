@@ -1,3 +1,5 @@
+import { Type } from "../typechecker/Type";
+
 export class Env<T> {
   private _vars = new Map<string, T>();
   private _children: Array<Env<T>> = [];
@@ -24,6 +26,10 @@ export class Env<T> {
     return Array.from(this.vars.keys());
   }
 
+  public delete(name: string) {
+    return this._vars.delete(name);
+  }
+
   public extend(name: string): Env<T> {
     const env = Env.new(name, this);
     let currentEnv: Env<T> | undefined = this;
@@ -39,14 +45,15 @@ export class Env<T> {
   public get(name: string) {
     const scope = this.lookup(name);
 
-    if (scope) {
-      return scope._vars.get(name);
+    if (!scope) {
+      throw new Error(`Name ${name} cannot be resolved in the current scope`);
     }
 
-    throw new Error(`Name ${name} cannot be resolved in the current scope`);
+    // Cannot be undefined because above lookup would have failed, resulting in Error
+    return scope._vars.get(name)!;
   }
 
-  public getChildEnv(name: string) {
+  public getChildEnv(name: string): Env<T> | undefined {
     return this._children.find((child) => name === child.name);
   }
 

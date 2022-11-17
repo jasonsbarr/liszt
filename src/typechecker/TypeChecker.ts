@@ -27,7 +27,7 @@ import { fromAnnotation } from "./fromAnnotation";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 
-let isFirstPass = true;
+let isSecondPass = false;
 let scopes = 0;
 
 export class TypeChecker {
@@ -146,7 +146,42 @@ export class TypeChecker {
   }
 
   private checkIdentifier(node: Identifier, env: TypeEnv) {
-    return bind(node, env);
+    try {
+      let type: Type = env.get(node.name);
+
+      if (isSecondPass) {
+        let varTypeInCurrentScope: Type | undefined = env.get(node.name);
+        let currentScope: TypeEnv | undefined = env;
+
+        while (Type.isUNDEFINED(varTypeInCurrentScope)) {
+          env.delete(node.name);
+          currentScope = env.parent;
+          varTypeInCurrentScope = currentScope?.get(node.name);
+
+          if (!varTypeInCurrentScope) break;
+        }
+
+        if (varTypeInCurrentScope) {
+          type = varTypeInCurrentScope;
+        }
+      }
+
+      return bind(node, env, type);
+    } catch (e: any) {
+      if (isSecondPass) {
+        throw e;
+      }
+
+      // This should only happen on the first pass and with a binding that hasn't been declared yet
+      if (!isSecondPass && !env.has(node.name)) {
+        const loc = node.start;
+        const type = Type.undefinedType(loc);
+        env.set(node.name, type);
+        return bind(node, env, type);
+      }
+
+      throw new Error("I don't know what happened");
+    }
   }
 
   private checkMemberExpression(node: MemberExpression, env: TypeEnv) {
@@ -170,9 +205,14 @@ export class TypeChecker {
 
   private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
     const scopeName = `lambda${scopes++}`;
-    const lambdaEnv = isFirstPass
+    const lambdaEnv = isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
+
+    if (!lambdaEnv) {
+      throw new Error(`Could not resolve environment ${scopeName}`);
+    }
+
     const lambdaType = synth(node, env) as Type.Function;
     check(node, lambdaType, lambdaEnv);
     const bound = bind(node, lambdaEnv, lambdaType);
@@ -215,7 +255,14 @@ export class TypeChecker {
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
     if (node.assignment.left instanceof Identifier) {
       const name = node.assignment.left.name;
-      if (env.lookup(name)) {
+
+      if (env.has(name) && Type.isUNDEFINED(env.get(name)) && isSecondPass) {
+        throw new Error(
+          `Cannot reference name ${name} prior to initialization`
+        );
+      }
+
+      if (env.has(name) && !isSecondPass) {
         throw new Error(`Variable ${name} has already been declared`);
       }
     }
@@ -236,10 +283,22 @@ export class TypeChecker {
 
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
     const name = node.name.name;
+
+    if (env.has(name) && !Type.isUNDEFINED(env.get(name))) {
+      throw new Error(
+        `Identifier ${name} has already been declared in the current scope`
+      );
+    }
+
     const scopeName = `${name}${scopes++}`;
-    const funcEnv = isFirstPass
+    const funcEnv = isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
+
+    if (!funcEnv) {
+      throw new Error(`Could not resolve environment ${scopeName}`);
+    }
+
     const funcType = synth(node, funcEnv) as Type.Function;
     check(node, funcType, funcEnv);
     env.set(name, funcType);
