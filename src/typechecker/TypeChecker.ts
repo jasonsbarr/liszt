@@ -324,7 +324,7 @@ export class TypeChecker {
         `Identifier ${name} has already been declared in the current scope`
       );
     }
-
+    console.log(!isSecondPass);
     const scopeName = `${name}${scopes++}`;
     const funcEnv = !isSecondPass
       ? env.extend(scopeName)

@@ -43,6 +43,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
     return checkReturnStatement(ast as ReturnStatement, t, env);
   }
 
+  if (Type.isUNDEFINED(t)) {
+    return true;
+  }
+
   const synthType = synth(ast, env);
 
   if (isSubtype(synthType, t)) return true;

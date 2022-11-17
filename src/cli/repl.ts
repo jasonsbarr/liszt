@@ -36,7 +36,7 @@ export const repl = () => {
         )
       ) {
         input += os.EOL;
-        prompt = "....  ";
+        prompt = ".....  ";
         continue;
       } else {
         input = "";
