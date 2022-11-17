@@ -26,6 +26,8 @@ import { ReturnStatement } from "./ast/ReturnStatement";
 import { VariableDeclaration } from "./ast/VariableDeclaration";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
 import { BinaryOperation } from "./ast/BinaryOperation";
+import { Token } from "../lexer/Token";
+import { UnaryOperation } from "./ast/UnaryOperation";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -52,6 +54,7 @@ const ledAttributes = {
   [TokenNames.Is]: { prec: 30, assoc: "left" },
   [TokenNames.NotEqual]: { prec: 30, assoc: "left" },
   [TokenNames.DoubleEqual]: { prec: 30, assoc: "left" },
+  [TokenNames.Is]: { prec: 30, assoc: "left" },
   [TokenNames.GTE]: { prec: 35, assoc: "left" },
   [TokenNames.GT]: { prec: 35, assoc: "left" },
   [TokenNames.LTE]: { prec: 35, assoc: "left" },
@@ -86,6 +89,10 @@ export class StatementParser extends TypeAnnotationParser {
   private getLedAssociativity() {
     const token = this.reader.peek();
     return ledAttributes[token.name as led]?.assoc ?? "left";
+  }
+
+  private getNudPrecedence(token: Token) {
+    return nudAttributes[token.name as nud]?.prec ?? -1;
   }
 
   private parseAsExpression(left: ASTNode) {
@@ -152,6 +159,11 @@ export class StatementParser extends TypeAnnotationParser {
             );
           case TokenNames.LBrace:
             return this.parseObjectLiteral();
+          case TokenNames.Not:
+          case TokenNames.Plus:
+          case TokenNames.Minus:
+          case TokenNames.TypeOf:
+            return this.parseUnaryOperation();
           default:
             throw new Error(
               `Unrecognized token (type: ${token.type}, name: ${token.name})`
@@ -385,6 +397,7 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenNames.And:
       case TokenNames.DoubleEqual:
       case TokenNames.NotEqual:
+      case TokenNames.Is:
       case TokenNames.LT:
       case TokenNames.LTE:
       case TokenNames.GT:
@@ -488,6 +501,16 @@ export class StatementParser extends TypeAnnotationParser {
     }
 
     return this.parseExpression();
+  }
+
+  private parseUnaryOperation() {
+    const token = this.reader.next();
+    const start = token.location;
+    const prec = this.getNudPrecedence(token);
+    const expression = this.parseExpression(prec);
+    const end = expression.end;
+
+    return UnaryOperation.new(expression, token.value, start, end);
   }
 
   private parseVariableDeclaration(constant: boolean) {
