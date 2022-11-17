@@ -27,7 +27,7 @@ import { fromAnnotation } from "./fromAnnotation";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 
-let isFirstPass = false;
+let isFirstPass = true;
 let scopes = 0;
 
 export class TypeChecker {
@@ -169,7 +169,10 @@ export class TypeChecker {
   }
 
   private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
-    const lambdaEnv = env.extend();
+    const scopeName = `lambda${scopes++}`;
+    const lambdaEnv = isFirstPass
+      ? env.extend(scopeName)
+      : env.getChildEnv(scopeName);
     const lambdaType = synth(node, env) as Type.Function;
     check(node, lambdaType, lambdaEnv);
     const bound = bind(node, lambdaEnv, lambdaType);
@@ -232,10 +235,14 @@ export class TypeChecker {
   }
 
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
-    const funcEnv = env.extend();
+    const name = node.name.name;
+    const scopeName = `${name}${scopes++}`;
+    const funcEnv = isFirstPass
+      ? env.extend(scopeName)
+      : env.getChildEnv(scopeName);
     const funcType = synth(node, funcEnv) as Type.Function;
     check(node, funcType, funcEnv);
-    env.set(node.name.name, funcType);
+    env.set(name, funcType);
     return bind(node, funcEnv, funcType);
   }
 }

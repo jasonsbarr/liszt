@@ -8,6 +8,10 @@ export class Env<T> {
     return new Env<T>(name, parent);
   }
 
+  protected get children() {
+    return this._children;
+  }
+
   public get vars() {
     return this._vars;
   }
@@ -22,8 +26,12 @@ export class Env<T> {
 
   public extend(name: string): Env<T> {
     const env = Env.new(name, this);
+    let currentEnv: Env<T> | undefined = this;
 
-    this._children.push(env);
+    while (currentEnv) {
+      currentEnv.children.push(env);
+      currentEnv = currentEnv.parent;
+    }
 
     return env;
   }
@@ -36,6 +44,10 @@ export class Env<T> {
     }
 
     throw new Error(`Name ${name} cannot be resolved in the current scope`);
+  }
+
+  public getChildEnv(name: string) {
+    return this._children.find((child) => name === child.name);
   }
 
   // looks in current scope ONLY
