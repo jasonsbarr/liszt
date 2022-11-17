@@ -59,6 +59,7 @@ export const KEYWORDS = {
   def: TokenNames.Def,
   var: TokenNames.Var,
   const: TokenNames.Const,
+  do: TokenNames.Do,
   end: TokenNames.End,
   return: TokenNames.Return,
   lambda: TokenNames.Lambda,
