@@ -29,7 +29,7 @@ export const isHexChar = (c: string) => /[0-9a-zA-Z]/.test(c);
 
 export const isIdStart = (c: string) => /[\p{L}_\$]/u.test(c);
 
-export const isIdChar = (c: string) => /[\p{L}\p{N}_\$\?!]/u.test(c);
+export const isIdChar = (c: string) => /[\p{L}\p{N}_\$\?!']/u.test(c);
 
 export const isKeyword = (str: string) => str in KEYWORDS;
 
@@ -41,7 +41,7 @@ export const isNanValue = (str: string) => /NaN/.test(str);
 
 export const isInfinity = (str: string) => /Infinity/.test(str);
 
-export const isOpChar = (c: string) => /[=>]/.test(c);
+export const isOpChar = (c: string) => /[=>\+\-\*\/%!\?<]/.test(c);
 
 export const KEYWORDS = {
   true: TokenNames.True,
@@ -70,6 +70,21 @@ export type kw = keyof typeof KEYWORDS;
 export const OPERATORS = {
   "=": TokenNames.Equals,
   "=>": TokenNames.FatArrow,
+  "+": TokenNames.Plus,
+  "-": TokenNames.Minus,
+  "*": TokenNames.Times,
+  "/": TokenNames.Div,
+  "%": TokenNames.Mod,
+  and: TokenNames.And,
+  or: TokenNames.Or,
+  not: TokenNames.Not,
+  "==": TokenNames.DoubleEquals,
+  is: TokenNames.Is,
+  "<": TokenNames.LT,
+  "<=": TokenNames.LTE,
+  ">": TokenNames.GT,
+  ">=": TokenNames.GTE,
+  typeof: TokenNames.TypeOf,
 };
 
 export type ops = keyof typeof OPERATORS;
