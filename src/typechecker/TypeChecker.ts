@@ -27,6 +27,9 @@ import { fromAnnotation } from "./fromAnnotation";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 
+let isFirstPass = false;
+let scopes = 0;
+
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
 
@@ -40,7 +43,8 @@ export class TypeChecker {
 
   public check(env = TypeEnv.globals) {
     const program = this.tree.root;
-    const boundProgram = this.checkNode(program, env);
+    const moduleEnv = env.extend(`module${scopes++}`);
+    const boundProgram = this.checkNode(program, moduleEnv);
 
     return BoundTree.new(
       boundProgram as BoundProgramNode,
