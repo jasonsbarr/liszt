@@ -214,7 +214,7 @@ export class TypeChecker {
 
   private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
     const scopeName = `lambda${scopes++}`;
-    const lambdaEnv = isSecondPass
+    const lambdaEnv = !isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
 
@@ -300,7 +300,7 @@ export class TypeChecker {
     }
 
     const scopeName = `${name}${scopes++}`;
-    const funcEnv = isSecondPass
+    const funcEnv = !isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
 
