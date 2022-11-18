@@ -41,7 +41,7 @@ export const isNanValue = (str: string) => /NaN/.test(str);
 
 export const isInfinity = (str: string) => /Infinity/.test(str);
 
-export const isOpChar = (c: string) => /[=>\+\-\*\/%!\?<]/.test(c);
+export const isOpChar = (c: string) => /[=>\+\-\*\/%!\?<|&\^~]/.test(c);
 
 export const isColon = (c: string) => /:/.test(c);
 
@@ -91,6 +91,12 @@ export const OPERATORS = {
   ">": TokenNames.GT,
   ">=": TokenNames.GTE,
   typeof: TokenNames.TypeOf,
+  "&": TokenNames.Amp,
+  "|": TokenNames.Pipe,
+  ">>": TokenNames.RShift,
+  "<<": TokenNames.LShift,
+  "^": TokenNames.Xor,
+  "~": TokenNames.BNot,
 };
 
 export type ops = keyof typeof OPERATORS;
