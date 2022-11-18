@@ -180,7 +180,8 @@ export class TypeChecker {
 
         while (
           Type.isUNDEFINED(varTypeInCurrentScope) ||
-          isUndefinedFunction(varTypeInCurrentScope as Type.Function)
+          (Type.isFunction(varTypeInCurrentScope) &&
+            isUndefinedFunction(varTypeInCurrentScope))
         ) {
           env.delete(node.name);
           currentScope = env.parent;
