@@ -9,6 +9,7 @@ module Type {
   export type Float = Types.FloatType;
   export type String = Types.StringType;
   export type Boolean = Types.BooleanType;
+  export type Symbol = Types.SymbolType;
   export type Nil = Types.NilType;
   export type Object = Types.ObjectType;
   export type Property = Types.Property;
@@ -25,6 +26,7 @@ module Type {
   export const number = Constructors.number;
   export const string = Constructors.string;
   export const boolean = Constructors.boolean;
+  export const symbol = Constructors.symbol;
   export const nil = Constructors.nil;
   export const object = Constructors.object;
   export const functionType = Constructors.functionType;
@@ -38,6 +40,7 @@ module Type {
   export const isFloat = Validators.isFloat;
   export const isString = Validators.isString;
   export const isBoolean = Validators.isBoolean;
+  export const isSymbol = Validators.isSymbol;
   export const isNil = Validators.isNil;
   export const isObject = Validators.isObject;
   export const isFunction = Validators.isFunction;

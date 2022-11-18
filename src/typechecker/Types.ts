@@ -68,6 +68,16 @@ export class BooleanType extends BaseType {
   }
 }
 
+export class SymbolType extends BaseType {
+  constructor(constant = false, nullable = false) {
+    super("Symbol", constant, nullable);
+  }
+
+  public static new(constant = false, nullable = false) {
+    return new SymbolType(constant, nullable);
+  }
+}
+
 export class NilType extends BaseType {
   constructor() {
     super("Nil", true);
@@ -174,6 +184,7 @@ export type Type =
   | NumberType
   | StringType
   | BooleanType
+  | SymbolType
   | NilType
   | ObjectType
   | FunctionType

@@ -11,19 +11,28 @@ import {
   Property,
   SingletonType,
   StringType,
+  SymbolType,
   Type,
   UNDEFINED,
 } from "./Types";
 
-export const integer = (constant = false) => IntegerType.new(constant);
+export const integer = (constant = false, nullable = false) =>
+  IntegerType.new(constant, nullable);
 
-export const float = (constant = false) => FloatType.new(constant);
+export const float = (constant = false, nullable = false) =>
+  FloatType.new(constant, nullable);
 
-export const number = (constant = false) => NumberType.new(constant);
+export const number = (constant = false, nullable = false) =>
+  NumberType.new(constant, nullable);
 
-export const string = (constant = false) => StringType.new(constant);
+export const string = (constant = false, nullable = false) =>
+  StringType.new(constant, nullable);
 
-export const boolean = (constant = false) => BooleanType.new(constant);
+export const boolean = (constant = false, nullable = false) =>
+  BooleanType.new(constant, nullable);
+
+export const symbol = (constant = false, nullable = false) =>
+  SymbolType.new(constant, nullable);
 
 export const nil = NilType.new();
 
