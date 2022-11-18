@@ -28,6 +28,7 @@ import { TokenNames } from "../syntax/lexer/TokenNames";
 import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
+import { isFalsy, isTruthy } from "../utils/truthiness";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -66,6 +67,12 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthFunctionDeclaration(ast as FunctionDeclaration, env);
     case SyntaxNodes.ReturnStatement:
       return synthReturnStatement(ast as ReturnStatement, env);
+    case SyntaxNodes.BinaryOperation:
+      return synthBinary(ast as BinaryOperation, env);
+    case SyntaxNodes.LogicalOperation:
+      return synthLogical(ast as LogicalOperation, env);
+    case SyntaxNodes.UnaryOperation:
+      return synthUnary(ast as UnaryOperation, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -327,7 +334,6 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
       } else if (Type.isString(left) && Type.isString(right)) {
         return Type.string();
       }
-
       throwOperatorTypeError(node.operator, Type.number(), left, right);
 
     case "-":
@@ -341,6 +347,7 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
         throwOperatorTypeError(node.operator, Type.number(), left, right);
       }
       return Type.number();
+
     case "/":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
         throwOperatorTypeError(node.operator, Type.number(), left, right);
@@ -360,13 +367,46 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
       return Type.number();
 
     default:
-      throw new Error("This will never happen");
+      throw new Error(`Unimplemented binary operator ${node.operator}`);
   }
 };
 
-const synthLogical = (node: LogicalOperation, env: TypeEnv) => {};
+const synthLogical = (node: LogicalOperation, env: TypeEnv) => {
+  const left = synth(node.left, env);
+  const right = synth(node.right, env);
 
-const synthUnary = (node: UnaryOperation, env: TypeEnv) => {};
+  switch (node.operator) {
+    case "and":
+      if (isFalsy(left)) return left;
+      else if (isTruthy(right)) return right;
+      else return Type.boolean();
+
+    case "or":
+      if (isTruthy(left)) return left;
+      else if (isFalsy(left)) return right;
+      else return Type.boolean();
+
+    default:
+      throw new Error(`Unimplemented logical operator ${node.operator}`);
+  }
+};
+
+const synthUnary = (node: UnaryOperation, env: TypeEnv): Type => {
+  const expression = synth(node.expression, env);
+
+  switch (node.operator) {
+    case "not":
+      if (isTruthy(expression)) return Type.singleton(false);
+      else if (isFalsy(expression)) return Type.singleton(true);
+      else return Type.boolean();
+
+    case "typeof":
+      return Type.string();
+
+    default:
+      throw new Error(`Unimplemented unary operator ${node.operator}`);
+  }
+};
 
 const throwOperatorTypeError = (
   operator: string,
