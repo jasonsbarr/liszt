@@ -15,7 +15,7 @@ export const Integer = (value: string | number | bigint) => {
     : BigInt(value);
 };
 
-const isInteger = (value: number | bigint) => {
+export const isInteger = (value: number | bigint) => {
   return typeof value === "bigint" || Number.isInteger(value);
 };
 
