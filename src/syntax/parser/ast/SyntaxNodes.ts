@@ -32,4 +32,5 @@ export enum SyntaxNodes {
   FunctionDeclaration = "FunctionDeclaration",
   ReturnStatement = "ReturnStatement",
   UnaryOperation = "UnaryOperation",
+  LogicalOperation = "LogicalOperation",
 }

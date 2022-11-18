@@ -25,6 +25,8 @@ import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
 import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { TokenNames } from "../syntax/lexer/TokenNames";
+import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
+import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -270,3 +272,9 @@ const synthFloatLiteral = (node: FloatLiteral, _env: TypeEnv) => {
 const synthStringLiteral = (node: StringLiteral, _env: TypeEnv) => {
   return Type.singleton(node.token.value);
 };
+
+const synthBinary = (node: BinaryOperation, env: TypeEnv) => {};
+
+const synthLogical = (node: BinaryOperation, env: TypeEnv) => {};
+
+const synthUnary = (node: UnaryOperation, env: TypeEnv) => {};
