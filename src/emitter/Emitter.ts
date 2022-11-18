@@ -21,6 +21,7 @@ import { BoundParenthesizedExpression } from "../typechecker/bound/BoundParenthe
 import { BoundProgramNode } from "../typechecker/bound/BoundProgramNode";
 import { BoundReturnStatement } from "../typechecker/bound/BoundReturnStatement";
 import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
+import { BoundSymbolLiteral } from "../typechecker/bound/BoundSymbolLiteral";
 import { BoundTree } from "../typechecker/bound/BoundTree";
 import { BoundUnaryOperation } from "../typechecker/bound/BoundUnaryOperation";
 import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
@@ -50,6 +51,8 @@ export class Emitter {
         return this.emitString(node as BoundStringLiteral);
       case BoundNodes.BoundBooleanLiteral:
         return this.emitBoolean(node as BoundBooleanLiteral);
+      case BoundNodes.BoundSymbolLiteral:
+        return this.emitSymbol(node as BoundSymbolLiteral);
       case BoundNodes.BoundNilLiteral:
         return this.emitNil(node as BoundNilLiteral);
       case BoundNodes.BoundIdentifier:
@@ -114,6 +117,11 @@ export class Emitter {
 
   private emitBoolean(node: BoundBooleanLiteral) {
     return node.token.value;
+  }
+
+  private emitSymbol(node: BoundSymbolLiteral) {
+    // slice removes the colon
+    return `Symbol.for(${node.token.value.slice(1)})`;
   }
 
   private emitNil(_node: BoundNilLiteral) {
