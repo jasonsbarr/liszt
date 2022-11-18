@@ -145,6 +145,7 @@ export class StatementParser extends TypeAnnotationParser {
         );
         return BooleanLiteral.new(token, token.location);
       case TokenTypes.Symbol:
+        this.reader.skip(TokenNames.Symbol);
         return SymbolLiteral.new(token, token.location);
       case TokenTypes.Nil:
         this.reader.skip(TokenNames.Nil);
