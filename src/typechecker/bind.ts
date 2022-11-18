@@ -165,10 +165,10 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       if (node instanceof AssignmentExpression) {
         // Type checker always passes in the type here
         if (node.left instanceof Identifier) {
-          const isDefined = env.lookup((node.left as Identifier).name);
+          const isDefined = env.lookup(node.left.name);
 
           if (isDefined) {
-            const checkType = env.get((node.left as Identifier).name)!;
+            const checkType = env.get(node.left.name)!;
 
             if (!isSubtype(ty!, checkType)) {
               throw new Error(
