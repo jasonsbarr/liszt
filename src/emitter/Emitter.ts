@@ -38,7 +38,7 @@ export class Emitter {
     return this.emitNode(program);
   }
 
-  private emitNode(node: ASTNode) {
+  private emitNode(node: ASTNode): string {
     switch (node.kind) {
       case BoundNodes.BoundProgramNode:
         return this.emitProgram(node as BoundProgramNode);
@@ -217,7 +217,7 @@ export class Emitter {
     )}`;
   }
 
-  private emitUnaryOperation(node: BoundUnaryOperation) {
+  private emitUnaryOperation(node: BoundUnaryOperation): string {
     return `${node.operator} ${this.emitNode(node.expression)}`;
   }
 }
