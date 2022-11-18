@@ -54,8 +54,6 @@ export const extendNumberProto = () => {
         return me + Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) + them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me + (them as number));
       }
       return me + (them as number);
     },
@@ -68,8 +66,6 @@ export const extendNumberProto = () => {
         return me - Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) - them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me - (them as number));
       }
       return me - (them as number);
     },
@@ -82,8 +78,6 @@ export const extendNumberProto = () => {
         return me * Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) * them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me * (them as number));
       }
       return me * (them as number);
     },
@@ -100,8 +94,6 @@ export const extendNumberProto = () => {
         return me / Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) / them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me / (them as number));
       }
       return me / (them as number);
     },
@@ -118,8 +110,6 @@ export const extendNumberProto = () => {
         return me % Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) % them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me % (them as number));
       }
       return me % (them as number);
     },
@@ -132,8 +122,6 @@ export const extendNumberProto = () => {
         return me ** Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) ** them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me ** (them as number));
       }
       return me ** (them as number);
     },
@@ -146,8 +134,6 @@ export const extendNumberProto = () => {
         return me & Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) & them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me & (them as number));
       }
       return me & (them as number);
     },
@@ -160,8 +146,6 @@ export const extendNumberProto = () => {
         return me | Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) | them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me | (them as number));
       }
       return me | (them as number);
     },
@@ -178,8 +162,6 @@ export const extendNumberProto = () => {
         return me << Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) << them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me << (them as number));
       }
       return me << (them as number);
     },
@@ -192,8 +174,6 @@ export const extendNumberProto = () => {
         return me >> Number(them);
       } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) >> them);
-      } else if (isInteger(me) && isInteger(them)) {
-        return Integer(me >> (them as number));
       }
       return me >> (them as number);
     },
