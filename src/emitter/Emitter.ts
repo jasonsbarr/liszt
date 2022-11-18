@@ -220,12 +220,28 @@ export class Emitter {
   private emitBinaryOperation(
     node: BoundBinaryOperation | BoundLogicalOperation
   ): string {
-    return `${this.emitNode(node.left)} ${node.operator} ${this.emitNode(
-      node.right
-    )}`;
+    switch (node.operator) {
+      case "is":
+        return `Object.is(${this.emitNode(node.left)}, ${this.emitNode(
+          node.right
+        )})`;
+      case "and":
+        return `${this.emitNode(node.left)} && ${this.emitNode(node.right)}`;
+      case "or":
+        return `${this.emitNode(node.left)} || ${this.emitNode(node.right)}`;
+      default:
+        return `${this.emitNode(node.left)} ${node.operator} ${this.emitNode(
+          node.right
+        )}`;
+    }
   }
 
   private emitUnaryOperation(node: BoundUnaryOperation): string {
-    return `${node.operator} ${this.emitNode(node.expression)}`;
+    switch (node.operator) {
+      case "not":
+        return `!${this.emitNode(node.expression)}`;
+      default:
+        return `${node.operator} ${this.emitNode(node.expression)}`;
+    }
   }
 }
