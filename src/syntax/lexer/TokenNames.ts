@@ -58,4 +58,5 @@ export enum TokenNames {
   Type = "Type",
   Self = "Self",
   EOF = "EOF",
+  In = "In",
 }

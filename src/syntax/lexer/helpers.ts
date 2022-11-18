@@ -86,6 +86,7 @@ export const OPERATORS = {
   "==": TokenNames.DoubleEqual,
   "!=": TokenNames.NotEqual,
   is: TokenNames.Is,
+  in: TokenNames.In,
   "<": TokenNames.LT,
   "<=": TokenNames.LTE,
   ">": TokenNames.GT,

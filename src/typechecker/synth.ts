@@ -309,25 +309,25 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
 
     case "<":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.boolean();
 
     case "<=":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.boolean();
 
     case ">":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.boolean();
 
     case ">=":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.boolean();
 
@@ -336,14 +336,19 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
         if (isSubtype(right, Type.number())) {
           return Type.number();
         } else {
-          throwOperatorTypeError(node.operator, Type.number(), left, right);
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
         }
       } else if (Type.isString(left)) {
         if (Type.isString(right)) {
           return Type.string();
         }
       } else {
-        throwOperatorTypeError(node.operator, Type.string(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.string(), left, right);
       }
 
       throw new Error(
@@ -352,33 +357,95 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
 
     case "-":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.number();
 
     case "*":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.number();
 
     case "/":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.number();
 
     case "%":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.number();
 
     case "**":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
       }
       return Type.number();
+
+    case "<":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "<=":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case ">":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case ">=":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "&":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "|":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case ">>":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "<<":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "^":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "in":
+      if (!isSubtype(Type.string(), left) || !Type.isObject(right)) {
+        throw new Error(
+          `Invalid type for in operator: expected string and object, got ${left} and ${right}`
+        );
+      }
+      return Type.boolean();
 
     default:
       throw new Error(`Unimplemented binary operator ${node.operator}`);
@@ -417,18 +484,40 @@ const synthUnary = (node: UnaryOperation, env: TypeEnv): Type => {
     case "typeof":
       return Type.string();
 
+    case "-":
+      if (!isSubtype(Type.number(), expression)) {
+        throwOperatorTypeErrorUnary(node.operator, Type.number(), expression);
+      }
+      return Type.number();
+
+    case "~":
+      if (!isSubtype(Type.number(), expression)) {
+        throwOperatorTypeErrorUnary(node.operator, Type.number(), expression);
+      }
+      return Type.number();
+
     default:
       throw new Error(`Unimplemented unary operator ${node.operator}`);
   }
 };
 
-const throwOperatorTypeError = (
+const throwOperatorTypeErrorBinary = (
   operator: string,
   expectedType: Type,
   left: Type,
   right: Type
 ) => {
   throw new Error(
-    `Invalid type for operator ${operator}; expected ${expectedType}s, got ${left} and ${right}`
+    `Invalid type for binary operator ${operator}; expected ${expectedType}s, got ${left} and ${right}`
+  );
+};
+
+const throwOperatorTypeErrorUnary = (
+  operator: string,
+  expectedType: Type,
+  actualType: Type
+) => {
+  throw new Error(
+    `Invalid type for unary operator ${operator}; expected ${expectedType}, got ${actualType}`
   );
 };
