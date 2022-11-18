@@ -121,7 +121,7 @@ export class Emitter {
 
   private emitSymbol(node: BoundSymbolLiteral) {
     // slice removes the colon
-    return `Symbol.for(${node.token.value.slice(1)})`;
+    return `Symbol.for("${node.token.value.slice(1)}")`;
   }
 
   private emitNil(_node: BoundNilLiteral) {
