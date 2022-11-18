@@ -1,7 +1,7 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
-import { BoundBinaryOp as BoundBinaryOperation } from "./BoundBinaryOperation";
+import { BoundBinaryOperation as BoundBinaryOperation } from "./BoundBinaryOperation";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundLogicalOperation extends BoundBinaryOperation {

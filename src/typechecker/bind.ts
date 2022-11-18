@@ -41,24 +41,35 @@ import { BoundBlock } from "./bound/BoundBlock";
 import { Block } from "../syntax/parser/ast/Block";
 import { BoundReturnStatement } from "./bound/BoundReturnStatement";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
+import { BoundBinaryOperation } from "./bound/BoundBinaryOperation";
+import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
+import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
+import { BoundLogicalOperation } from "./bound/BoundLogicalOperation";
+import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
+import { BoundUnaryOperation } from "./bound/BoundUnaryOperation";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
   switch (node.kind) {
     case SyntaxNodes.IntegerLiteral:
       return BoundIntegerLiteral.new(node as IntegerLiteral);
+
     case SyntaxNodes.FloatLiteral:
       return BoundFloatLiteral.new(node as FloatLiteral);
+
     case SyntaxNodes.BooleanLiteral:
       return BoundBooleanLiteral.new(node as BooleanLiteral);
+
     case SyntaxNodes.StringLiteral:
       return BoundStringLiteral.new(node as StringLiteral);
+
     case SyntaxNodes.Identifier:
       if (!ty) {
         // ty cannot be undefined below because if so, get method throws error
         ty = env.get((node as Identifier).name);
       }
       return BoundIdentifier.new(ty!, node as Identifier);
+
     case SyntaxNodes.ObjectProperty:
       synthType = synth((node as ObjectProperty).value, env);
       key = bind((node as ObjectProperty).key, env, synthType);
@@ -69,6 +80,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         synthType,
         node as ObjectProperty
       );
+
     case SyntaxNodes.ObjectLiteral:
       const properties: BoundObjectProperty[] = (
         node as ObjectLiteral
@@ -77,6 +89,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         ty = synth(node, env);
       }
       return BoundObjectLiteral.new(ty, properties, node as ObjectLiteral);
+
     case SyntaxNodes.MemberExpression:
       const obj = (node as MemberExpression).object;
       const prop = (node as MemberExpression).property as Identifier;
@@ -104,6 +117,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         bind(prop, env, propertyType),
         node as MemberExpression
       );
+
     case SyntaxNodes.AsExpression:
       if (!ty) {
         ty = synth(node, env);
@@ -119,6 +133,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         node.start,
         node.end
       );
+
     case SyntaxNodes.LambdaExpression:
       // gets extended lambdaEnvironment from type checker
       const lambdaBody = bind((node as LambdaExpression).body, env);
@@ -145,6 +160,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         node.start,
         node.end
       );
+
     case SyntaxNodes.AssignmentExpression:
       if (node instanceof AssignmentExpression) {
         // Type checker always passes in the type here
@@ -175,6 +191,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
       // Should never happen
       throw new Error("WTF");
+
     case SyntaxNodes.VariableDeclaration:
       if (node instanceof VariableDeclaration) {
         // Type checker always passes in the type here
@@ -193,6 +210,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
       // Should never happen
       throw new Error("Again, WTF?");
+
     case SyntaxNodes.FunctionDeclaration:
       if (node instanceof FunctionDeclaration) {
         // gets extended environment from type checker
@@ -216,6 +234,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
       // Should never happen
       throw new Error("WTF, indeed?");
+
     case SyntaxNodes.Block:
       if (node instanceof Block) {
         const exprs = node.expressions;
@@ -235,11 +254,62 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         return BoundBlock.new(boundExprs, ty!, node.start, node.end);
       }
       throw new Error("WTAF");
+
     case SyntaxNodes.ReturnStatement:
-      // ty will be passed in from type checker
-      const boundExpr = bind((node as ReturnStatement).expression, env, ty!);
+      if (!ty) {
+        ty = synth((node as ReturnStatement).expression, env);
+      }
+
+      const boundExpr = bind((node as ReturnStatement).expression, env, ty);
       return BoundReturnStatement.new(boundExpr, ty!, node.start, node.end);
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
+
+    case SyntaxNodes.BinaryOperation:
+      const left = bind((node as BinaryOperation).left, env, ty);
+      const right = bind((node as BinaryOperation).right, env, ty);
+      const op = (node as BinaryOperation).operator;
+
+      if (!ty) {
+        ty = synth(node, env);
+      }
+
+      return BoundBinaryOperation.new(
+        left,
+        right,
+        op,
+        node.start,
+        node.end,
+        ty
+      );
+
+    case SyntaxNodes.LogicalOperation:
+      const leftL = bind((node as LogicalOperation).left, env, ty);
+      const rightL = bind((node as LogicalOperation).right, env, ty);
+      const oper = (node as LogicalOperation).operator;
+
+      if (!ty) {
+        ty = synth(node, env);
+      }
+
+      return BoundLogicalOperation.new(
+        leftL,
+        rightL,
+        oper,
+        node.start,
+        node.end,
+        // passed in from type checker
+        ty
+      );
+
+    case SyntaxNodes.UnaryOperation:
+      const expr = bind((node as UnaryOperation).expression, env, ty);
+      const operator = (node as UnaryOperation).operator;
+
+      if (!ty) {
+        ty = synth(node, env);
+      }
+
+      return BoundUnaryOperation.new(expr, operator, node.start, node.end, ty);
   }
 };

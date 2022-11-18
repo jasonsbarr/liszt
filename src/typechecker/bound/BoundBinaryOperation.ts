@@ -4,7 +4,7 @@ import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundNodes } from "./BoundNodes";
 
-export class BoundBinaryOp extends BoundASTNode {
+export class BoundBinaryOperation extends BoundASTNode {
   constructor(
     public left: BoundASTNode,
     public right: BoundASTNode,
@@ -26,7 +26,15 @@ export class BoundBinaryOp extends BoundASTNode {
     type: Type,
     name?: BoundNodes
   ) {
-    return new BoundBinaryOp(left, right, operator, start, end, type, name);
+    return new BoundBinaryOperation(
+      left,
+      right,
+      operator,
+      start,
+      end,
+      type,
+      name
+    );
   }
 
   public get children() {

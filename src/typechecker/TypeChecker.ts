@@ -31,6 +31,9 @@ import {
   UNDEFINED_FUNCTION,
 } from "../utils/UndefinedFunction";
 import { BoundCallExpression } from "./bound/BoundCallExpression";
+import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
+import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
+import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 
 let isSecondPass = false;
 let scopes = 0;
@@ -107,6 +110,13 @@ export class TypeChecker {
         return this.checkVariableDeclaration(node as VariableDeclaration, env);
       case SyntaxNodes.FunctionDeclaration:
         return this.checkFunctionDeclaration(node as FunctionDeclaration, env);
+      case SyntaxNodes.BinaryOperation:
+      case SyntaxNodes.LogicalOperation:
+      case SyntaxNodes.UnaryOperation:
+        return this.checkOperation(
+          node as BinaryOperation | LogicalOperation | UnaryOperation,
+          env
+        );
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -302,6 +312,7 @@ export class TypeChecker {
       }
     }
 
+    // need to try/catch this in case of forward reference
     const type = node.assignment.type
       ? fromAnnotation(node.assignment.type)
       : synth(node.assignment.right, env, node.constant);
@@ -331,7 +342,7 @@ export class TypeChecker {
     //   );
     // }
 
-    const scopeName = `${name}`;
+    const scopeName = name;
     const funcEnv = !isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
@@ -363,5 +374,13 @@ export class TypeChecker {
       }
       throw e;
     }
+  }
+
+  private checkOperation(
+    node: BinaryOperation | LogicalOperation | UnaryOperation,
+    env: TypeEnv
+  ) {
+    const type = synth(node, env);
+    return bind(node, env, type);
   }
 }

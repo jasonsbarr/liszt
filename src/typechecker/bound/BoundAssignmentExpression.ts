@@ -2,7 +2,7 @@ import { SrcLoc } from "../../syntax/lexer/SrcLoc";
 import { Token } from "../../syntax/lexer/Token";
 import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
-import { BoundBinaryOp } from "./BoundBinaryOperation";
+import { BoundBinaryOperation } from "./BoundBinaryOperation";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundAssignmentExpression extends BoundASTNode {
