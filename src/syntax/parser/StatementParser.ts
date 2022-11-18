@@ -28,6 +28,7 @@ import { TypeAnnotationParser } from "./TypeAnnotationParser";
 import { BinaryOperation } from "./ast/BinaryOperation";
 import { Token } from "../lexer/Token";
 import { UnaryOperation } from "./ast/UnaryOperation";
+import { LogicalOperation } from "./ast/LogicalOperation";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -395,6 +396,7 @@ export class StatementParser extends TypeAnnotationParser {
         return this.parseAsExpression(left);
       case TokenNames.Or:
       case TokenNames.And:
+        return this.parseLogicalOperation(left);
       case TokenNames.DoubleEqual:
       case TokenNames.NotEqual:
       case TokenNames.Is:
@@ -412,6 +414,18 @@ export class StatementParser extends TypeAnnotationParser {
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }
+  }
+
+  private parseLogicalOperation(left: ASTNode) {
+    const binaryOp = this.parseBinaryOperation(left);
+    binaryOp.kind = SyntaxNodes.LogicalOperation;
+    return LogicalOperation.new(
+      binaryOp.left,
+      binaryOp.right,
+      binaryOp.operator,
+      binaryOp.start,
+      binaryOp.end
+    );
   }
 
   private parseMemberExpression(left: ASTNode) {
