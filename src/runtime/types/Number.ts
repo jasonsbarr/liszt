@@ -199,5 +199,5 @@ export const extendNumberProto = () => {
     },
   };
 
-  Object.assign(Number.prototype, extendedProto);
+  Object.assign(self, extendedProto);
 };
