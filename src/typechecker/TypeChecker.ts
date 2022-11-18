@@ -34,6 +34,7 @@ import { BoundCallExpression } from "./bound/BoundCallExpression";
 import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
 import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
+import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 
 let isSecondPass = false;
 let scopes = 0;
@@ -85,6 +86,8 @@ export class TypeChecker {
         return this.checkStringLiteral(node as StringLiteral, env);
       case SyntaxNodes.BooleanLiteral:
         return this.checkBooleanLiteral(node as BooleanLiteral, env);
+      case SyntaxNodes.SymbolLiteral:
+        return this.checkSymbolLiteral(node as SymbolLiteral, env);
       case SyntaxNodes.NilLiteral:
         return this.checkNilLiteral(node as NilLiteral, env);
       case SyntaxNodes.ObjectLiteral:
@@ -154,6 +157,11 @@ export class TypeChecker {
   }
 
   private checkBooleanLiteral(node: BooleanLiteral, env: TypeEnv) {
+    this.checkLiteral(node, env);
+    return bind(node, env);
+  }
+
+  private checkSymbolLiteral(node: SymbolLiteral, env: TypeEnv) {
     this.checkLiteral(node, env);
     return bind(node, env);
   }

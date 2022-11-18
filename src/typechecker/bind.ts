@@ -47,6 +47,8 @@ import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 import { BoundLogicalOperation } from "./bound/BoundLogicalOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { BoundUnaryOperation } from "./bound/BoundUnaryOperation";
+import { BoundSymbolLiteral } from "./bound/BoundSymbolLiteral";
+import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -62,6 +64,9 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
 
     case SyntaxNodes.StringLiteral:
       return BoundStringLiteral.new(node as StringLiteral);
+
+    case SyntaxNodes.SymbolLiteral:
+      return BoundSymbolLiteral.new(node as SymbolLiteral);
 
     case SyntaxNodes.Identifier:
       if (!ty) {

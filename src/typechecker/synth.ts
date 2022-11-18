@@ -18,8 +18,6 @@ import { Block } from "../syntax/parser/ast/Block";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
-import { SingletonType } from "../syntax/parser/ast/SingletonType";
-import { PrimitiveNode } from "../syntax/parser/ast/PrimitiveNode";
 import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { IntegerLiteral } from "../syntax/parser/ast/IntegerLiteral";
 import { FloatLiteral } from "../syntax/parser/ast/FloatLiteral";
@@ -29,6 +27,7 @@ import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 import { isFalsy, isTruthy } from "../utils/truthiness";
+import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -40,6 +39,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthString(ast as StringLiteral, constant);
     case SyntaxNodes.BooleanLiteral:
       return synthBoolean(ast as BooleanLiteral, constant);
+    case SyntaxNodes.SymbolLiteral:
+      return synthSymbol(ast as SymbolLiteral);
     case SyntaxNodes.NilLiteral:
       return synthNil();
     case SyntaxNodes.ObjectLiteral:
@@ -102,6 +103,11 @@ const synthBoolean = (node: BooleanLiteral, constant: boolean) => {
   }
   return Type.boolean(false);
 };
+
+const synthSymbol = (node: SymbolLiteral) => {
+  return Type.symbol();
+};
+
 const synthNil = () => Type.nil;
 
 const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {
