@@ -337,20 +337,9 @@ export class TypeChecker {
   }
 
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
+    // need to figure out how to disallow redefining a
+    // binding that already exists as a new function
     const name = node.name.name;
-
-    // if (
-    //   env.has(name) &&
-    //   !Type.isUNDEFINED(env.get(name)) &&
-    //   !isUndefinedFunction(env.get(name) as Type.Function) &&
-    //   !isSecondPass
-    // ) {
-    //   console.log(env.get(name));
-    //   throw new Error(
-    //     `Identifier ${name} has already been declared in the current scope`
-    //   );
-    // }
-
     const scopeName = name;
     const funcEnv = !isSecondPass
       ? env.extend(scopeName)
