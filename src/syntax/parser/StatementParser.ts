@@ -29,6 +29,7 @@ import { BinaryOperation } from "./ast/BinaryOperation";
 import { Token } from "../lexer/Token";
 import { UnaryOperation } from "./ast/UnaryOperation";
 import { LogicalOperation } from "./ast/LogicalOperation";
+import { SymbolLiteral } from "./ast/SymbolLiteral";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -143,6 +144,8 @@ export class StatementParser extends TypeAnnotationParser {
           token.name === TokenNames.True ? TokenNames.True : TokenNames.False
         );
         return BooleanLiteral.new(token, token.location);
+      case TokenTypes.Symbol:
+        return SymbolLiteral.new(token, token.location);
       case TokenTypes.Nil:
         this.reader.skip(TokenNames.Nil);
         return NilLiteral.new(token, token.location);

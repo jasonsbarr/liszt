@@ -18,6 +18,7 @@ import { TypeLiteral } from "./ast/TypeLiteral";
 import { LHVParser } from "./LHVParser";
 import { SrcLoc } from "../lexer/SrcLoc";
 import { SingletonType } from "./ast/SingletonType";
+import { SymbolKeyword } from "./ast/SymbolKeyword";
 
 export class TypeAnnotationParser extends LHVParser {
   constructor(lexResult: LexResult) {
@@ -125,6 +126,11 @@ export class TypeAnnotationParser extends LHVParser {
     return SingletonType.new("String", token, token.location);
   }
 
+  private parseSymbolKeyword() {
+    const token = this.reader.next();
+    return SymbolKeyword.new(token, token.location);
+  }
+
   public parseTypeAnnotation() {
     const type = this.parseType();
     return TypeAnnotation.new(type, type.start, type.end);
@@ -144,6 +150,8 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseBooleanKeyword();
       case TokenNames.StringKeyword:
         return this.parseStringKeyword();
+      case TokenNames.SymbolKeyword:
+        return this.parseSymbolKeyword();
       case TokenNames.Nil:
         return this.parseNilLiteral();
       case TokenNames.Identifier:
