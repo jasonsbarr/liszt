@@ -8,7 +8,7 @@ export class BoundBinaryOp extends BoundASTNode {
   constructor(
     public left: BoundASTNode,
     public right: BoundASTNode,
-    public operator: Token,
+    public operator: string,
     start: SrcLoc,
     end: SrcLoc,
     public type: Type,
@@ -20,7 +20,7 @@ export class BoundBinaryOp extends BoundASTNode {
   public static new(
     left: BoundASTNode,
     right: BoundASTNode,
-    operator: Token,
+    operator: string,
     start: SrcLoc,
     end: SrcLoc,
     type: Type,

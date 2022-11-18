@@ -273,7 +273,13 @@ const synthStringLiteral = (node: StringLiteral, _env: TypeEnv) => {
   return Type.singleton(node.token.value);
 };
 
-const synthBinary = (node: BinaryOperation, env: TypeEnv) => {};
+const synthBinary = (node: BinaryOperation, env: TypeEnv) => {
+  const left = synth(node.left, env);
+  const right = synth(node.right, env);
+
+  switch (node.operator) {
+  }
+};
 
 const synthLogical = (node: BinaryOperation, env: TypeEnv) => {};
 
