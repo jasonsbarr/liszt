@@ -322,10 +322,13 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
       return Type.boolean();
 
     case "+":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      if (isSubtype(left, Type.number()) && isSubtype(right, Type.number())) {
+        return Type.number();
+      } else if (Type.isString(left) && Type.isString(right)) {
+        return Type.string();
       }
-      return Type.number();
+
+      throwOperatorTypeError(node.operator, Type.number(), left, right);
 
     case "-":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
