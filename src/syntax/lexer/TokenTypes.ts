@@ -4,6 +4,7 @@ export enum TokenTypes {
   String = "StringToken",
   Boolean = "BooleanToken",
   Nil = "NilToken",
+  Symbol = "SymbolToken",
   Identifier = "IdentifierToken",
   Punctuation = "PunctuationToken",
   Operator = "OperatorToken",

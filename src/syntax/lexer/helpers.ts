@@ -43,6 +43,8 @@ export const isInfinity = (str: string) => /Infinity/.test(str);
 
 export const isOpChar = (c: string) => /[=>\+\-\*\/%!\?<]/.test(c);
 
+export const isColon = (c: string) => /:/.test(c);
+
 export const KEYWORDS = {
   true: TokenNames.True,
   false: TokenNames.False,
@@ -55,6 +57,7 @@ export const KEYWORDS = {
   number: TokenNames.NumberKeyword,
   boolean: TokenNames.BooleanKeyword,
   string: TokenNames.StringKeyword,
+  symbol: TokenNames.SymbolKeyword,
   any: TokenNames.AnyKeyword,
   def: TokenNames.Def,
   var: TokenNames.Var,

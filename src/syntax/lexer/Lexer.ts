@@ -3,6 +3,7 @@ import {
   isAlphaNumeric,
   isBinInt,
   isBooleanLiteral,
+  isColon,
   isComment,
   isDecimalInt,
   isDigit,
@@ -213,6 +214,26 @@ export class Lexer {
     }
   }
 
+  private readSymbol(trivia: string) {
+    // will always be colon
+    let sym = this.input.next();
+    const { pos, line, col } = this.input;
+    sym += this.input.readWhile(isIdChar);
+
+    this.tokens.addSymbolToken(sym, pos, line, col, trivia);
+  }
+
+  private addPuncToken(char: string, trivia: string) {
+    this.tokens.addPuncToken(
+      PUNC[char as punc],
+      char,
+      this.input.pos,
+      this.input.line,
+      this.input.col,
+      trivia
+    );
+  }
+
   public tokenize() {
     let trivia = "";
 
@@ -249,17 +270,16 @@ export class Lexer {
       } else if (isIdStart(char)) {
         this.readIdentifier(trivia);
         trivia = "";
+      } else if (isColon(char)) {
+        if (isIdStart(this.input.lookahead(1))) {
+          this.readSymbol(trivia);
+        } else {
+          this.addPuncToken(char, trivia);
+        }
       } else if (isOpChar(char)) {
         this.readOp(trivia);
       } else if (isPunc(char)) {
-        this.tokens.addPuncToken(
-          PUNC[char as punc],
-          char,
-          this.input.pos,
-          this.input.line,
-          this.input.col,
-          trivia
-        );
+        this.addPuncToken(char, trivia);
         this.input.next();
       } else {
         throw new Error(
