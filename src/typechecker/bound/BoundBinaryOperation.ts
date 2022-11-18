@@ -14,7 +14,7 @@ export class BoundBinaryOperation extends BoundASTNode {
     public type: Type,
     name?: BoundNodes
   ) {
-    super(name ?? BoundNodes.BoundBinaryOp, start, end);
+    super(name ?? BoundNodes.BoundBinaryOperation, start, end);
   }
 
   public static new(

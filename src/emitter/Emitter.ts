@@ -3,6 +3,7 @@ import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { BoundAssignmentExpression } from "../typechecker/bound/BoundAssignmentExpression";
+import { BoundBinaryOperation } from "../typechecker/bound/BoundBinaryOperation";
 import { BoundBlock } from "../typechecker/bound/BoundBlock";
 import { BoundBooleanLiteral } from "../typechecker/bound/BoundBooleanLiteral";
 import { BoundCallExpression } from "../typechecker/bound/BoundCallExpression";
@@ -11,6 +12,7 @@ import { BoundFunctionDeclaration } from "../typechecker/bound/BoundFunctionDecl
 import { BoundIdentifier } from "../typechecker/bound/BoundIdentifier";
 import { BoundIntegerLiteral } from "../typechecker/bound/BoundIntegerLiteral";
 import { BoundLambdaExpression } from "../typechecker/bound/BoundLambdaExpression";
+import { BoundLogicalOperation } from "../typechecker/bound/BoundLogicalOperation";
 import { BoundMemberExpression } from "../typechecker/bound/BoundMemberExpression";
 import { BoundNilLiteral } from "../typechecker/bound/BoundNilLiteral";
 import { BoundNodes } from "../typechecker/bound/BoundNodes";
@@ -20,6 +22,7 @@ import { BoundProgramNode } from "../typechecker/bound/BoundProgramNode";
 import { BoundReturnStatement } from "../typechecker/bound/BoundReturnStatement";
 import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
 import { BoundTree } from "../typechecker/bound/BoundTree";
+import { BoundUnaryOperation } from "../typechecker/bound/BoundUnaryOperation";
 import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
 
 export class Emitter {
@@ -73,6 +76,13 @@ export class Emitter {
         return this.emitBlock(node as BoundBlock);
       case BoundNodes.BoundReturnStatement:
         return this.emitReturnStatement(node as BoundReturnStatement);
+      case BoundNodes.BoundBinaryOperation:
+      case BoundNodes.BoundLogicalOperation:
+        return this.emitBinaryOperation(
+          node as BoundBinaryOperation | BoundLogicalOperation
+        );
+      case BoundNodes.BoundUnaryOperation:
+        return this.emitUnaryOperation(node as BoundUnaryOperation);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -197,5 +207,17 @@ export class Emitter {
 
   private emitReturnStatement(node: BoundReturnStatement): string {
     return `return ${this.emitNode(node.expression)};`;
+  }
+
+  private emitBinaryOperation(
+    node: BoundBinaryOperation | BoundLogicalOperation
+  ): string {
+    return `${this.emitNode(node.left)} ${node.operator} ${this.emitNode(
+      node.right
+    )}`;
+  }
+
+  private emitUnaryOperation(node: BoundUnaryOperation) {
+    return `${node.operator} ${this.emitNode(node.expression)}`;
   }
 }

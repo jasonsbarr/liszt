@@ -13,7 +13,7 @@ export enum BoundNodes {
   BoundLambdaExpression = "BoundLambdaExpression",
   BoundParameter = "BoundParameter",
   BoundCallExpression = "BoundCallExpression",
-  BoundBinaryOp = "BoundBinaryOp",
+  BoundBinaryOperation = "BoundBinaryOp",
   BoundAssignmentExpression = "BoundAssignmentExpression",
   BoundVariableDeclaration = "BoundVariableDeclaration",
   BoundFunctionDeclaration = "BoundFunctionDeclaration",
