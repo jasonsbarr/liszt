@@ -299,9 +299,6 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
       return Type.boolean();
 
     case "is":
-      if (Type.isSingleton(left) && Type.isSingleton(right)) {
-        return Type.singleton(Object.is(left.value, right.value));
-      }
       return Type.boolean();
 
     case "<":
@@ -329,12 +326,23 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
       return Type.boolean();
 
     case "+":
-      if (isSubtype(left, Type.number()) && isSubtype(right, Type.number())) {
-        return Type.number();
-      } else if (Type.isString(left) && Type.isString(right)) {
-        return Type.string();
+      if (isSubtype(left, Type.number())) {
+        if (isSubtype(right, Type.number())) {
+          return Type.number();
+        } else {
+          throwOperatorTypeError(node.operator, Type.number(), left, right);
+        }
+      } else if (Type.isString(left)) {
+        if (Type.isString(right)) {
+          return Type.string();
+        }
+      } else {
+        throwOperatorTypeError(node.operator, Type.string(), left, right);
       }
-      throwOperatorTypeError(node.operator, Type.number(), left, right);
+
+      throw new Error(
+        `+ only works with 2 strings or 2 numbers; ${left} and ${right} given`
+      );
 
     case "-":
       if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
