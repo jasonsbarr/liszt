@@ -27,6 +27,7 @@ import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { TokenNames } from "../syntax/lexer/TokenNames";
 import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
+import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -273,14 +274,104 @@ const synthStringLiteral = (node: StringLiteral, _env: TypeEnv) => {
   return Type.singleton(node.token.value);
 };
 
-const synthBinary = (node: BinaryOperation, env: TypeEnv) => {
+const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
   const left = synth(node.left, env);
   const right = synth(node.right, env);
 
   switch (node.operator) {
+    case "==":
+      if (Type.isSingleton(left) && Type.isSingleton(right)) {
+        return Type.singleton(left.value === right.value);
+      }
+      return Type.boolean();
+
+    case "!=":
+      if (Type.isSingleton(left) && Type.isSingleton(right)) {
+        return Type.singleton(left.value !== right.value);
+      }
+      return Type.boolean();
+
+    case "is":
+      if (Type.isSingleton(left) && Type.isSingleton(right)) {
+        return Type.singleton(Object.is(left.value, right.value));
+      }
+      return Type.boolean();
+
+    case "<":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.boolean();
+
+    case "<=":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.boolean();
+
+    case ">":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.boolean();
+
+    case ">=":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.boolean();
+
+    case "+":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "-":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "*":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+    case "/":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "%":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    case "**":
+      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
+        throwOperatorTypeError(node.operator, Type.number(), left, right);
+      }
+      return Type.number();
+
+    default:
+      throw new Error("This will never happen");
   }
 };
 
-const synthLogical = (node: BinaryOperation, env: TypeEnv) => {};
+const synthLogical = (node: LogicalOperation, env: TypeEnv) => {};
 
 const synthUnary = (node: UnaryOperation, env: TypeEnv) => {};
+
+const throwOperatorTypeError = (
+  operator: string,
+  expectedType: Type,
+  left: Type,
+  right: Type
+) => {
+  throw new Error(
+    `Invalid type for operator ${operator}; expected ${expectedType}s, got ${left} and ${right}`
+  );
+};
