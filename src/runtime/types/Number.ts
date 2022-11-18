@@ -1,3 +1,8 @@
+enum NumType {
+  Integer = "Integer",
+  Float = "Float",
+}
+
 export const Integer = (value: string | number | bigint) => {
   const num = Number(value);
 
@@ -16,14 +21,19 @@ const isInteger = (value: number | bigint) => {
 
 export const extendNumberProto = () => {
   const self = Number.prototype;
-  const extendedProto = {
+
+  const thisType = (type: NumType) =>
+    extendedProto.__type__.call(self) === type;
+
+  // var so above function can access its type via forward reference
+  var extendedProto = {
     __type__(): string {
       return Number.isInteger(self.valueOf()) ? "Integer" : "Float";
     },
 
     __string__(): string {
-      const value = self.valueOf();
-      return this.__type__() === "Float" && Number.isInteger(value)
+      const value = self.valueOf() as number | bigint;
+      return thisType(NumType.Float) && isInteger(value)
         ? `${value}.0`
         : value.toString();
     },
@@ -32,9 +42,9 @@ export const extendNumberProto = () => {
       const me = self.valueOf();
       const them = other.valueOf();
 
-      if (this.__type__() === "Float" || isInteger(them)) {
+      if (thisType(NumType.Float) || isInteger(them)) {
         return me + Number(them);
-      } else if (this.__type__() === "Integer" && typeof them === "bigint") {
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
         return Integer(BigInt(me) + them);
       } else if (isInteger(me) && isInteger(them)) {
         return Integer(me + (them as number));
