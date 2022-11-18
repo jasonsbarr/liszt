@@ -53,14 +53,20 @@ type nud = keyof typeof nudAttributes;
 const ledAttributes = {
   [TokenNames.Or]: { prec: 15, assoc: "left" },
   [TokenNames.And]: { prec: 20, assoc: "left" },
+  [TokenNames.Amp]: { prec: 25, assoc: "left" },
+  [TokenNames.Pipe]: { prec: 25, assoc: "left" },
+  [TokenNames.Is]: { prec: 25, assoc: "left" },
   [TokenNames.Is]: { prec: 30, assoc: "left" },
   [TokenNames.NotEqual]: { prec: 30, assoc: "left" },
   [TokenNames.DoubleEqual]: { prec: 30, assoc: "left" },
   [TokenNames.Is]: { prec: 30, assoc: "left" },
+  [TokenNames.In]: { prec: 35, assoc: "left" },
   [TokenNames.GTE]: { prec: 35, assoc: "left" },
   [TokenNames.GT]: { prec: 35, assoc: "left" },
   [TokenNames.LTE]: { prec: 35, assoc: "left" },
   [TokenNames.LT]: { prec: 35, assoc: "left" },
+  [TokenNames.LShift]: { prec: 37, assoc: "left" },
+  [TokenNames.RShift]: { prec: 37, assoc: "left" },
   [TokenNames.As]: { prec: 40, assoc: "left" },
   [TokenNames.Plus]: { prec: 40, assoc: "left" },
   [TokenNames.Minus]: { prec: 40, assoc: "left" },
@@ -168,6 +174,7 @@ export class StatementParser extends TypeAnnotationParser {
           case TokenNames.Plus:
           case TokenNames.Minus:
           case TokenNames.TypeOf:
+          case TokenNames.BNot:
             return this.parseUnaryOperation();
           default:
             throw new Error(
@@ -414,6 +421,12 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenNames.Div:
       case TokenNames.Mod:
       case TokenNames.Exp:
+      case TokenNames.In:
+      case TokenNames.Amp:
+      case TokenNames.Pipe:
+      case TokenNames.RShift:
+      case TokenNames.LShift:
+      case TokenNames.Xor:
         return this.parseBinaryOperation(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
