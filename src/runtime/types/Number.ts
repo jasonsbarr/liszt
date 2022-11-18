@@ -38,6 +38,14 @@ export const extendNumberProto = () => {
         : value.toString();
     },
 
+    __eq__(other: number | bigint) {
+      return self.valueOf() == other.valueOf();
+    },
+
+    __lte__(other: number | bigint) {
+      return self.valueOf() <= other.valueOf();
+    },
+
     __plus__(other: number | bigint): number | bigint {
       const me = self.valueOf();
       const them = other.valueOf();
@@ -50,6 +58,144 @@ export const extendNumberProto = () => {
         return Integer(me + (them as number));
       }
       return me + (them as number);
+    },
+
+    __sub__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me - Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) - them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me - (them as number));
+      }
+      return me - (them as number);
+    },
+
+    __mul__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me * Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) * them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me * (them as number));
+      }
+      return me * (them as number);
+    },
+
+    __div__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (them === 0 || them === 0n) {
+        throw new Error("Cannot divide by zero");
+      }
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me / Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) / them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me / (them as number));
+      }
+      return me / (them as number);
+    },
+
+    __mod__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (them === 0 || them === 0n) {
+        throw new Error("Cannot divide by zero");
+      }
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me % Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) % them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me % (them as number));
+      }
+      return me % (them as number);
+    },
+
+    __exp__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me ** Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) ** them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me ** (them as number));
+      }
+      return me ** (them as number);
+    },
+
+    __band__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me & Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) & them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me & (them as number));
+      }
+      return me & (them as number);
+    },
+
+    __bor__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me | Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) | them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me | (them as number));
+      }
+      return me | (them as number);
+    },
+
+    __bnot__() {
+      return ~(self.valueOf() as number | bigint);
+    },
+
+    __bleft__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me << Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) << them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me << (them as number));
+      }
+      return me << (them as number);
+    },
+
+    __bright__(other: number | bigint): number | bigint {
+      const me = self.valueOf();
+      const them = other.valueOf();
+
+      if (thisType(NumType.Float) || isInteger(them)) {
+        return me >> Number(them);
+      } else if (thisType(NumType.Integer) && typeof them === "bigint") {
+        return Integer(BigInt(me) >> them);
+      } else if (isInteger(me) && isInteger(them)) {
+        return Integer(me >> (them as number));
+      }
+      return me >> (them as number);
     },
   };
 
