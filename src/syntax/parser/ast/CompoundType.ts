@@ -1,12 +1,12 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
-import { AnnotatedType } from "./AnnotatedType";
 import { ASTNode } from "./ASTNode";
 import { SyntaxNodes } from "./SyntaxNodes";
+import { TypeAnnotation } from "./TypeAnnotation";
 
 export class CompoundType extends ASTNode {
   constructor(
     name: SyntaxNodes,
-    public types: AnnotatedType[],
+    public types: TypeAnnotation[],
     start: SrcLoc,
     end: SrcLoc
   ) {
@@ -15,7 +15,7 @@ export class CompoundType extends ASTNode {
 
   public static new(
     name: SyntaxNodes,
-    types: AnnotatedType[],
+    types: TypeAnnotation[],
     start: SrcLoc,
     end: SrcLoc
   ) {
