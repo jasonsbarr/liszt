@@ -275,6 +275,8 @@ export class Lexer {
           this.readSymbol(trivia);
         } else {
           this.addPuncToken(char, trivia);
+          // advance input stream
+          this.input.next();
         }
       } else if (isOpChar(char)) {
         this.readOp(trivia);
