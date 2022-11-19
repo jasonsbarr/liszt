@@ -164,7 +164,7 @@ const synthParenthesizedExpression = (
 const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
-    const type = param?.type ? fromAnnotation(param.type) : Type.any;
+    const type = param?.type ? fromAnnotation(param.type) : Type.any();
     // has extended lambdaEnvironment from caller
     env.set(name, type);
     return type;
@@ -207,7 +207,7 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
 const synthBlock = (node: Block, env: TypeEnv): Type => {
   const returnType = node.expressions.reduce((_: Type, curr: ASTNode) => {
     return synth(curr, env);
-  }, Type.any as Type);
+  }, Type.any() as Type);
 
   return returnType;
 };

@@ -53,7 +53,7 @@ export const object = (
 export const functionType = (args: Type[], ret: Type) =>
   FunctionType.new(args, ret);
 
-export const any = AnyType.new();
+export const any = () => AnyType.new();
 
 export const singleton = (value: boolean | number | bigint | string) => {
   switch (typeof value) {
