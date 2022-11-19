@@ -21,7 +21,7 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
     case SyntaxNodes.SymbolKeyword:
       return Type.symbol();
     case SyntaxNodes.NilLiteral:
-      return Type.nil;
+      return Type.nil();
     case SyntaxNodes.AnyKeyword:
       return Type.any;
     case SyntaxNodes.TypeLiteral:

@@ -108,7 +108,7 @@ const synthSymbol = (node: SymbolLiteral) => {
   return Type.symbol();
 };
 
-const synthNil = () => Type.nil;
+const synthNil = () => Type.nil();
 
 const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {
   const props: Property[] = obj.properties.map((prop) => ({

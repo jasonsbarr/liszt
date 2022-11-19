@@ -12,6 +12,7 @@ import {
   SingletonType,
   UNDEFINED,
   SymbolType,
+  NeverType,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -39,3 +40,5 @@ export const isSingleton = (t: Type): t is SingletonType =>
   t.name === "Singleton";
 
 export const isUNDEFINED = (t: Type): t is UNDEFINED => t.name === "UNDEFINED";
+
+export const isNever = (t: Type): t is NeverType => t.name === "Never";

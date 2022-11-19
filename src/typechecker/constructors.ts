@@ -5,6 +5,7 @@ import {
   FloatType,
   FunctionType,
   IntegerType,
+  NeverType,
   NilType,
   NumberType,
   ObjectType,
@@ -34,7 +35,7 @@ export const boolean = (constant = false, nullable = false) =>
 export const symbol = (constant = false, nullable = false) =>
   SymbolType.new(constant, nullable);
 
-export const nil = NilType.new();
+export const nil = () => NilType.new();
 
 export const object = (
   properties: Property[] | { [name: string]: Type },
@@ -71,3 +72,5 @@ export const singleton = (value: boolean | number | bigint | string) => {
 };
 
 export const undefinedType = (location: SrcLoc) => UNDEFINED.new(location);
+
+export const never = () => NeverType.new();

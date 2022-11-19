@@ -177,6 +177,16 @@ export class UNDEFINED extends BaseType {
   }
 }
 
+export class NeverType extends BaseType {
+  constructor() {
+    super("Never", true, false);
+  }
+
+  public static new() {
+    return new NeverType();
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -190,4 +200,5 @@ export type Type =
   | FunctionType
   | AnyType
   | SingletonType
-  | UNDEFINED;
+  | UNDEFINED
+  | NeverType;
