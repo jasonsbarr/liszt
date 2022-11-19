@@ -120,15 +120,6 @@ const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {
 
 const synthMember = (ast: MemberExpression, env: TypeEnv) => {
   const prop = ast.property;
-
-  if (!(prop instanceof Identifier)) {
-    throw new Error(
-      `Only valid identifiers may be object property names; ${
-        (prop as ASTNode).kind
-      } given`
-    );
-  }
-
   const object = synth(ast.object, env);
 
   if (!Type.isObject(object)) {
