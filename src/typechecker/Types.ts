@@ -191,6 +191,10 @@ export class UnionType extends BaseType {
   constructor(public types: Type[], constant = false, nullable = false) {
     super("Union", constant, nullable);
   }
+
+  public static new(types: Type[], constant = false, nullable = false) {
+    return new UnionType(types, constant, nullable);
+  }
 }
 
 export type Type =
