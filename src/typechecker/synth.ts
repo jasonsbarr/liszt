@@ -28,6 +28,7 @@ import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 import { isFalsy, isTruthy } from "../utils/truthiness";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
+import { map } from "./map";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -122,17 +123,19 @@ const synthMember = (ast: MemberExpression, env: TypeEnv) => {
   const prop = ast.property;
   const object = synth(ast.object, env);
 
-  if (!Type.isObject(object)) {
-    throw new Error(`MemberExpression expects an object; ${object} given`);
-  }
+  return map(object, (obj) => {
+    if (!Type.isObject(obj)) {
+      throw new Error(`MemberExpression expects an object; ${obj} given`);
+    }
 
-  const type = propType(object, prop.name);
+    const type = propType(obj, prop.name);
 
-  if (!type) {
-    throw new Error(`No such property ${prop.name} on object`);
-  }
+    if (!type) {
+      throw new Error(`No such property ${prop.name} on object`);
+    }
 
-  return type;
+    return type;
+  });
 };
 
 const synthAs = (node: AsExpression, env: TypeEnv) => {
@@ -178,21 +181,23 @@ const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
 const synthCall = (node: CallExpression, env: TypeEnv): Type => {
   const func: Type = synth(node.func, env);
 
-  if (!Type.isFunction(func)) {
-    throw new Error(`Call expression expects a function type, got ${func}`);
-  }
+  return map(func, (f) => {
+    if (!Type.isFunction(f)) {
+      throw new Error(`Call expression expects a function type, got ${f}`);
+    }
 
-  if (func.args.length !== node.args.length) {
-    throw new Error(
-      `Expected ${func.args.length} arguments, got ${node.args.length}`
-    );
-  }
+    if (f.args.length !== node.args.length) {
+      throw new Error(
+        `Expected ${f.args.length} arguments, got ${node.args.length}`
+      );
+    }
 
-  func.args.forEach((argType, i) => {
-    check(node.args[i], argType, env);
+    f.args.forEach((argType, i) => {
+      check(node.args[i], argType, env);
+    });
+
+    return f.ret;
   });
-
-  return func.ret;
 };
 
 const synthBlock = (node: Block, env: TypeEnv): Type => {
@@ -282,51 +287,28 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
   const left = synth(node.left, env);
   const right = synth(node.right, env);
 
-  switch (node.operator) {
-    case "==":
-      if (Type.isSingleton(left) && Type.isSingleton(right)) {
-        return Type.singleton(left.value === right.value);
-      }
-      return Type.boolean();
+  return map(left, right, (left: Type, right: Type) => {
+    switch (node.operator) {
+      case "==":
+        if (Type.isSingleton(left) && Type.isSingleton(right)) {
+          return Type.singleton(left.value === right.value);
+        }
+        return Type.boolean();
 
-    case "!=":
-      if (Type.isSingleton(left) && Type.isSingleton(right)) {
-        return Type.singleton(left.value !== right.value);
-      }
-      return Type.boolean();
+      case "!=":
+        if (Type.isSingleton(left) && Type.isSingleton(right)) {
+          return Type.singleton(left.value !== right.value);
+        }
+        return Type.boolean();
 
-    case "is":
-      return Type.boolean();
+      case "is":
+        return Type.boolean();
 
-    case "<":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.boolean();
-
-    case "<=":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.boolean();
-
-    case ">":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.boolean();
-
-    case ">=":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.boolean();
-
-    case "+":
-      if (isSubtype(left, Type.number())) {
-        if (isSubtype(right, Type.number())) {
-          return Type.number();
-        } else {
+      case "<":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
           throwOperatorTypeErrorBinary(
             node.operator,
             Type.number(),
@@ -334,162 +316,346 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
             right
           );
         }
-      } else if (Type.isString(left)) {
-        if (Type.isString(right)) {
-          return Type.string();
+        return Type.boolean();
+
+      case "<=":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
         }
-      } else {
-        throwOperatorTypeErrorBinary(node.operator, Type.string(), left, right);
-      }
+        return Type.boolean();
 
-      throw new Error(
-        `+ only works with 2 strings or 2 numbers; ${left} and ${right} given`
-      );
+      case ">":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.boolean();
 
-    case "-":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
+      case ">=":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.boolean();
 
-    case "*":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
+      case "+":
+        if (isSubtype(left, Type.number())) {
+          if (isSubtype(right, Type.number())) {
+            return Type.number();
+          } else {
+            throwOperatorTypeErrorBinary(
+              node.operator,
+              Type.number(),
+              left,
+              right
+            );
+          }
+        } else if (Type.isString(left)) {
+          if (Type.isString(right)) {
+            return Type.string();
+          }
+        } else {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.string(),
+            left,
+            right
+          );
+        }
 
-    case "/":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "%":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "**":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "<":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "<=":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case ">":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case ">=":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "&":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "|":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case ">>":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "<<":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "^":
-      if (!isSubtype(left, Type.number()) || !isSubtype(right, Type.number())) {
-        throwOperatorTypeErrorBinary(node.operator, Type.number(), left, right);
-      }
-      return Type.number();
-
-    case "in":
-      if (!isSubtype(Type.string(), left) || !Type.isObject(right)) {
         throw new Error(
-          `Invalid type for in operator: expected string and object, got ${left} and ${right}`
+          `+ only works with 2 strings or 2 numbers; ${left} and ${right} given`
         );
-      }
-      return Type.boolean();
 
-    default:
-      throw new Error(`Unimplemented binary operator ${node.operator}`);
-  }
+      case "-":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "*":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "/":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "%":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "**":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "<":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "<=":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case ">":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case ">=":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "&":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "|":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case ">>":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "<<":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "^":
+        if (
+          !isSubtype(left, Type.number()) ||
+          !isSubtype(right, Type.number())
+        ) {
+          throwOperatorTypeErrorBinary(
+            node.operator,
+            Type.number(),
+            left,
+            right
+          );
+        }
+        return Type.number();
+
+      case "in":
+        if (!isSubtype(Type.string(), left) || !Type.isObject(right)) {
+          throw new Error(
+            `Invalid type for in operator: expected string and object, got ${left} and ${right}`
+          );
+        }
+        return Type.boolean();
+
+      default:
+        throw new Error(`Unimplemented binary operator ${node.operator}`);
+    }
+  });
 };
 
 const synthLogical = (node: LogicalOperation, env: TypeEnv) => {
   const left = synth(node.left, env);
   const right = synth(node.right, env);
 
-  switch (node.operator) {
-    case "and":
-      if (isFalsy(left)) return left;
-      else if (isTruthy(right)) return right;
-      else return Type.boolean();
+  return map(left, right, (left: Type, right: Type) => {
+    switch (node.operator) {
+      case "and":
+        if (isFalsy(left)) return left;
+        else if (isTruthy(right)) return right;
+        else return Type.boolean();
 
-    case "or":
-      if (isTruthy(left)) return left;
-      else if (isFalsy(left)) return right;
-      else return Type.boolean();
+      case "or":
+        if (isTruthy(left)) return left;
+        else if (isFalsy(left)) return right;
+        else return Type.boolean();
 
-    default:
-      throw new Error(`Unimplemented logical operator ${node.operator}`);
-  }
+      default:
+        throw new Error(`Unimplemented logical operator ${node.operator}`);
+    }
+  });
 };
 
 const synthUnary = (node: UnaryOperation, env: TypeEnv): Type => {
   const expression = synth(node.expression, env);
 
-  switch (node.operator) {
-    case "not":
-      if (isTruthy(expression)) return Type.singleton(false);
-      else if (isFalsy(expression)) return Type.singleton(true);
-      else return Type.boolean();
+  return map(expression, (expression) => {
+    switch (node.operator) {
+      case "not":
+        if (isTruthy(expression)) return Type.singleton(false);
+        else if (isFalsy(expression)) return Type.singleton(true);
+        else return Type.boolean();
 
-    case "typeof":
-      return Type.string();
+      case "typeof":
+        return Type.string();
 
-    case "-":
-      if (!isSubtype(Type.number(), expression)) {
-        throwOperatorTypeErrorUnary(node.operator, Type.number(), expression);
-      }
-      return Type.number();
+      case "-":
+        if (!isSubtype(Type.number(), expression)) {
+          throwOperatorTypeErrorUnary(node.operator, Type.number(), expression);
+        }
+        return Type.number();
 
-    case "~":
-      if (!isSubtype(Type.number(), expression)) {
-        throwOperatorTypeErrorUnary(node.operator, Type.number(), expression);
-      }
-      return Type.number();
+      case "+":
+        if (!isSubtype(Type.number(), expression)) {
+          throwOperatorTypeErrorUnary(node.operator, Type.number(), expression);
+        }
+        return Type.number();
 
-    default:
-      throw new Error(`Unimplemented unary operator ${node.operator}`);
-  }
+      case "~":
+        if (!isSubtype(Type.number(), expression)) {
+          throwOperatorTypeErrorUnary(node.operator, Type.number(), expression);
+        }
+        return Type.number();
+
+      default:
+        throw new Error(`Unimplemented unary operator ${node.operator}`);
+    }
+  });
 };
 
 const throwOperatorTypeErrorBinary = (
@@ -512,6 +678,3 @@ const throwOperatorTypeErrorUnary = (
     `Invalid type for unary operator ${operator}; expected ${expectedType}, got ${actualType}`
   );
 };
-
-const map = (t: Type, fn: (t: Type) => Type) =>
-  Type.isUnion(t) ? Type.union(...t.types.map(fn)) : fn(t);
