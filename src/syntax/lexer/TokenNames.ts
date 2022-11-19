@@ -49,6 +49,7 @@ export enum TokenNames {
   BooleanKeyword = "BooleanKeyword",
   SymbolKeyword = "SymbolKeyword",
   AnyKeyword = "AnyKeyword",
+  NeverKeyword = "NeverKeyword",
   Def = "Def",
   Var = "Var",
   Const = "Const",

@@ -21,6 +21,7 @@ import { SingletonType } from "./ast/SingletonType";
 import { SymbolKeyword } from "./ast/SymbolKeyword";
 import { CompoundType } from "./ast/CompoundType";
 import { SyntaxNodes } from "./ast/SyntaxNodes";
+import { NeverKeyword } from "./ast/NeverKeyword";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -113,6 +114,11 @@ export class TypeAnnotationParser extends LHVParser {
     return SingletonType.new("Integer", token, token.location);
   }
 
+  private parseNeverKeyword() {
+    const token = this.reader.next();
+    return NeverKeyword.new(token, token.location);
+  }
+
   private parseNilLiteral() {
     const token = this.reader.next();
     return NilLiteral.new(token, token.location);
@@ -158,12 +164,10 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseNilLiteral();
       case TokenNames.Identifier:
         return this.parseIdentifier();
-      case TokenNames.LBrace:
-        return this.parseTypeLiteral();
       case TokenNames.AnyKeyword:
         return this.parseAnyKeyword();
-      case TokenNames.LParen:
-        return this.parseFunctionType();
+      case TokenNames.NeverKeyword:
+        return this.parseNeverKeyword();
       case TokenNames.Integer:
         return this.parseIntegerSingleton();
       case TokenNames.Float:
@@ -173,6 +177,10 @@ export class TypeAnnotationParser extends LHVParser {
       case TokenNames.True:
       case TokenNames.False:
         return this.parseBooleanSingleton();
+      case TokenNames.LBrace:
+        return this.parseTypeLiteral();
+      case TokenNames.LParen:
+        return this.parseFunctionType();
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }
