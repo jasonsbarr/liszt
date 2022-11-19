@@ -1,4 +1,4 @@
-# Chopin Programming Language
+# Liszt Programming Language
 
 Programming language that seeks to incorporate the best aspects of both functional and object oriented programming
 
