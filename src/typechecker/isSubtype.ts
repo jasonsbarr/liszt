@@ -30,7 +30,11 @@ export const isSubtype = (t1: Type, t2: Type): boolean => {
       // even if I use typeof [TypeName] for my constructor arguments
       return isSubtype((t1 as any).base, t2);
     }
-  } else if (Type.isAny(t1)) {
+  } else if (Type.isUnion(t1)) {
+    return t1.types.every((t1) => isSubtype(t1, t2));
+  } else if (Type.isUnion(t2)) {
+    return t2.types.some((t2) => isSubtype(t1, t2));
+  } else if (Type.isAny(t1) || Type.isNever(t1)) {
     return true;
   } else {
     return false;
