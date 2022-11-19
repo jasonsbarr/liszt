@@ -1,4 +1,5 @@
 import { TokenNames } from "../syntax/lexer/TokenNames";
+import { CompoundType } from "../syntax/parser/ast/CompoundType";
 import { FunctionType } from "../syntax/parser/ast/FunctionType";
 import { SingletonType } from "../syntax/parser/ast/SingletonType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
@@ -32,6 +33,10 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
       return generateFunctionType(type.type as FunctionType);
     case SyntaxNodes.SingletonType:
       return generateSingletonType(type.type as SingletonType);
+    case SyntaxNodes.UnionType:
+      return Type.union(
+        ...(type.type as CompoundType).types.map(fromAnnotation)
+      );
     default:
       throw new Error(`No type definition found for type ${type.type.kind}`);
   }
