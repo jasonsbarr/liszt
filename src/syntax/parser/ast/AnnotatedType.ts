@@ -8,6 +8,7 @@ import { TypeLiteral } from "./TypeLiteral";
 import { AnyKeyword } from "./AnyKeyword";
 import { FunctionType } from "./FunctionType";
 import { NumberKeyword } from "./NumberKeyword";
+import { CompoundType } from "./CompoundType";
 
 export type AnnotatedType =
   | IntegerKeyword
@@ -19,4 +20,5 @@ export type AnnotatedType =
   | Identifier
   | TypeLiteral
   | AnyKeyword
-  | FunctionType;
+  | FunctionType
+  | CompoundType;

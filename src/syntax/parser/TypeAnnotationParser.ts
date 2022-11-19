@@ -20,6 +20,11 @@ import { SrcLoc } from "../lexer/SrcLoc";
 import { SingletonType } from "./ast/SingletonType";
 import { SymbolKeyword } from "./ast/SymbolKeyword";
 
+enum CompoundTypes {
+  Intersection = "Intersection",
+  Union = "Union",
+}
+
 export class TypeAnnotationParser extends LHVParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
@@ -131,11 +136,6 @@ export class TypeAnnotationParser extends LHVParser {
     return SymbolKeyword.new(token, token.location);
   }
 
-  public parseTypeAnnotation() {
-    const type = this.parseType();
-    return TypeAnnotation.new(type, type.start, type.end);
-  }
-
   private parseType() {
     const token = this.reader.peek();
 
@@ -174,6 +174,33 @@ export class TypeAnnotationParser extends LHVParser {
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }
+  }
+
+  public parseTypeAnnotation() {
+    const type = this.parseType();
+    let token = this.reader.peek();
+
+    if (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
+      let types = [type];
+      let compoundType =
+        token.name === TokenNames.Amp
+          ? CompoundTypes.Intersection
+          : CompoundTypes.Union;
+
+      // need to advance the token stream
+      this.reader.next();
+
+      while (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
+        types.push(this.parseType());
+        token = this.reader.peek();
+      }
+
+      const annotations = types.map((ty) =>
+        TypeAnnotation.new(ty, ty.start, ty.end)
+      );
+    }
+
+    return TypeAnnotation.new(type, type.start, type.end);
   }
 
   private parseTypeLiteral() {
