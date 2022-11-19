@@ -19,6 +19,8 @@ import { LHVParser } from "./LHVParser";
 import { SrcLoc } from "../lexer/SrcLoc";
 import { SingletonType } from "./ast/SingletonType";
 import { SymbolKeyword } from "./ast/SymbolKeyword";
+import { CompoundType } from "./ast/CompoundType";
+import { SyntaxNodes } from "./ast/SyntaxNodes";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -197,6 +199,20 @@ export class TypeAnnotationParser extends LHVParser {
 
       const annotations = types.map((ty) =>
         TypeAnnotation.new(ty, ty.start, ty.end)
+      );
+      const annotatedType = CompoundType.new(
+        compoundType === CompoundTypes.Union
+          ? SyntaxNodes.UnionType
+          : SyntaxNodes.IntersectionType,
+        annotations,
+        type.start,
+        types[types.length - 1].end
+      );
+
+      return TypeAnnotation.new(
+        annotatedType,
+        annotatedType.start,
+        annotatedType.end
       );
     }
 
