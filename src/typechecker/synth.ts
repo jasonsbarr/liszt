@@ -521,3 +521,6 @@ const throwOperatorTypeErrorUnary = (
     `Invalid type for unary operator ${operator}; expected ${expectedType}, got ${actualType}`
   );
 };
+
+const map = (t: Type, fn: (t: Type) => Type) =>
+  Type.isUnion(t) ? Type.union(...t.types.map(fn)) : fn(t);
