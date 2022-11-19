@@ -129,6 +129,16 @@ export class TypeAnnotationParser extends LHVParser {
     return NumberKeyword.new(token, token.location);
   }
 
+  private parseParenthesizedAnnotation() {
+    // need to advance token stream
+    this.reader.skip(TokenNames.LParen);
+    const annotation = this.parseTypeAnnotation();
+    // need to move past closing paren
+    this.reader.skip(TokenNames.RParen);
+
+    return annotation;
+  }
+
   private parseStringKeyword() {
     const token = this.reader.next();
     return StringKeyword.new(token, token.location);
@@ -180,13 +190,16 @@ export class TypeAnnotationParser extends LHVParser {
       case TokenNames.LBrace:
         return this.parseTypeLiteral();
       case TokenNames.LParen:
-        return this.parseFunctionType();
+        return this.or(
+          this.parseParenthesizedAnnotation.bind(this),
+          this.parseFunctionType.bind(this)
+        );
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }
   }
 
-  public parseTypeAnnotation() {
+  public parseTypeAnnotation(): TypeAnnotation {
     const type = this.parseType();
     let token = this.reader.peek();
 
@@ -206,7 +219,7 @@ export class TypeAnnotationParser extends LHVParser {
       }
 
       const annotations = types.map((ty) =>
-        TypeAnnotation.new(ty, ty.start, ty.end)
+        TypeAnnotation.new(ty as AnnotatedType, ty.start, ty.end)
       );
       const annotatedType = CompoundType.new(
         compoundType === CompoundTypes.Union
@@ -224,7 +237,7 @@ export class TypeAnnotationParser extends LHVParser {
       );
     }
 
-    return TypeAnnotation.new(type, type.start, type.end);
+    return TypeAnnotation.new(type as AnnotatedType, type.start, type.end);
   }
 
   private parseTypeLiteral() {
@@ -247,7 +260,9 @@ export class TypeAnnotationParser extends LHVParser {
       const propType = this.parseType();
       const en = propType.end;
 
-      properties.push(ObjectPropertyType.new(propName, propType, st, en));
+      properties.push(
+        ObjectPropertyType.new(propName, propType as AnnotatedType, st, en)
+      );
       token = this.reader.peek();
 
       if (token.name !== TokenNames.RBrace) {

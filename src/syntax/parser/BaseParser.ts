@@ -1,5 +1,6 @@
 import { DiagnosticBag } from "../../diagnostics/DiagnosticBag";
 import { LexResult } from "../lexer/LexResult";
+import { AnnotatedType } from "./ast/AnnotatedType";
 import { ASTNode } from "./ast/ASTNode";
 import { Reader } from "./Reader";
 
@@ -14,7 +15,9 @@ export abstract class BaseParser {
     this.diagnostics = DiagnosticBag.new();
   }
 
-  protected or(...parsers: (() => ASTNode)[]): ASTNode {
+  protected or(
+    ...parsers: ((() => ASTNode) | (() => AnnotatedType))[]
+  ): ASTNode | AnnotatedType {
     const current = this.reader.pos;
 
     for (let parser of parsers) {
