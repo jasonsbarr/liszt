@@ -608,12 +608,12 @@ const synthLogical = (node: LogicalOperation, env: TypeEnv) => {
       case "and":
         if (isFalsy(left)) return left;
         else if (isTruthy(right)) return right;
-        else return Type.boolean();
+        else return Type.union(left, right);
 
       case "or":
         if (isTruthy(left)) return left;
         else if (isFalsy(left)) return right;
-        else return Type.boolean();
+        else return Type.union(left, right);
 
       default:
         throw new Error(`Unimplemented logical operator ${node.operator}`);
