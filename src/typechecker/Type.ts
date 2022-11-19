@@ -1,6 +1,7 @@
 import * as Types from "./Types";
 import * as Constructors from "./constructors";
 import * as Validators from "./validators";
+import { union as u } from "./union";
 
 module Type {
   // types
@@ -36,6 +37,7 @@ module Type {
   export const singleton = Constructors.singleton;
   export const undefinedType = Constructors.undefinedType;
   export const never = Constructors.never;
+  export const union = u;
 
   // validators
   export const isNumber = Validators.isNumber;
