@@ -187,6 +187,12 @@ export class NeverType extends BaseType {
   }
 }
 
+export class UnionType extends BaseType {
+  constructor(public types: Type[], constant = false, nullable = false) {
+    super("Union", constant, nullable);
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType

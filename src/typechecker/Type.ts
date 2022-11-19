@@ -18,6 +18,7 @@ module Type {
   export type Singleton = Types.SingletonType;
   export type UNDEFINED = Types.UNDEFINED;
   export type Never = Types.NeverType;
+  export type Union = Types.UnionType;
 
   export type Type = Types.Type;
 
@@ -50,6 +51,7 @@ module Type {
   export const isSingleton = Validators.isSingleton;
   export const isUNDEFINED = Validators.isUNDEFINED;
   export const isNever = Validators.isNever;
+  export const isUnion = Validators.isUnion;
 }
 
 type Type = Type.Type;

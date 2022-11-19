@@ -13,6 +13,7 @@ import {
   UNDEFINED,
   SymbolType,
   NeverType,
+  UnionType,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -42,3 +43,5 @@ export const isSingleton = (t: Type): t is SingletonType =>
 export const isUNDEFINED = (t: Type): t is UNDEFINED => t.name === "UNDEFINED";
 
 export const isNever = (t: Type): t is NeverType => t.name === "Never";
+
+export const isUnion = (t: Type): t is UnionType => t.name === "Union";
