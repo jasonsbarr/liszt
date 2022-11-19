@@ -200,11 +200,18 @@ export class TypeAnnotationParser extends LHVParser {
   }
 
   public parseTypeAnnotation(): TypeAnnotation {
-    const type = this.parseType();
+    const type: AnnotatedType | TypeAnnotation = this.parseType() as
+      | AnnotatedType
+      | TypeAnnotation;
+
+    if (type instanceof TypeAnnotation) {
+      return type;
+    }
+
     let token = this.reader.peek();
 
     if (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
-      let types = [type];
+      let types: AnnotatedType[] | TypeAnnotation[] = [type];
       let compoundType =
         token.name === TokenNames.Amp
           ? CompoundTypes.Intersection
@@ -214,13 +221,18 @@ export class TypeAnnotationParser extends LHVParser {
       this.reader.next();
 
       while (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
-        types.push(this.parseType());
+        // any is hack because type system doesn't like having both
+        // AnnotatedTypeand TypeAnnotations in the same array
+        types.push(this.parseType() as any);
         token = this.reader.peek();
       }
 
-      const annotations = types.map((ty) =>
-        TypeAnnotation.new(ty as AnnotatedType, ty.start, ty.end)
-      );
+      const annotations = types.map((ty) => {
+        if (ty instanceof TypeAnnotation) {
+          return ty;
+        }
+        return TypeAnnotation.new(ty as AnnotatedType, ty.start, ty.end);
+      });
       const annotatedType = CompoundType.new(
         compoundType === CompoundTypes.Union
           ? SyntaxNodes.UnionType
