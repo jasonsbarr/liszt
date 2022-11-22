@@ -11,7 +11,7 @@ export class BoundParameter extends BoundASTNode {
 
   constructor(node: Parameter) {
     super(BoundNodes.BoundParameter, node.start, node.end);
-    this.type = node.type ? fromAnnotation(node.type) : Type.any;
+    this.type = node.type ? fromAnnotation(node.type) : Type.any();
     this.name = BoundIdentifier.new(this.type, node.name);
   }
 
