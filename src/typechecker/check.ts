@@ -61,15 +61,11 @@ type ObjectProps = {
 };
 
 const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
-  const objProps: ObjectProps[] = ast.properties.map((prop) => {
-    if (prop.key.kind !== SyntaxNodes.Identifier) {
-      throw new Error(
-        `Object property names must be valid identifiers; ${prop.key.kind} given`
-      );
-    }
-
-    return { name: prop.key.name, expr: prop.value, key: prop.key };
-  });
+  const objProps: ObjectProps[] = ast.properties.map((prop) => ({
+    name: prop.key.name,
+    expr: prop.value,
+    key: prop.key,
+  }));
 
   type.properties.forEach(({ name }) => {
     const prop = objProps.find(({ name: propName }) => propName === name);
