@@ -292,6 +292,8 @@ export class TypeChecker {
       constant = node.left.constant;
 
       // if this is a variable declaration, it won't be set in the environment yet
+      // so if it is set, it's been previously defined and we need to make sure
+      // it's not an attempt to reassign a constant
       if (
         env.lookup(node.left.name) &&
         env.get(node.left.name)?.constant === true
