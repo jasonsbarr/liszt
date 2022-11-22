@@ -257,10 +257,22 @@ export class TypeChecker {
       throw new Error(`Could not resolve environment ${scopeName}`);
     }
 
-    const lambdaType = synth(node, env) as Type.Function;
-    check(node, lambdaType, lambdaEnv);
-    const bound = bind(node, lambdaEnv, lambdaType);
-    return bound;
+    try {
+      const lambdaType = synth(node, env) as Type.Function;
+      check(node, lambdaType, lambdaEnv);
+      const bound = bind(node, lambdaEnv, lambdaType);
+      return bound;
+    } catch (e: any) {
+      if (node.body instanceof CallExpression) {
+        // undefined function will be set in the environment here
+        this.checkCallExpression(node.body, lambdaEnv);
+        const lambdaType = synth(node.body, lambdaEnv);
+        check(node.body, lambdaType, lambdaEnv);
+        return bind(node, lambdaEnv, lambdaType);
+      }
+
+      throw e;
+    }
   }
 
   private checkCallExpression(node: CallExpression, env: TypeEnv) {
@@ -319,7 +331,12 @@ export class TypeChecker {
     if (node.assignment.left instanceof Identifier) {
       const name = node.assignment.left.name;
 
-      if (env.has(name) && Type.isUNDEFINED(env.get(name)) && isSecondPass) {
+      if (
+        env.has(name) &&
+        (Type.isUNDEFINED(env.get(name)) ||
+          isUndefinedFunction(env.get(name) as Type.Function)) &&
+        isSecondPass
+      ) {
         throw new Error(
           `Cannot reference name ${name} prior to initialization`
         );
@@ -330,19 +347,34 @@ export class TypeChecker {
       }
     }
 
-    // need to try/catch this in case of forward reference
-    const type = node.assignment.type
-      ? fromAnnotation(node.assignment.type)
-      : synth(node.assignment.right, env, node.constant);
+    // need to try/catch this in case of legal forward reference
+    try {
+      const type = node.assignment.type
+        ? fromAnnotation(node.assignment.type)
+        : synth(node.assignment.right, env, node.constant);
 
-    // Need to set the variable name and type BEFORE checking and binding the assignment node
-    env.set((node.assignment.left as Identifier).name, type);
+      // Need to set the variable name and type BEFORE checking and binding the assignment node
+      env.set((node.assignment.left as Identifier).name, type);
 
-    if (node.assignment.type) {
-      check(node, type, env);
+      if (node.assignment.type) {
+        check(node, type, env);
+      }
+
+      return bind(node, env, type);
+    } catch (e: any) {
+      if (isSecondPass) {
+        throw e;
+      }
+
+      if (node.assignment.right instanceof LambdaExpression) {
+        // if forward reference to function name, undefined function will be set here
+        this.checkLambdaExpression(node.assignment.right, env);
+        const type = synth(node.assignment.right, env);
+        return bind(node, env, type);
+      }
+
+      throw e;
     }
-
-    return bind(node, env, type);
   }
 
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
