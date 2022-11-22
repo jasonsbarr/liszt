@@ -222,7 +222,7 @@ export class TypeAnnotationParser extends LHVParser {
 
       while (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
         // any is hack because type system doesn't like having both
-        // AnnotatedTypeand TypeAnnotations in the same array
+        // AnnotatedType and TypeAnnotations in the same array
         types.push(this.parseType() as any);
         token = this.reader.peek();
       }
