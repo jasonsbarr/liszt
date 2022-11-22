@@ -259,7 +259,7 @@ export class TypeChecker {
     }
 
     try {
-      const lambdaType = synth(node, env) as Type.Function;
+      const lambdaType = synth(node, lambdaEnv) as Type.Function;
       check(node, lambdaType, lambdaEnv);
       const bound = bind(node, lambdaEnv, lambdaType);
       return bound;
@@ -270,7 +270,7 @@ export class TypeChecker {
 
       if (node.body instanceof CallExpression) {
         // undefined function will be set in the environment here
-        this.checkCallExpression(node.body, lambdaEnv);
+        this.checkCallExpression(node.body, lambdaEnv, true);
         const lambdaType = synth(node, lambdaEnv) as Type.Function;
         check(node, lambdaType, lambdaEnv);
 
@@ -367,7 +367,7 @@ export class TypeChecker {
 
       return bind(node, env, type);
     } catch (e: any) {
-      console.log(e);
+      throw e;
     }
   }
 
