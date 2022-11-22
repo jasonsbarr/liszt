@@ -367,6 +367,19 @@ export class TypeChecker {
 
       return bind(node, env, type);
     } catch (e: any) {
+      if (node.assignment.right instanceof LambdaExpression) {
+        // this should set the undefined function type in the lambda env if it's a forward reference
+        this.checkLambdaExpression(node.assignment.right, env);
+        const lambdaEnv =
+          env.getChildEnv(`lambda${getScopeNumber(env.name) + 1}`) ??
+          // this should never happen, but putting it here to make the type checker happy
+          env.extend(`lambda${getScopeNumber(env.name) + 1}`);
+        const lambdaType = synth(node.assignment.right, lambdaEnv);
+        env.set((node.assignment.left as Identifier).name, lambdaType);
+
+        return bind(node, lambdaEnv, lambdaType);
+      }
+
       throw e;
     }
   }
