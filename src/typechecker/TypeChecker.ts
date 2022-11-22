@@ -210,6 +210,7 @@ export class TypeChecker {
       return bind(node, env, type);
     } catch (e: any) {
       if (isSecondPass) {
+        // if this is the second pass, identifier is undefined and that's an error
         throw e;
       }
 
