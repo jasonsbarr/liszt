@@ -15,10 +15,6 @@ import { Type } from "./Type";
 import { TypeEnv } from "./TypeEnv";
 
 export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
-  if (Type.isAny(t)) {
-    return true;
-  }
-
   if (ast.kind === SyntaxNodes.ObjectLiteral && Type.isObject(t)) {
     return checkObject(ast as ObjectLiteral, t, env);
   }
@@ -48,6 +44,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
   }
 
   if (Type.isUNDEFINED(t)) {
+    return true;
+  }
+
+  if (Type.isAny(t)) {
     return true;
   }
 
