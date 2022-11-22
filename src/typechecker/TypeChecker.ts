@@ -326,15 +326,36 @@ export class TypeChecker {
       }
     }
 
-    const type = node.type
-      ? fromAnnotation(node.type)
-      : synth(node.right, env, constant);
+    try {
+      const type = node.type
+        ? fromAnnotation(node.type)
+        : synth(node.right, env, constant);
 
-    if (node.type) {
-      check(node.right, type, env);
+      if (node.type) {
+        check(node.right, type, env);
+      }
+
+      return bind(node, env, type);
+    } catch (e: any) {
+      if (isSecondPass) {
+        throw e;
+      }
+
+      if (node.right instanceof LambdaExpression) {
+        // this should set the undefined function type in the lambda env if it's a forward reference
+        this.checkLambdaExpression(node.right, env);
+        const lambdaEnv =
+          env.getChildEnv(`lambda${getScopeNumber(env.name) + 1}`) ??
+          // this should never happen, but putting it here to make the type checker happy
+          env.extend(`lambda${getScopeNumber(env.name) + 1}`);
+        const lambdaType = synth(node.right, lambdaEnv);
+        env.set((node.left as Identifier).name, lambdaType);
+
+        return bind(node, lambdaEnv, lambdaType);
+      }
+
+      throw e;
     }
-
-    return bind(node, env, type);
   }
 
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
@@ -367,6 +388,10 @@ export class TypeChecker {
 
       return bind(node, env, type);
     } catch (e: any) {
+      if (isSecondPass) {
+        throw e;
+      }
+
       if (node.assignment.right instanceof LambdaExpression) {
         // this should set the undefined function type in the lambda env if it's a forward reference
         this.checkLambdaExpression(node.assignment.right, env);
