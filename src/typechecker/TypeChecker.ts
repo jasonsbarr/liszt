@@ -37,11 +37,13 @@ import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 
 let isSecondPass = false;
-let scopes = 0;
 // make sure moduleEnv is only defined once
 const moduleEnv =
-  TypeEnv.globals.getChildEnv("module0") ??
-  TypeEnv.globals.extend(`module${scopes++}`);
+  TypeEnv.globals.getChildEnv("module0") ?? TypeEnv.globals.extend(`module0`);
+
+const getScopeNumber = (scopeName: string) => {
+  return Number(scopeName.slice(-1));
+};
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -60,7 +62,6 @@ export class TypeChecker {
     // first pass is to populate environments so valid forward references will resolve
     this.checkNode(program, env);
     isSecondPass = true;
-    scopes = 1;
 
     const boundProgram = this.checkNode(program, env);
     isSecondPass = false;
@@ -248,7 +249,7 @@ export class TypeChecker {
   }
 
   private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
-    const scopeName = `lambda${scopes++}`;
+    const scopeName = `lambda${getScopeNumber(env.name) + 1}`;
     const lambdaEnv = !isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
@@ -257,10 +258,27 @@ export class TypeChecker {
       throw new Error(`Could not resolve environment ${scopeName}`);
     }
 
-    const lambdaType = synth(node, env) as Type.Function;
-    check(node, lambdaType, lambdaEnv);
-    const bound = bind(node, lambdaEnv, lambdaType);
-    return bound;
+    try {
+      const lambdaType = synth(node, env) as Type.Function;
+      check(node, lambdaType, lambdaEnv);
+      const bound = bind(node, lambdaEnv, lambdaType);
+      return bound;
+    } catch (e: any) {
+      if (isSecondPass) {
+        throw e;
+      }
+
+      if (node.body instanceof CallExpression) {
+        // undefined function will be set in the environment here
+        this.checkCallExpression(node.body, lambdaEnv);
+        const lambdaType = synth(node, lambdaEnv) as Type.Function;
+        check(node, lambdaType, lambdaEnv);
+
+        return bind(node, lambdaEnv, lambdaType);
+      }
+
+      throw e;
+    }
   }
 
   private checkCallExpression(node: CallExpression, env: TypeEnv) {
@@ -351,8 +369,8 @@ export class TypeChecker {
     const name = node.name.name;
     const scopeName = name;
     const funcEnv = !isSecondPass
-      ? env.extend(scopeName)
-      : env.getChildEnv(scopeName);
+      ? env.extend(name + getScopeNumber(env.name) + 1)
+      : env.getChildEnv(name + getScopeNumber(env.name) + 1);
 
     if (!funcEnv) {
       throw new Error(`Could not resolve environment ${scopeName}`);
