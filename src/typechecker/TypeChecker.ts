@@ -37,13 +37,13 @@ import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 
 let isSecondPass = false;
-// make sure moduleEnv is only defined once
-const moduleEnv =
-  TypeEnv.globals.getChildEnv("module0") ?? TypeEnv.globals.extend(`module0`);
-
 const getScopeNumber = (scopeName: string) => {
   return Number(scopeName.slice(-1));
 };
+
+// make sure moduleEnv is only defined once
+const moduleEnv =
+  TypeEnv.globals.getChildEnv("module0") ?? TypeEnv.globals.extend(`module0`);
 
 export class TypeChecker {
   public diagnostics: DiagnosticBag;
@@ -353,18 +353,22 @@ export class TypeChecker {
     }
 
     // need to try/catch this in case of legal forward reference
-    const type = node.assignment.type
-      ? fromAnnotation(node.assignment.type)
-      : synth(node.assignment.right, env, node.constant);
+    try {
+      const type = node.assignment.type
+        ? fromAnnotation(node.assignment.type)
+        : synth(node.assignment.right, env, node.constant);
 
-    // Need to set the variable name and type BEFORE checking and binding the assignment node
-    env.set((node.assignment.left as Identifier).name, type);
+      // Need to set the variable name and type BEFORE checking and binding the assignment node
+      env.set((node.assignment.left as Identifier).name, type);
 
-    if (node.assignment.type) {
-      check(node, type, env);
+      if (node.assignment.type) {
+        check(node, type, env);
+      }
+
+      return bind(node, env, type);
+    } catch (e: any) {
+      console.log(e);
     }
-
-    return bind(node, env, type);
   }
 
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
