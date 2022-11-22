@@ -183,6 +183,10 @@ export class TypeChecker {
       let type: Type = env.get(node.name);
 
       if (isSecondPass) {
+        // any undefined identifier reference has been set in its scope to undefined
+        // to check for variable reference before definition - we need to delete
+        // these undefined types until we get to the scope the identifier
+        // was originally declared in
         let varTypeInCurrentScope: Type | undefined = env.get(node.name);
         let currentScope: TypeEnv | undefined = env;
 
