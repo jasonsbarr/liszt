@@ -215,6 +215,8 @@ export class TypeChecker {
       }
 
       // This should only happen on the first pass and with a binding that hasn't been declared yet
+      // We set the identifier to undefined in its current scope so we can check for variable
+      // references before its definition
       if (!isSecondPass && !env.has(node.name)) {
         const loc = node.start;
         const type = Type.undefinedType(loc);
