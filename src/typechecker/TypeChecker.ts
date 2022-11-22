@@ -367,10 +367,10 @@ export class TypeChecker {
     // need to figure out how to disallow redefining a
     // binding that already exists as a new function
     const name = node.name.name;
-    const scopeName = name;
+    const scopeName = name + getScopeNumber(env.name) + 1;
     const funcEnv = !isSecondPass
-      ? env.extend(name + getScopeNumber(env.name) + 1)
-      : env.getChildEnv(name + getScopeNumber(env.name) + 1);
+      ? env.extend(scopeName)
+      : env.getChildEnv(scopeName);
 
     if (!funcEnv) {
       throw new Error(`Could not resolve environment ${scopeName}`);
