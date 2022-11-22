@@ -281,11 +281,15 @@ export class TypeChecker {
     }
   }
 
-  private checkCallExpression(node: CallExpression, env: TypeEnv) {
+  private checkCallExpression(
+    node: CallExpression,
+    env: TypeEnv,
+    isFwRef = false
+  ) {
     try {
       return bind(node, env, synth(node, env));
     } catch (e: any) {
-      if (!isSecondPass && node.func instanceof Identifier) {
+      if (!isSecondPass && node.func instanceof Identifier && isFwRef) {
         const args = node.args.map((arg) => synth(arg, env));
         env.set(node.func.name, UNDEFINED_FUNCTION(args, node.start));
 
@@ -388,7 +392,8 @@ export class TypeChecker {
             // undefined function will be set in the environment here
             this.checkCallExpression(
               expr as CallExpression,
-              funcEnv
+              funcEnv,
+              true
             ) as BoundCallExpression;
           }
         }
