@@ -29,6 +29,8 @@ import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 import { isFalsy, isTruthy } from "../utils/truthiness";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { map } from "./map";
+import { IfExpression } from "../syntax/parser/ast/IfExpression";
+import { narrow } from "./narrow";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -41,7 +43,7 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
     case SyntaxNodes.BooleanLiteral:
       return synthBoolean(ast as BooleanLiteral, constant);
     case SyntaxNodes.SymbolLiteral:
-      return synthSymbol(ast as SymbolLiteral);
+      return synthSymbol(ast as SymbolLiteral, constant);
     case SyntaxNodes.NilLiteral:
       return synthNil();
     case SyntaxNodes.ObjectLiteral:
@@ -75,6 +77,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthLogical(ast as LogicalOperation, env);
     case SyntaxNodes.UnaryOperation:
       return synthUnary(ast as UnaryOperation, env);
+    case SyntaxNodes.IfExpression:
+      return synthIfExpression(ast as IfExpression, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -105,8 +109,8 @@ const synthBoolean = (node: BooleanLiteral, constant: boolean) => {
   return Type.boolean(false);
 };
 
-const synthSymbol = (node: SymbolLiteral) => {
-  return Type.symbol();
+const synthSymbol = (node: SymbolLiteral, constant: boolean) => {
+  return Type.symbol(constant);
 };
 
 const synthNil = () => Type.nil();
@@ -662,4 +666,24 @@ const throwOperatorTypeErrorUnary = (
   throw new Error(
     `Invalid type for unary operator ${operator}; expected ${expectedType}, got ${actualType}`
   );
+};
+
+const synthIfExpression = (node: IfExpression, env: TypeEnv): Type => {
+  const test = synth(node.test, env);
+  const then = synth(node.then, narrow(node.then, env, true));
+  const elseType = synth(node.else, narrow(node.test, env, false));
+
+  if (!isSubtype(then, elseType) && !isSubtype(elseType, then)) {
+    throw new Error(
+      `If expression branches must both evaluate to the same type or a subtype; ${then} and ${elseType} given`
+    );
+  }
+
+  if (isTruthy(test)) {
+    return then;
+  } else if (isFalsy(test)) {
+    return elseType;
+  }
+
+  return Type.union(then, elseType);
 };
