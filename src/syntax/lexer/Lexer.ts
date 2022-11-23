@@ -23,6 +23,7 @@ import {
   isOp,
   isOpChar,
   isPunc,
+  isSingleQuote,
   isWhitespace,
   KEYWORDS,
   kw,
@@ -34,7 +35,6 @@ import {
 import { Input } from "./Input";
 import { LexResult } from "./LexResult";
 import { TokenBag } from "./TokenBag";
-import { TokenNames } from "./TokenNames";
 
 export class Lexer {
   public fileName: string;
@@ -234,6 +234,14 @@ export class Lexer {
     );
   }
 
+  private readTypeVariable(trivia: string) {
+    const { pos, line, col } = this.input;
+    trivia += this.input.next();
+    const tyVar = this.input.readWhile(isIdChar);
+
+    this.tokens.addTypeVariableToken(tyVar, pos, line, col, trivia);
+  }
+
   public tokenize() {
     let trivia = "";
 
@@ -283,6 +291,8 @@ export class Lexer {
       } else if (isPunc(char)) {
         this.addPuncToken(char, trivia);
         this.input.next();
+      } else if (isSingleQuote(char)) {
+        this.readTypeVariable(trivia);
       } else {
         throw new Error(
           `Unrecognized character ${char} (${this.input.col}:${this.input.line})`

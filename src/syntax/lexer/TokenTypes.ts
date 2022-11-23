@@ -9,5 +9,6 @@ export enum TokenTypes {
   Punctuation = "PunctuationToken",
   Operator = "OperatorToken",
   Keyword = "KeywordToken",
+  TypeVariable = "TypeVariable",
   EOF = "EOFToken",
 }

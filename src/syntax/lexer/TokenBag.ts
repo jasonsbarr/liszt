@@ -216,6 +216,24 @@ export class TokenBag {
     );
   }
 
+  public addTypeVariableToken(
+    value: string,
+    pos: number,
+    line: number,
+    col: number,
+    trivia: string
+  ) {
+    this.append(
+      Token.new(
+        TokenTypes.TypeVariable,
+        TokenNames.TypeVariable,
+        value,
+        SrcLoc.new(pos, line, col),
+        trivia
+      )
+    );
+  }
+
   public get(i: number) {
     return this._tokens[i];
   }
