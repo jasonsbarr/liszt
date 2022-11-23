@@ -35,6 +35,7 @@ import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
 import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
+import { IfExpression } from "../syntax/parser/ast/IfExpression";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -121,6 +122,8 @@ export class TypeChecker {
           node as BinaryOperation | LogicalOperation | UnaryOperation,
           env
         );
+      case SyntaxNodes.IfExpression:
+        return this.checkIfExpression(node as IfExpression, env);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -453,6 +456,12 @@ export class TypeChecker {
     env: TypeEnv
   ) {
     const type = synth(node, env);
+    return bind(node, env, type);
+  }
+
+  private checkIfExpression(node: IfExpression, env: TypeEnv) {
+    const type = synth(node, env);
+    check(node, type, env);
     return bind(node, env, type);
   }
 }

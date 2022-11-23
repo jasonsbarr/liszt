@@ -49,6 +49,8 @@ import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { BoundUnaryOperation } from "./bound/BoundUnaryOperation";
 import { BoundSymbolLiteral } from "./bound/BoundSymbolLiteral";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
+import { IfExpression } from "../syntax/parser/ast/IfExpression";
+import { BoundIfExpression } from "./bound/BoundIfExpression";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -316,5 +318,27 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
 
       return BoundUnaryOperation.new(expr, operator, node.start, node.end, ty);
+
+    case SyntaxNodes.IfExpression:
+      if (node instanceof IfExpression) {
+        const testSynth = synth(node.test, env);
+        const thenSynth = synth(node.then, env);
+        const elseSynth = synth(node.else, env);
+
+        if (!ty) {
+          ty = synth(node, env);
+        }
+
+        return BoundIfExpression.new(
+          bind(node.test, env, testSynth),
+          bind(node.then, env, thenSynth),
+          bind(node.else, env, elseSynth),
+          ty,
+          node.start,
+          node.end
+        );
+      }
+
+      throw new Error("WTF?");
   }
 };
