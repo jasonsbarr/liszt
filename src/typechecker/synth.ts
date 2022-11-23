@@ -163,16 +163,22 @@ const synthFunction = (
   node: LambdaExpression | FunctionDeclaration,
   env: TypeEnv
 ) => {
+  let generic = false;
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
     const type = param?.type ? fromAnnotation(param.type) : Type.any();
-    // has extended lambdaEnvironment from caller
+
+    if (Type.isGeneric(type)) {
+      generic = true;
+    }
+
     return { name, type };
   });
   const params = paramTypes.map(({ type }) => type);
   const paramLists = Type.distributeUnion(params);
   const funcTypes: Type.Function[] = paramLists.map((args) => {
     paramTypes.forEach((pType, i) => {
+      // has extended lambdaEnvironment from caller
       env.set(pType.name, args[i]);
     });
     const returnType: Type = synth(node.body, env);
@@ -185,6 +191,16 @@ const synthFunction = (
           `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
         );
       }
+    }
+
+    if (generic) {
+      return Type.genericFunction(
+        params,
+        returnType,
+        paramTypes,
+        node.body,
+        env
+      );
     }
 
     return Type.functionType(args, returnType);
