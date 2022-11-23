@@ -54,6 +54,7 @@ const nudAttributes = {
 type nud = keyof typeof nudAttributes;
 
 const ledAttributes = {
+  [TokenNames.Equals]: { prec: 5, assoc: "right" },
   [TokenNames.Or]: { prec: 15, assoc: "left" },
   [TokenNames.And]: { prec: 20, assoc: "left" },
   [TokenNames.Amp]: { prec: 25, assoc: "left" },
@@ -116,8 +117,11 @@ export class StatementParser extends TypeAnnotationParser {
   }
 
   private parseAssign(left: ASTNode, type?: TypeAnnotation, constant = false) {
-    let token = this.reader.next();
-    const right: ASTNode = this.parseExpression();
+    let token = this.reader.peek();
+    const prec = this.getLedPrecedence();
+    // advance token stream
+    this.reader.next();
+    const right: ASTNode = this.parseExpression(prec);
     const start = left.start;
     const end = right.end;
 
