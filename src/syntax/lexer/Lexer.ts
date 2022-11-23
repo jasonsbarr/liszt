@@ -260,15 +260,7 @@ export class Lexer {
         if (isDigit(this.input.lookahead(1))) {
           this.readNumber(trivia);
         } else {
-          this.tokens.addPuncToken(
-            PUNC[char as punc], // always Dot, obviously
-            char,
-            this.input.pos,
-            this.input.line,
-            this.input.col,
-            trivia
-          );
-          this.input.next();
+          this.readOp(trivia);
         }
       } else if (isDoubleQuote(char)) {
         this.readString(trivia);
