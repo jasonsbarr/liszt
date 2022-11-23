@@ -15,6 +15,12 @@ import { Type } from "./Type";
 import { TypeEnv } from "./TypeEnv";
 
 export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
+  if (Type.isIntersection(t)) {
+    (t as Type.Intersection).types.forEach((ty) => check(ast, ty, env));
+    // this works because it will error if any check fails
+    return true;
+  }
+
   if (ast.kind === SyntaxNodes.ObjectLiteral && Type.isObject(t)) {
     return checkObject(ast as ObjectLiteral, t, env);
   }
@@ -51,12 +57,6 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
     return true;
   }
 
-  if (Type.isIntersection(t)) {
-    (t as Type.Intersection).types.forEach((ty) => check(ast, ty, env));
-    // this works because it will error if any check fails
-    return true;
-  }
-
   const synthType = synth(ast, env);
 
   if (isSubtype(synthType, t)) return true;
@@ -90,8 +90,6 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
 
     if (pType) {
       check(expr, pType, env);
-    } else {
-      throw new Error(`Property ${name} does not exist on type ${type}`);
     }
   });
 
