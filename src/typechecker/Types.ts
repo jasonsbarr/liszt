@@ -189,6 +189,26 @@ export class UnionType extends BaseType {
   }
 }
 
+export class UnknownType extends BaseType {
+  constructor(constant = false, nullable = false) {
+    super("Unknown", constant, nullable);
+  }
+
+  public static new(constant = false, nullable = false) {
+    return new UnknownType(constant, nullable);
+  }
+}
+
+export class IntersectionType extends BaseType {
+  constructor(public types: Type[], constant = false, nullable = false) {
+    super("Intersection", constant, nullable);
+  }
+
+  public static new(types: Type[], constant = false, nullable = false) {
+    return new IntersectionType(types, constant, nullable);
+  }
+}
+
 type PrimitiveType =
   | typeof IntegerType
   | typeof FloatType
@@ -209,4 +229,6 @@ export type Type =
   | AnyType
   | SingletonType
   | UNDEFINED
-  | NeverType;
+  | NeverType
+  | UnknownType
+  | IntersectionType;
