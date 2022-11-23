@@ -14,6 +14,8 @@ import {
   SymbolType,
   NeverType,
   UnionType,
+  UnknownType,
+  IntersectionType,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -45,3 +47,8 @@ export const isUNDEFINED = (t: Type): t is UNDEFINED => t.name === "UNDEFINED";
 export const isNever = (t: Type): t is NeverType => t.name === "Never";
 
 export const isUnion = (t: Type): t is UnionType => t.name === "Union";
+
+export const isUnknown = (t: Type): t is UnknownType => t.name === "Unknown";
+
+export const isIntersection = (t: Type): t is IntersectionType =>
+  t.name === "Intersection";

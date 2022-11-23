@@ -15,6 +15,7 @@ import {
   SymbolType,
   Type,
   UNDEFINED,
+  UnknownType,
 } from "./Types";
 
 export const integer = (constant = false, nullable = false) =>
@@ -74,3 +75,5 @@ export const singleton = (value: boolean | number | bigint | string) => {
 export const undefinedType = (location: SrcLoc) => UNDEFINED.new(location);
 
 export const never = () => NeverType.new();
+
+export const unknown = () => UnknownType.new();
