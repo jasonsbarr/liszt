@@ -102,6 +102,7 @@ export const OPERATORS = {
   "<<": TokenNames.LShift,
   "^": TokenNames.Xor,
   "~": TokenNames.BNot,
+  "...": TokenNames.ThreeDots,
 };
 
 export type ops = keyof typeof OPERATORS;
@@ -114,6 +115,8 @@ export const PUNC = {
   "}": TokenNames.RBrace,
   ".": TokenNames.Dot,
   ",": TokenNames.Comma,
+  "[": TokenNames.LBracket,
+  "]": TokenNames.RBracket,
 };
 
 export type punc = keyof typeof PUNC;
