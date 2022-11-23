@@ -37,6 +37,10 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
       return Type.union(
         ...(type.type as CompoundType).types.map(fromAnnotation)
       );
+    case SyntaxNodes.IntersectionType:
+      return Type.intersection(
+        ...(type.type as CompoundType).types.map(fromAnnotation)
+      );
     default:
       throw new Error(`No type definition found for type ${type.type.kind}`);
   }
