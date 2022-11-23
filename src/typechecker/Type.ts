@@ -2,6 +2,7 @@ import * as Types from "./Types";
 import * as Constructors from "./constructors";
 import * as Validators from "./validators";
 import { union as u } from "./union";
+import { intersection as i } from "./intersection";
 
 module Type {
   // types
@@ -20,6 +21,8 @@ module Type {
   export type UNDEFINED = Types.UNDEFINED;
   export type Never = Types.NeverType;
   export type Union = Types.UnionType;
+  export type Unknown = Types.UnknownType;
+  export type Intersection = Types.IntersectionType;
 
   export type Type = Types.Type;
 
@@ -38,6 +41,8 @@ module Type {
   export const undefinedType = Constructors.undefinedType;
   export const never = Constructors.never;
   export const union = u;
+  export const unknown = Constructors.unknown;
+  export const intersection = i;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -54,6 +59,8 @@ module Type {
   export const isUNDEFINED = Validators.isUNDEFINED;
   export const isNever = Validators.isNever;
   export const isUnion = Validators.isUnion;
+  export const isUnknown = Validators.isUnknown;
+  export const isIntersection = Validators.isIntersection;
 }
 
 type Type = Type.Type;

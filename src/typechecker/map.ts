@@ -1,7 +1,29 @@
+import { intersection } from "./intersection";
 import { Type } from "./Type";
 
-const map1 = (t: Type, fn: (t: Type) => Type) =>
-  Type.isUnion(t) ? Type.union(...t.types.map(fn)) : fn(t);
+const map1 = (t: Type, fn: (t: Type) => Type) => {
+  if (Type.isUnion(t)) return Type.union(...t.types.map(fn));
+  else if (Type.isIntersection(t)) {
+    let error: unknown = undefined;
+    const ts = (t as Type.Intersection).types.reduce((types, ty) => {
+      try {
+        types.push(fn(ty));
+        return types;
+      } catch (e) {
+        if (!error) error = e;
+        return types;
+      }
+    }, [] as Type[]);
+
+    if (ts.length === 0) {
+      throw error;
+    } else {
+      return intersection(...ts);
+    }
+  }
+
+  return fn(t);
+};
 
 const map2 = (t1: Type, t2: Type, fn: (t1: Type, t2: Type) => Type): Type => {
   if (Type.isUnion(t1) || Type.isUnion(t2)) {
@@ -11,13 +33,35 @@ const map2 = (t1: Type, t2: Type, fn: (t1: Type, t2: Type) => Type): Type => {
     const ts = t1s.reduce(
       (types, t1) =>
         t2s.reduce((_, t2) => {
-          types.push(fn(t1, t2));
+          types.push(map(t1, t2, fn));
           return types;
         }, [] as Type[]),
       [] as Type[]
     );
 
     return Type.union(...ts);
+  } else if (Type.isIntersection(t1) || Type.isIntersection(t2)) {
+    const t1s = Type.isIntersection(t1) ? t1.types : [t1];
+    const t2s = Type.isIntersection(t2) ? t2.types : [t2];
+    let error: unknown = undefined;
+    const ts = t1s.reduce(
+      (types, t1) =>
+        t2s.reduce((_, t2) => {
+          try {
+            types.push(fn(t1, t2));
+          } catch (e) {
+            if (!error) error = e;
+          }
+          return types;
+        }, [] as Type[]),
+      [] as Type[]
+    );
+
+    if (ts.length === 0) {
+      throw error;
+    } else {
+      return intersection(...ts);
+    }
   }
 
   return fn(t1, t2);
