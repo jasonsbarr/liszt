@@ -44,6 +44,7 @@ const nudAttributes = {
   [TokenNames.Identifier]: { prec: 0, assoc: "none" },
   // I don't think associativity really matters for these unary operations
   [TokenNames.If]: { prec: 5, assoc: "left" },
+  [TokenNames.ThreeDots]: { prec: 5, assoc: "right" },
   [TokenNames.Plus]: { prec: 60, assoc: "right" },
   [TokenNames.Minus]: { prec: 60, assoc: "right" },
   [TokenNames.Not]: { prec: 60, assoc: "right" },
