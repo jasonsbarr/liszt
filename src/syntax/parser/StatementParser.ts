@@ -43,6 +43,7 @@ const nudAttributes = {
   [TokenNames.Nil]: { prec: 0, assoc: "none" },
   [TokenNames.Identifier]: { prec: 0, assoc: "none" },
   // I don't think associativity really matters for these unary operations
+  [TokenNames.If]: { prec: 5, assoc: "left" },
   [TokenNames.Plus]: { prec: 60, assoc: "right" },
   [TokenNames.Minus]: { prec: 60, assoc: "right" },
   [TokenNames.Not]: { prec: 60, assoc: "right" },
@@ -52,7 +53,6 @@ const nudAttributes = {
 type nud = keyof typeof nudAttributes;
 
 const ledAttributes = {
-  [TokenNames.If]: { prec: 5, assoc: "left" },
   [TokenNames.Or]: { prec: 15, assoc: "left" },
   [TokenNames.And]: { prec: 20, assoc: "left" },
   [TokenNames.Amp]: { prec: 25, assoc: "left" },
@@ -346,16 +346,20 @@ export class StatementParser extends TypeAnnotationParser {
     );
   }
 
-  private parseIfExpression(left: ASTNode) {
-    const start = left.start;
-    const prec = this.getLedPrecedence();
+  private parseIfExpression() {
+    const token = this.reader.peek();
+    const start = token.location;
+    const prec = this.getNudPrecedence(token);
     this.reader.skip(TokenNames.If);
     const ifNode = this.parseExpression(prec);
+    const then = this.parseExpression(prec);
+
+    // Else keyword is required
     this.reader.skip(TokenNames.Else);
     const elseNode = this.parseExpression(prec);
     const end = elseNode.end;
 
-    return IfExpression.new(ifNode, left, elseNode, start, end);
+    return IfExpression.new(ifNode, then, elseNode, start, end);
   }
 
   private parseKeyword(): ASTNode {
@@ -370,6 +374,8 @@ export class StatementParser extends TypeAnnotationParser {
         return this.parseFunctionDeclaration();
       case TokenNames.Return:
         return this.parseReturnStatement();
+      case TokenNames.If:
+        return this.parseIfExpression();
       default:
         throw new Error(`Parse rule not found for token name ${token.name}`);
     }
@@ -442,8 +448,6 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenNames.LShift:
       case TokenNames.Xor:
         return this.parseBinaryOperation(left);
-      case TokenNames.If:
-        return this.parseIfExpression(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }
