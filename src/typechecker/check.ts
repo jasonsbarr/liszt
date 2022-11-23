@@ -51,6 +51,12 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
     return true;
   }
 
+  if (Type.isIntersection(t)) {
+    (t as Type.Intersection).types.forEach((ty) => check(ast, ty, env));
+    // this works because it will error if any check fails
+    return true;
+  }
+
   const synthType = synth(ast, env);
 
   if (isSubtype(synthType, t)) return true;
