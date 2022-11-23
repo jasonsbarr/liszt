@@ -79,4 +79,4 @@ export const never = () => NeverType.new();
 
 export const unknown = () => UnknownType.new();
 
-export const not = () => NotType.new();
+export const not = (base: Type) => NotType.new(base);
