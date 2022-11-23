@@ -30,6 +30,7 @@ import { Token } from "../lexer/Token";
 import { UnaryOperation } from "./ast/UnaryOperation";
 import { LogicalOperation } from "./ast/LogicalOperation";
 import { SymbolLiteral } from "./ast/SymbolLiteral";
+import { IfExpression } from "./ast/IfExpression";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -51,6 +52,7 @@ const nudAttributes = {
 type nud = keyof typeof nudAttributes;
 
 const ledAttributes = {
+  [TokenNames.If]: { prec: 5, assoc: "left" },
   [TokenNames.Or]: { prec: 15, assoc: "left" },
   [TokenNames.And]: { prec: 20, assoc: "left" },
   [TokenNames.Amp]: { prec: 25, assoc: "left" },
@@ -344,6 +346,18 @@ export class StatementParser extends TypeAnnotationParser {
     );
   }
 
+  private parseIfExpression(left: ASTNode) {
+    const start = left.start;
+    const prec = this.getLedPrecedence();
+    this.reader.skip(TokenNames.If);
+    const ifNode = this.parseExpression(prec);
+    this.reader.skip(TokenNames.Else);
+    const elseNode = this.parseExpression(prec);
+    const end = elseNode.end;
+
+    return IfExpression.new(ifNode, left, elseNode, start, end);
+  }
+
   private parseKeyword(): ASTNode {
     const token = this.reader.peek();
 
@@ -428,6 +442,8 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenNames.LShift:
       case TokenNames.Xor:
         return this.parseBinaryOperation(left);
+      case TokenNames.If:
+        return this.parseIfExpression(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }
