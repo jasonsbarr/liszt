@@ -16,6 +16,7 @@ import {
   UnionType,
   UnknownType,
   IntersectionType,
+  NotType,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -52,3 +53,5 @@ export const isUnknown = (t: Type): t is UnknownType => t.name === "Unknown";
 
 export const isIntersection = (t: Type): t is IntersectionType =>
   t.name === "Intersection";
+
+export const isNot = (t: Type): t is NotType => t.name === "Not";

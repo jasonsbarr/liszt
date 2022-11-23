@@ -7,6 +7,7 @@ import {
   IntegerType,
   NeverType,
   NilType,
+  NotType,
   NumberType,
   ObjectType,
   Property,
@@ -77,3 +78,5 @@ export const undefinedType = (location: SrcLoc) => UNDEFINED.new(location);
 export const never = () => NeverType.new();
 
 export const unknown = () => UnknownType.new();
+
+export const not = () => NotType.new();

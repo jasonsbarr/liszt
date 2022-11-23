@@ -23,6 +23,7 @@ module Type {
   export type Union = Types.UnionType;
   export type Unknown = Types.UnknownType;
   export type Intersection = Types.IntersectionType;
+  export type Not = Types.NotType;
 
   export type Type = Types.Type;
 
@@ -43,6 +44,7 @@ module Type {
   export const union = u;
   export const unknown = Constructors.unknown;
   export const intersection = i;
+  export const not = Constructors.not;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -61,6 +63,7 @@ module Type {
   export const isUnion = Validators.isUnion;
   export const isUnknown = Validators.isUnknown;
   export const isIntersection = Validators.isIntersection;
+  export const isNot = Validators.isNot;
 
   export const distributeUnion = dU;
 }

@@ -223,6 +223,16 @@ export class IntersectionType extends BaseType {
   }
 }
 
+export class NotType extends BaseType {
+  constructor(constant = false, nullable = false) {
+    super("Not", constant, nullable);
+  }
+
+  public static new(constant = false, nullable = false) {
+    return new NotType(constant, nullable);
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
