@@ -141,22 +141,14 @@ export class AnyType extends BaseType {
 
 export class SingletonType extends BaseType {
   constructor(
-    public base:
-      | typeof IntegerType
-      | typeof FloatType
-      | typeof StringType
-      | typeof BooleanType,
+    public base: PrimitiveType,
     public value: string | number | bigint | boolean
   ) {
     super("Singleton", true, false);
   }
 
   public static new(
-    base:
-      | typeof IntegerType
-      | typeof FloatType
-      | typeof StringType
-      | typeof BooleanType,
+    base: PrimitiveType,
     value: string | number | bigint | boolean
   ) {
     return new SingletonType(base, value);
@@ -196,6 +188,12 @@ export class UnionType extends BaseType {
     return new UnionType(types, constant, nullable);
   }
 }
+
+type PrimitiveType =
+  | typeof IntegerType
+  | typeof FloatType
+  | typeof StringType
+  | typeof BooleanType;
 
 export type Type =
   | IntegerType
