@@ -18,6 +18,7 @@ import {
   IntersectionType,
   NotType,
   GenericType,
+  GenericFunction,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -58,3 +59,6 @@ export const isIntersection = (t: Type): t is IntersectionType =>
 export const isNot = (t: Type): t is NotType => t.name === "Not";
 
 export const isGeneric = (t: Type): t is GenericType => t.name === "Generic";
+
+export const isGenericFunction = (t: Type): t is GenericFunction =>
+  t.name === "GenericFunction";

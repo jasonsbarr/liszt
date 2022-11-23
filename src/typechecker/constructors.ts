@@ -1,9 +1,12 @@
 import { SrcLoc } from "../syntax/lexer/SrcLoc";
+import { ASTNode } from "../syntax/parser/ast/ASTNode";
+import { TypeEnv } from "./TypeEnv";
 import {
   AnyType,
   BooleanType,
   FloatType,
   FunctionType,
+  GenericFunction,
   GenericType,
   IntegerType,
   NeverType,
@@ -83,3 +86,11 @@ export const unknown = () => UnknownType.new();
 export const not = (base: Type) => NotType.new(base);
 
 export const generic = (variable: string) => GenericType.new(variable);
+
+export const genericFunction = (
+  args: Type[],
+  ret: Type,
+  params: { name: string; type: Type }[],
+  body: ASTNode,
+  env: TypeEnv
+) => GenericFunction.new(args, ret, params, body, env);

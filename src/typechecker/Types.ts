@@ -1,4 +1,6 @@
 import { SrcLoc } from "../syntax/lexer/SrcLoc";
+import { ASTNode } from "../syntax/parser/ast/ASTNode";
+import { TypeEnv } from "./TypeEnv";
 
 export type Property = {
   name: string;
@@ -251,6 +253,32 @@ export class GenericType extends BaseType {
   }
 }
 
+export class GenericFunction extends BaseType {
+  constructor(
+    public args: Type[],
+    public ret: Type,
+    public params: { name: string; type: Type }[],
+    public body: ASTNode,
+    public env: TypeEnv
+  ) {
+    super("GenericFunction", false, false);
+  }
+
+  public static new(
+    args: Type[],
+    ret: Type,
+    params: { name: string; type: Type }[],
+    body: ASTNode,
+    env: TypeEnv
+  ) {
+    return new GenericFunction(args, ret, params, body, env);
+  }
+
+  public toString() {
+    return `(${this.args.map((arg) => arg.name).join(", ")}) => ${this.ret}`;
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -269,4 +297,5 @@ export type Type =
   | UnknownType
   | IntersectionType
   | NotType
-  | GenericType;
+  | GenericType
+  | GenericFunction;
