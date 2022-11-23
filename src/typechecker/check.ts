@@ -39,7 +39,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
     return checkVariableDeclaration(ast as VariableDeclaration, t, env);
   }
 
-  if (ast.kind === SyntaxNodes.FunctionDeclaration && Type.isFunction(t)) {
+  if (
+    ast.kind === SyntaxNodes.FunctionDeclaration &&
+    (Type.isFunction(t) || Type.isGenericFunction(t))
+  ) {
     return checkFunction(ast as FunctionDeclaration, t, env);
   }
 

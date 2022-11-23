@@ -416,7 +416,7 @@ export class TypeChecker {
     // need to figure out how to disallow redefining a
     // binding that already exists as a new function
     const name = node.name.name;
-    const scopeName = name + getScopeNumber(env.name) + 1;
+    const scopeName = name + (getScopeNumber(env.name) + 1);
     const funcEnv = !isSecondPass
       ? env.extend(scopeName)
       : env.getChildEnv(scopeName);
@@ -443,6 +443,7 @@ export class TypeChecker {
           }
         }
         const funcType = synth(node, funcEnv) as Type.Function;
+        console.log(funcType);
         check(node, funcType, funcEnv);
         env.set(name, funcType);
         return bind(node, funcEnv, funcType);

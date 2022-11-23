@@ -176,35 +176,37 @@ const synthFunction = (
   });
   const params = paramTypes.map(({ type }) => type);
   const paramLists = Type.distributeUnion(params);
-  const funcTypes: Type.Function[] = paramLists.map((args) => {
-    paramTypes.forEach((pType, i) => {
-      // has extended lambdaEnvironment from caller
-      env.set(pType.name, args[i]);
-    });
-    const returnType: Type = synth(node.body, env);
-    let annotatedType: Type | undefined;
+  const funcTypes: (Type.Function | Type.GenericFunction)[] = paramLists.map(
+    (args) => {
+      paramTypes.forEach((pType, i) => {
+        // has extended lambdaEnvironment from caller
+        env.set(pType.name, args[i]);
+      });
+      const returnType: Type = synth(node.body, env);
+      let annotatedType: Type | undefined;
 
-    if (node.ret) {
-      annotatedType = fromAnnotation(node.ret);
-      if (!isSubtype(returnType, annotatedType)) {
-        throw new Error(
-          `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
+      if (node.ret) {
+        annotatedType = fromAnnotation(node.ret);
+        if (!isSubtype(returnType, annotatedType)) {
+          throw new Error(
+            `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
+          );
+        }
+      }
+
+      if (generic) {
+        return Type.genericFunction(
+          params,
+          returnType,
+          paramTypes,
+          node.body,
+          env
         );
       }
-    }
 
-    if (generic) {
-      return Type.genericFunction(
-        params,
-        returnType,
-        paramTypes,
-        node.body,
-        env
-      );
+      return Type.functionType(args, returnType);
     }
-
-    return Type.functionType(args, returnType);
-  });
+  );
   return Type.intersection(...funcTypes);
 };
 
@@ -212,7 +214,7 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
   const func: Type = synth(node.func, env);
 
   return map(func, (f) => {
-    if (!Type.isFunction(f)) {
+    if (!Type.isFunction(f) && !Type.isGenericFunction(f)) {
       throw new Error(`Call expression expects a function type, got ${f}`);
     }
 
@@ -222,14 +224,25 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
       );
     }
 
+    let generic = false;
     f.args.forEach((argType, i) => {
       if (Type.isGeneric(argType)) {
         const synthType = synth(node.args[i], env);
         isSubtype(synthType, argType);
+        generic = true;
       } else {
         check(node.args[i], argType, env);
       }
     });
+
+    if (generic) {
+      if (Type.isGenericFunction(f)) {
+        f.params.forEach((param, i) => {
+          f.env.set(param.name, f.args[i]);
+        });
+        return synth(f.body, f.env);
+      }
+    }
 
     return f.ret;
   });
