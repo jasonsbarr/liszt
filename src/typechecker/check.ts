@@ -3,12 +3,15 @@ import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { Block } from "../syntax/parser/ast/Block";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 import { Identifier } from "../syntax/parser/ast/Identifier";
+import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
+import { isFalsy, isTruthy } from "../utils/truthiness";
 import { isSubtype } from "./isSubtype";
+import { narrow } from "./narrow";
 import { propType } from "./propType";
 import { synth } from "./synth";
 import { Type } from "./Type";
@@ -47,6 +50,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   if (ast.kind === SyntaxNodes.ReturnStatement) {
     return checkReturnStatement(ast as ReturnStatement, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.IfExpression) {
+    return checkIfExpression(ast as IfExpression, t, env);
   }
 
   if (Type.isUNDEFINED(t)) {
@@ -155,4 +162,16 @@ const checkReturnStatement = (
   env: TypeEnv
 ): boolean => {
   return check(node.expression, type, env);
+};
+
+const checkIfExpression = (
+  node: IfExpression,
+  type: Type,
+  env: TypeEnv
+): boolean => {
+  // shouldn't need to synth the test because all we're returning is a boolean, not a type
+  return (
+    check(node.then, type, narrow(node.test, env, true)) &&
+    check(node.else, type, narrow(node.test, env, false))
+  );
 };
