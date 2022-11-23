@@ -1,7 +1,7 @@
 import * as Types from "./Types";
 import * as Constructors from "./constructors";
 import * as Validators from "./validators";
-import { union as u } from "./union";
+import { union as u, distributeUnion as dU } from "./union";
 import { intersection as i } from "./intersection";
 
 module Type {
@@ -61,6 +61,8 @@ module Type {
   export const isUnion = Validators.isUnion;
   export const isUnknown = Validators.isUnknown;
   export const isIntersection = Validators.isIntersection;
+
+  export const distributeUnion = dU;
 }
 
 type Type = Type.Type;
