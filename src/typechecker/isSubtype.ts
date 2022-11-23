@@ -3,12 +3,20 @@ import { propType } from "./propType";
 import * as Type from "./validators";
 
 export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
-  if (Type.isUnion(a)) return a.types.every((a) => isSubtype(a, b));
-  if (Type.isUnion(b)) return b.types.some((b) => isSubtype(a, b));
+  if (Type.isAny(a) || Type.isAny(b)) return true;
+  if (Type.isNever(a)) return true;
+  if (Type.isUnknown(b)) return true;
 
-  if (Type.isIntersection(a)) return a.types.some((a) => isSubtype(a, b));
+  if (Type.isUnion(a))
+    return (a as Types.UnionType).types.every((a) => isSubtype(a, b));
+  if (Type.isUnion(b))
+    return (b as Types.UnionType).types.some((b) => isSubtype(a, b));
 
-  if (Type.isIntersection(b)) return b.types.every((b) => isSubtype(a, b));
+  if (Type.isIntersection(a))
+    return (a as Types.IntersectionType).types.some((a) => isSubtype(a, b));
+
+  if (Type.isIntersection(b))
+    return (b as Types.IntersectionType).types.every((b) => isSubtype(a, b));
 
   if (Type.isNil(a) && Type.isNil(b)) return true;
   if (Type.isBoolean(a) && Type.isBoolean(b)) return true;
@@ -17,29 +25,33 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
   if (Type.isUNDEFINED(a) && Type.isUNDEFINED(b)) return true;
 
   if (Type.isObject(a) && Type.isObject(b)) {
-    return b.properties.every(({ name: bName, type: bType }) => {
-      const aType = propType(a, bName);
-      if (!aType) return false;
-      else return isSubtype(aType, bType);
-    });
+    return (b as Types.ObjectType).properties.every(
+      ({ name: bName, type: bType }) => {
+        const aType = propType(a, bName);
+        if (!aType) return false;
+        else return isSubtype(aType, bType);
+      }
+    );
   }
 
   if (Type.isFunction(a) && Type.isFunction(b)) {
     return (
-      a.args.length === b.args.length &&
-      a.args.every((a, i) => isSubtype(b.args[i], a)) &&
-      isSubtype(a.ret, b.ret)
+      (a as Types.FunctionType).args.length ===
+        (b as Types.FunctionType).args.length &&
+      (a as Types.FunctionType).args.every((a, i) =>
+        isSubtype((b as Types.FunctionType).args[i], a)
+      ) &&
+      isSubtype((a as Types.FunctionType).ret, (b as Types.FunctionType).ret)
     );
   }
 
   if (Type.isSingleton(a)) {
-    if (Type.isSingleton(b)) return a.value === b.value;
-    else return isSubtype(a.base, b);
+    if (Type.isSingleton(b))
+      return (
+        (a as Types.SingletonType).value === (b as Types.SingletonType).value
+      );
+    else return isSubtype((a as Types.SingletonType).base, b);
   }
-
-  if (Type.isAny(a) || Type.isAny(b)) return true;
-  if (Type.isNever(a)) return true;
-  if (Type.isUnknown(b)) return true;
 
   return false;
 };
