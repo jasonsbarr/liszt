@@ -7,6 +7,10 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
   if (Type.isNever(a)) return true;
   if (Type.isUnknown(b)) return true;
 
+  if (Type.isGeneric(a) && Type.isGeneric(b)) {
+    return true;
+  }
+
   if (Type.isUnion(a))
     return (a as Types.UnionType).types.every((a) => isSubtype(a, b));
   if (Type.isUnion(b))

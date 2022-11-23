@@ -247,7 +247,7 @@ export class GenericType extends BaseType {
   }
 
   public toString() {
-    return `GenericType ${this.variable}`;
+    return `GenericType '${this.variable}`;
   }
 }
 
