@@ -23,6 +23,7 @@ import { CompoundType } from "./ast/CompoundType";
 import { SyntaxNodes } from "./ast/SyntaxNodes";
 import { NeverKeyword } from "./ast/NeverKeyword";
 import { UnknownKeyword } from "./ast/UnknownKeyword";
+import { TypeVariable } from "./ast/TypeVariable";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -197,6 +198,8 @@ export class TypeAnnotationParser extends LHVParser {
           this.parseParenthesizedAnnotation.bind(this),
           this.parseFunctionType.bind(this)
         );
+      case TokenNames.TypeVariable:
+        return this.parseTypeVariable();
       default:
         throw new Error(`No type annotation for token ${token.name}`);
     }
@@ -286,6 +289,18 @@ export class TypeAnnotationParser extends LHVParser {
     const end = token.location;
 
     return TypeLiteral.new(properties, start, end);
+  }
+
+  private parseTypeVariable() {
+    const token = this.reader.next();
+    const start = token.location;
+    const end = SrcLoc.new(
+      start.pos + token.value.length,
+      start.line,
+      start.col + token.value.length
+    );
+
+    return TypeVariable.new(token.value, start, end);
   }
 
   private parseUnknownKeyword() {

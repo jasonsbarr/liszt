@@ -40,4 +40,5 @@ export enum SyntaxNodes {
   UnaryOperation = "UnaryOperation",
   LogicalOperation = "LogicalOperation",
   IfExpression = "IfExpression",
+  TypeVariable = "TypeVariable",
 }
