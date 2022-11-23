@@ -256,7 +256,6 @@ export class Lexer {
         trivia += this.input.readWhile((c) => !isNewline(c));
       } else if (isDigit(char)) {
         this.readNumber(trivia);
-        trivia = "";
       } else if (isDot(char)) {
         if (isDigit(this.input.lookahead(1))) {
           this.readNumber(trivia);
@@ -271,13 +270,10 @@ export class Lexer {
           );
           this.input.next();
         }
-        trivia = "";
       } else if (isDoubleQuote(char)) {
         this.readString(trivia);
-        trivia = "";
       } else if (isIdStart(char)) {
         this.readIdentifier(trivia);
-        trivia = "";
       } else if (isColon(char)) {
         if (isIdStart(this.input.lookahead(1))) {
           this.readSymbol(trivia);
@@ -298,6 +294,8 @@ export class Lexer {
           `Unrecognized character ${char} (${this.input.col}:${this.input.line})`
         );
       }
+
+      trivia = "";
     }
 
     this.tokens.addEOFToken(
