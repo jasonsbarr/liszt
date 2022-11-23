@@ -141,14 +141,22 @@ export class AnyType extends BaseType {
 
 export class SingletonType extends BaseType {
   constructor(
-    public base: PrimitiveType,
+    public base:
+      | typeof IntegerType
+      | typeof FloatType
+      | typeof StringType
+      | typeof BooleanType,
     public value: string | number | bigint | boolean
   ) {
     super("Singleton", true, false);
   }
 
   public static new(
-    base: PrimitiveType,
+    base:
+      | typeof IntegerType
+      | typeof FloatType
+      | typeof StringType
+      | typeof BooleanType,
     value: string | number | bigint | boolean
   ) {
     return new SingletonType(base, value);
@@ -208,12 +216,6 @@ export class IntersectionType extends BaseType {
     return new IntersectionType(types, constant, nullable);
   }
 }
-
-type PrimitiveType =
-  | typeof IntegerType
-  | typeof FloatType
-  | typeof StringType
-  | typeof BooleanType;
 
 export type Type =
   | IntegerType
