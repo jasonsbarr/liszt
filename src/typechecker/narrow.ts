@@ -206,10 +206,10 @@ const narrowUnary = (
 ): TypeEnv => {
   switch (node.operator) {
     case "!":
+      return narrow(node.expression, env, !assume);
     case "-":
     case "+":
     case "~":
-      return narrow(node.expression, env, !assume);
     case "typeof":
       return env;
     default:
