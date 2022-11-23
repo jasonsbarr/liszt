@@ -32,12 +32,7 @@ export class Env<T> {
 
   public extend(name: string): Env<T> {
     const env = Env.new(name, this);
-    let currentEnv: Env<T> | undefined = this;
-
-    while (currentEnv) {
-      currentEnv.children.push(env);
-      currentEnv = currentEnv.parent;
-    }
+    this._children.push(env);
 
     return env;
   }
