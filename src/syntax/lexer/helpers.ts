@@ -67,6 +67,8 @@ export const KEYWORDS = {
   return: TokenNames.Return,
   type: TokenNames.Type,
   self: TokenNames.Self,
+  if: TokenNames.If,
+  else: TokenNames.Else,
 };
 
 export type kw = keyof typeof KEYWORDS;
