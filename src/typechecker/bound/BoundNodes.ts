@@ -22,4 +22,5 @@ export enum BoundNodes {
   BoundLogicalOperation = "BoundLogicalOperation",
   BoundUnaryOperation = "BoundUnaryOperation",
   BoundSymbolLiteral = "BoundSymbolLiteral",
+  BoundIfExpression = "BoundIfExpression",
 }
