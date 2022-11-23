@@ -34,7 +34,11 @@ export const isSubtype = (t1: Type, t2: Type): boolean => {
     return t1.types.every((t1) => isSubtype(t1, t2));
   } else if (Type.isUnion(t2)) {
     return t2.types.some((t2) => isSubtype(t1, t2));
-  } else if (Type.isAny(t1) || Type.isNever(t1)) {
+  } else if (Type.isIntersection(t1)) {
+    return t1.types.some((t1) => isSubtype(t1, t2));
+  } else if (Type.isIntersection(t2)) {
+    return t2.types.every((t2) => isSubtype(t1, t2));
+  } else if (Type.isAny(t1) || Type.isNever(t1) || Type.isUnknown(t2)) {
     return true;
   } else {
     return false;
