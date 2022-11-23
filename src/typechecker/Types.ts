@@ -150,7 +150,11 @@ export class SingletonType extends BaseType {
     public value: string | number | bigint | boolean
   ) {
     super("Singleton", true, false);
-    this.base = base as unknown as Type;
+    this.base = base as unknown as
+      | IntegerType
+      | FloatType
+      | BooleanType
+      | StringType;
   }
 
   public static new(
