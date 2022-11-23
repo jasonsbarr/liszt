@@ -51,6 +51,8 @@ import { BoundSymbolLiteral } from "./bound/BoundSymbolLiteral";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { BoundIfExpression } from "./bound/BoundIfExpression";
+import { BoundNilLiteral } from "./bound/BoundNilLiteral";
+import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -69,6 +71,9 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
 
     case SyntaxNodes.SymbolLiteral:
       return BoundSymbolLiteral.new(node as SymbolLiteral);
+
+    case SyntaxNodes.NilLiteral:
+      return BoundNilLiteral.new(node as NilLiteral);
 
     case SyntaxNodes.Identifier:
       if (!ty) {
