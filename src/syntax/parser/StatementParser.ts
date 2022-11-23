@@ -117,6 +117,7 @@ export class StatementParser extends TypeAnnotationParser {
   }
 
   private parseAssign(left: ASTNode, type?: TypeAnnotation, constant = false) {
+    left = this.parseLHV(left);
     let token = this.reader.peek();
     const prec = this.getLedPrecedence();
     // advance token stream
@@ -282,7 +283,6 @@ export class StatementParser extends TypeAnnotationParser {
     }
 
     if (token.name in assignmentOps) {
-      expr = this.parseLHV(expr);
       return this.parseAssign(expr, type);
     }
 
@@ -462,6 +462,8 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenNames.LShift:
       case TokenNames.Xor:
         return this.parseBinaryOperation(left);
+      case TokenNames.Equals:
+        return this.parseAssign(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }
@@ -482,7 +484,7 @@ export class StatementParser extends TypeAnnotationParser {
   private parseMemberExpression(left: ASTNode) {
     const prec = this.getLedPrecedence();
     this.reader.skip(TokenNames.Dot);
-    const prop = this.parseExpression(prec);
+    const prop = this.parseExpr(prec);
 
     return MemberExpression.new(left, prop as Identifier, left.start, prop.end);
   }
@@ -495,7 +497,7 @@ export class StatementParser extends TypeAnnotationParser {
       const st = this.reader.peek().location;
       const key = this.parseExpr();
       this.reader.skip(TokenNames.Colon);
-      const value = this.parseExpr();
+      const value = this.parseExpression();
       const en = this.reader.peek();
       properties.push(
         ObjectProperty.new(key as Identifier, value, st, en.location)

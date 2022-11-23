@@ -13,6 +13,10 @@ export class LHVParser extends BaseParser {
       return expr;
     }
 
+    if (expr.kind === SyntaxNodes.MemberExpression) {
+      return expr;
+    }
+
     throw new Error(`Invalid left side expression type ${expr.kind}`);
   }
 }
