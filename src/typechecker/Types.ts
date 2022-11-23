@@ -237,6 +237,16 @@ export class NotType extends BaseType {
   }
 }
 
+export class GenericType extends BaseType {
+  constructor(constant = false, nullable = false) {
+    super("Generic", constant, nullable);
+  }
+
+  public static new(constant = false, nullable = false) {
+    return new GenericType(constant, nullable);
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -254,4 +264,5 @@ export type Type =
   | NeverType
   | UnknownType
   | IntersectionType
-  | NotType;
+  | NotType
+  | GenericType;

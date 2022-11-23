@@ -4,6 +4,7 @@ import {
   BooleanType,
   FloatType,
   FunctionType,
+  GenericType,
   IntegerType,
   NeverType,
   NilType,
@@ -80,3 +81,5 @@ export const never = () => NeverType.new();
 export const unknown = () => UnknownType.new();
 
 export const not = (base: Type) => NotType.new(base);
+
+export const generic = () => GenericType.new();
