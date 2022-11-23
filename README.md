@@ -15,3 +15,7 @@ Liszt is object-oriented with prototypes, but also has first-class functions and
 The syntax is inspired by Ruby and Python. The type system is inspired by TypeScript.
 
 Liszt compiles to JavaScript, so it can be used both for browser-based applications and on the server via Node.js.
+
+## Credits
+
+The type checker implementation owes a great deal to Jake Donham's [Reconstructing TypeScript](https://jaked.org/blog/2021-09-07-Reconstructing-TypeScript-part-0) series.
