@@ -44,7 +44,7 @@ export const isFalsy = (type: Type): boolean => {
 
 export const falsy = Type.union(Type.singleton(false), Type.nil());
 
-export const truth = Type.intersection(
+export const truthy = Type.intersection(
   Type.not(Type.singleton(false)),
   Type.not(Type.nil())
 );
