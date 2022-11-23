@@ -1,46 +1,44 @@
+import * as Types from "./Types";
 import { propType } from "./propType";
-import { Type } from "./Type";
+import * as Type from "./validators";
 
-export const isSubtype = (t1: Type, t2: Type): boolean => {
-  if (Type.isNumber(t1) && Type.isNumber(t2)) return true;
-  else if (Type.isString(t1) && Type.isString(t2)) return true;
-  else if (Type.isBoolean(t1) && Type.isBoolean(t2)) return true;
-  else if (Type.isSymbol(t1) && Type.isSymbol(t2)) return true;
-  else if (Type.isNil(t1) && Type.isNil(t2)) return true;
-  else if (Type.isUNDEFINED(t1) && Type.isUNDEFINED(t2)) return true;
-  else if (Type.isObject(t1) && Type.isObject(t2)) {
-    return t2.properties.every(({ name: bName, type: bType }): boolean => {
-      const aType = propType(t1, bName);
+export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
+  if (Type.isUnion(a)) return a.types.every((a) => isSubtype(a, b));
+  if (Type.isUnion(b)) return b.types.some((b) => isSubtype(a, b));
 
+  if (Type.isIntersection(a)) return a.types.some((a) => isSubtype(a, b));
+
+  if (Type.isIntersection(b)) return b.types.every((b) => isSubtype(a, b));
+
+  if (Type.isNil(a) && Type.isNil(b)) return true;
+  if (Type.isBoolean(a) && Type.isBoolean(b)) return true;
+  if (Type.isNumber(a) && Type.isNumber(b)) return true;
+  if (Type.isString(a) && Type.isString(b)) return true;
+
+  if (Type.isObject(a) && Type.isObject(b)) {
+    return b.properties.every(({ name: bName, type: bType }) => {
+      const aType = propType(a, bName);
       if (!aType) return false;
-      return isSubtype(aType, bType);
+      else return isSubtype(aType, bType);
     });
-  } else if (Type.isFunction(t1) && Type.isFunction(t2)) {
-    return (
-      t1.args.length <= t2.args.length &&
-      t1.args.every((a, i) => isSubtype(t2.args[i], a)) &&
-      isSubtype(t1.ret, t2.ret)
-    );
-  } else if (Type.isSingleton(t1)) {
-    if (Type.isSingleton(t2)) {
-      return t1.value === t2.value;
-    } else {
-      // hack because I can't get TS to let me use classes as values
-      // in the Type constructor if I cast this as Type.Singleton,
-      // even if I use typeof [TypeName] for my constructor arguments
-      return isSubtype((t1 as any).base, t2);
-    }
-  } else if (Type.isUnion(t1)) {
-    return t1.types.every((t1) => isSubtype(t1, t2));
-  } else if (Type.isUnion(t2)) {
-    return t2.types.some((t2) => isSubtype(t1, t2));
-  } else if (Type.isIntersection(t1)) {
-    return t1.types.some((t1) => isSubtype(t1, t2));
-  } else if (Type.isIntersection(t2)) {
-    return t2.types.every((t2) => isSubtype(t1, t2));
-  } else if (Type.isAny(t1) || Type.isNever(t1) || Type.isUnknown(t2)) {
-    return true;
-  } else {
-    return false;
   }
+
+  if (Type.isFunction(a) && Type.isFunction(b)) {
+    return (
+      a.args.length === b.args.length &&
+      a.args.every((a, i) => isSubtype(b.args[i], a)) &&
+      isSubtype(a.ret, b.ret)
+    );
+  }
+
+  if (Type.isSingleton(a)) {
+    if (Type.isSingleton(b)) return a.value === b.value;
+    else return isSubtype(a.base, b);
+  }
+
+  if (Type.isAny(a) || Type.isAny(b)) return true;
+  if (Type.isNever(a)) return true;
+  if (Type.isUnknown(b)) return true;
+
+  return false;
 };

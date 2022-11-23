@@ -140,23 +140,25 @@ export class AnyType extends BaseType {
 }
 
 export class SingletonType extends BaseType {
+  public base: IntegerType | FloatType | BooleanType | StringType;
   constructor(
-    public base:
+    base:
       | typeof IntegerType
       | typeof FloatType
-      | typeof StringType
-      | typeof BooleanType,
+      | typeof BooleanType
+      | typeof StringType,
     public value: string | number | bigint | boolean
   ) {
     super("Singleton", true, false);
+    this.base = base as unknown as Type;
   }
 
   public static new(
     base:
       | typeof IntegerType
       | typeof FloatType
-      | typeof StringType
-      | typeof BooleanType,
+      | typeof BooleanType
+      | typeof StringType,
     value: string | number | bigint | boolean
   ) {
     return new SingletonType(base, value);
