@@ -5,6 +5,7 @@ import { SingletonType } from "../syntax/parser/ast/SingletonType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { TypeAnnotation } from "../syntax/parser/ast/TypeAnnotation";
 import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
+import { TypeVariable } from "../syntax/parser/ast/TypeVariable";
 import { Type } from "./Type";
 
 export const fromAnnotation = (type: TypeAnnotation): Type => {
@@ -43,6 +44,8 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
       return Type.intersection(
         ...(type.type as CompoundType).types.map(fromAnnotation)
       );
+    case SyntaxNodes.TypeVariable:
+      return Type.generic((type.type as TypeVariable).name);
     default:
       throw new Error(`No type definition found for type ${type.type.kind}`);
   }

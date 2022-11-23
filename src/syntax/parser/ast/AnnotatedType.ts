@@ -9,6 +9,7 @@ import { AnyKeyword } from "./AnyKeyword";
 import { FunctionType } from "./FunctionType";
 import { NumberKeyword } from "./NumberKeyword";
 import { CompoundType } from "./CompoundType";
+import { TypeVariable } from "./TypeVariable";
 
 export type AnnotatedType =
   | IntegerKeyword
@@ -21,4 +22,5 @@ export type AnnotatedType =
   | TypeLiteral
   | AnyKeyword
   | FunctionType
-  | CompoundType;
+  | CompoundType
+  | TypeVariable;
