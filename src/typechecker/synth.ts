@@ -55,7 +55,7 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
     case SyntaxNodes.ParenthesizedExpression:
       return synthParenthesizedExpression(ast as ParenthesizedExpression, env);
     case SyntaxNodes.LambdaExpression:
-      return synthLambda(ast as LambdaExpression, env);
+      return synthFunction(ast as LambdaExpression, env);
     case SyntaxNodes.CallExpression:
       return synthCall(ast as CallExpression, env);
     case SyntaxNodes.Block:
@@ -66,7 +66,7 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       }
       return synthVariableDeclaration(ast as VariableDeclaration, env);
     case SyntaxNodes.FunctionDeclaration:
-      return synthFunctionDeclaration(ast as FunctionDeclaration, env);
+      return synthFunction(ast as FunctionDeclaration, env);
     case SyntaxNodes.ReturnStatement:
       return synthReturnStatement(ast as ReturnStatement, env);
     case SyntaxNodes.BinaryOperation:
@@ -155,27 +155,37 @@ const synthParenthesizedExpression = (
   return synth(node.expression, env);
 };
 
-const synthLambda = (node: LambdaExpression, env: TypeEnv): Type.Function => {
+const synthFunction = (
+  node: LambdaExpression | FunctionDeclaration,
+  env: TypeEnv
+) => {
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
     const type = param?.type ? fromAnnotation(param.type) : Type.any();
     // has extended lambdaEnvironment from caller
-    env.set(name, type);
-    return type;
+    return { name, type };
   });
-  const returnType: Type = synth(node.body, env);
-  let annotatedType: Type | undefined;
+  const params = paramTypes.map(({ type }) => type);
+  const paramLists = Type.distributeUnion(params);
+  const funcTypes: Type.Function[] = paramLists.map((args) => {
+    paramTypes.forEach((pType, i) => {
+      env.set(pType.name, args[i]);
+    });
+    const returnType: Type = synth(node.body, env);
+    let annotatedType: Type | undefined;
 
-  if (node.ret) {
-    annotatedType = fromAnnotation(node.ret);
-    if (!isSubtype(returnType, annotatedType)) {
-      throw new Error(
-        `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
-      );
+    if (node.ret) {
+      annotatedType = fromAnnotation(node.ret);
+      if (!isSubtype(returnType, annotatedType)) {
+        throw new Error(
+          `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
+        );
+      }
     }
-  }
 
-  return Type.functionType(paramTypes, returnType);
+    return Type.functionType(args, returnType);
+  });
+  return Type.intersection(...funcTypes);
 };
 
 const synthCall = (node: CallExpression, env: TypeEnv): Type => {
@@ -218,31 +228,6 @@ const synthConstantDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   const type = synthSingleton(node, env);
   env.set((node.assignment.left as Identifier).name, type);
   return type;
-};
-
-const synthFunctionDeclaration = (node: FunctionDeclaration, env: TypeEnv) => {
-  const paramTypes = node.params.map((p) => {
-    const name = p.name.name;
-    // function declaration params will always have a type annotation
-    const type = fromAnnotation(p.type!);
-
-    env.set(name, type);
-    return type;
-  });
-
-  const returnType = synth(node.body, env);
-  let annotatedType: Type | undefined;
-
-  if (node.ret) {
-    annotatedType = fromAnnotation(node.ret);
-    if (!isSubtype(returnType, annotatedType)) {
-      throw new Error(
-        `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
-      );
-    }
-  }
-
-  return Type.functionType(paramTypes, returnType);
 };
 
 const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
