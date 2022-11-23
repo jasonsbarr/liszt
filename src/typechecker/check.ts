@@ -9,7 +9,6 @@ import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
-import { isFalsy, isTruthy } from "../utils/truthiness";
 import { isSubtype } from "./isSubtype";
 import { narrow } from "./narrow";
 import { propType } from "./propType";
