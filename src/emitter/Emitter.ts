@@ -10,6 +10,7 @@ import { BoundCallExpression } from "../typechecker/bound/BoundCallExpression";
 import { BoundFloatLiteral } from "../typechecker/bound/BoundFloatLiteral";
 import { BoundFunctionDeclaration } from "../typechecker/bound/BoundFunctionDeclaration";
 import { BoundIdentifier } from "../typechecker/bound/BoundIdentifier";
+import { BoundIfExpression } from "../typechecker/bound/BoundIfExpression";
 import { BoundIntegerLiteral } from "../typechecker/bound/BoundIntegerLiteral";
 import { BoundLambdaExpression } from "../typechecker/bound/BoundLambdaExpression";
 import { BoundLogicalOperation } from "../typechecker/bound/BoundLogicalOperation";
@@ -86,6 +87,8 @@ export class Emitter {
         );
       case BoundNodes.BoundUnaryOperation:
         return this.emitUnaryOperation(node as BoundUnaryOperation);
+      case BoundNodes.BoundIfExpression:
+        return this.emitIfExpression(node as BoundIfExpression);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -243,5 +246,11 @@ export class Emitter {
       default:
         return `${node.operator} ${this.emitNode(node.expression)}`;
     }
+  }
+
+  private emitIfExpression(node: BoundIfExpression): string {
+    return `${this.emitNode(node.test)} ? ${this.emitNode(
+      node.then
+    )} : ${this.emitNode(node.else)}`;
   }
 }
