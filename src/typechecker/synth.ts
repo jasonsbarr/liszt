@@ -207,13 +207,8 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
     }
 
     f.args.forEach((argType, i) => {
-      const synthType = synth(node.args[i], env);
       if (Type.isGeneric(argType)) {
-        if (Type.isGeneric(f.ret)) {
-          if ((argType as Type.Generic).name === (f.ret as Type.Generic).name) {
-            f.ret = synthType;
-          }
-        }
+        const synthType = synth(node.args[i], env);
         isSubtype(argType, synthType);
       } else {
         check(node.args[i], argType, env);
