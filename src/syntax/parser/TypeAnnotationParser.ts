@@ -204,14 +204,10 @@ export class TypeAnnotationParser extends LHVParser {
       | AnnotatedType
       | TypeAnnotation;
 
-    if (type instanceof TypeAnnotation) {
-      return type;
-    }
-
     let token = this.reader.peek();
 
     if (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
-      let types: AnnotatedType[] | TypeAnnotation[] = [type];
+      let types: (AnnotatedType | TypeAnnotation)[] = [type];
       let compoundType =
         token.name === TokenNames.Amp
           ? CompoundTypes.Intersection

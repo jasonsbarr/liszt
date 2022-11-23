@@ -61,7 +61,7 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   if (isSubtype(synthType, t)) return true;
 
-  throw new Error(`Expected ${(t as Type).name}, got ${synthType.name}`);
+  throw new Error(`Expected ${t as Type}, got ${synthType}`);
 };
 
 type ObjectProps = {
