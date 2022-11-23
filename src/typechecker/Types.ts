@@ -231,6 +231,10 @@ export class NotType extends BaseType {
   public static new(base: Type, constant = false, nullable = false) {
     return new NotType(base, constant, nullable);
   }
+
+  public toString() {
+    return `!${this.base}`;
+  }
 }
 
 export type Type =
