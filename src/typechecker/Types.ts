@@ -245,6 +245,10 @@ export class GenericType extends BaseType {
   public static new(variable: string, constant = false, nullable = false) {
     return new GenericType(variable, constant, nullable);
   }
+
+  public toString() {
+    return `GenericType ${this.variable}`;
+  }
 }
 
 export type Type =
