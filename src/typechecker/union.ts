@@ -22,3 +22,25 @@ export const union = (...types: Type[]): Type => {
   if (types.length === 1) return types[0];
   return UnionType.new(types);
 };
+
+export const distributeUnion = (ts: Type[]): Type[][] => {
+  const accum: Type[][] = [];
+
+  const dist = (ts: Type[], i: number) => {
+    if (i === ts.length) {
+      accum.push(ts);
+    } else {
+      const ti = ts[i];
+      if (isUnion(ti)) {
+        for (let t of ti.types) {
+          let ts2 = ts.slice(0, i).concat(t, ts.slice(i + 1));
+          dist(ts2, i + 1);
+        }
+      } else {
+        dist(ts, i + 1);
+      }
+    }
+  };
+  dist(ts, 0);
+  return accum;
+};
