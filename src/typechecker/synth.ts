@@ -26,11 +26,11 @@ import { TokenNames } from "../syntax/lexer/TokenNames";
 import { BinaryOperation } from "../syntax/parser/ast/BinaryOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
-import { isFalsy, isTruthy } from "../utils/truthiness";
+import { falsy, isFalsy, isTruthy, truthy } from "../utils/truthiness";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { map } from "./map";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
-import { narrow } from "./narrow";
+import { narrow, narrowType } from "./narrow";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -590,24 +590,22 @@ const synthBinary = (node: BinaryOperation, env: TypeEnv): Type => {
 
 const synthLogical = (node: LogicalOperation, env: TypeEnv) => {
   const left = synth(node.left, env);
-  const right = synth(node.right, env);
+  const right = () => synth(node.right, env);
 
-  return map(left, right, (left: Type, right: Type) => {
-    switch (node.operator) {
-      case "and":
-        if (isFalsy(left)) return left;
-        else if (isTruthy(right)) return right;
-        else return Type.union(left, right);
+  switch (node.operator) {
+    case "and":
+      if (isFalsy(left)) return left;
+      else if (isTruthy(left)) return right();
+      else return Type.union(narrowType(left, falsy), right());
 
-      case "or":
-        if (isTruthy(left)) return left;
-        else if (isFalsy(left)) return right;
-        else return Type.union(left, right);
+    case "or":
+      if (isTruthy(left)) return left;
+      else if (isFalsy(left)) return right();
+      else return Type.union(narrowType(left, truthy), right());
 
-      default:
-        throw new Error(`Unimplemented logical operator ${node.operator}`);
-    }
-  });
+    default:
+      throw new Error(`Unimplemented logical operator ${node.operator}`);
+  }
 };
 
 const synthUnary = (node: UnaryOperation, env: TypeEnv): Type => {
@@ -675,7 +673,7 @@ const synthIfExpression = (node: IfExpression, env: TypeEnv): Type => {
 
   if (!isSubtype(then, elseType) && !isSubtype(elseType, then)) {
     throw new Error(
-      `If expression branches must both evaluate to the same type or a subtype; ${then} and ${elseType} given`
+      `If expression branches must both evaluate to the same type or one must be a subtype of the other; ${then} and ${elseType} given`
     );
   }
 
