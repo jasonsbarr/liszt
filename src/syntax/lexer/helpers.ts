@@ -59,6 +59,8 @@ export const KEYWORDS = {
   string: TokenNames.StringKeyword,
   symbol: TokenNames.SymbolKeyword,
   any: TokenNames.AnyKeyword,
+  never: TokenNames.NeverKeyword,
+  unknown: TokenNames.UnknownKeyword,
   def: TokenNames.Def,
   var: TokenNames.Var,
   const: TokenNames.Const,

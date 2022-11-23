@@ -27,6 +27,8 @@ export const fromAnnotation = (type: TypeAnnotation): Type => {
       return Type.any();
     case SyntaxNodes.NeverKeyword:
       return Type.never();
+    case SyntaxNodes.UnknownKeyword:
+      return Type.unknown();
     case SyntaxNodes.TypeLiteral:
       return generateObjectType(type.type as TypeLiteral);
     case SyntaxNodes.FunctionType:

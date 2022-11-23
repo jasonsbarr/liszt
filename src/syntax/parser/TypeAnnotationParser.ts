@@ -22,6 +22,7 @@ import { SymbolKeyword } from "./ast/SymbolKeyword";
 import { CompoundType } from "./ast/CompoundType";
 import { SyntaxNodes } from "./ast/SyntaxNodes";
 import { NeverKeyword } from "./ast/NeverKeyword";
+import { UnknownKeyword } from "./ast/UnknownKeyword";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -178,6 +179,8 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseAnyKeyword();
       case TokenNames.NeverKeyword:
         return this.parseNeverKeyword();
+      case TokenNames.UnknownKeyword:
+        return this.parseUnknownKeyword();
       case TokenNames.Integer:
         return this.parseIntegerSingleton();
       case TokenNames.Float:
@@ -283,5 +286,10 @@ export class TypeAnnotationParser extends LHVParser {
     const end = token.location;
 
     return TypeLiteral.new(properties, start, end);
+  }
+
+  private parseUnknownKeyword() {
+    const token = this.reader.next();
+    return UnknownKeyword.new(token, token.location);
   }
 }
