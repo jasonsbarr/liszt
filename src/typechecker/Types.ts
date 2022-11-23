@@ -249,4 +249,5 @@ export type Type =
   | UNDEFINED
   | NeverType
   | UnknownType
-  | IntersectionType;
+  | IntersectionType
+  | NotType;
