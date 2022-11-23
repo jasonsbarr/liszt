@@ -82,4 +82,4 @@ export const unknown = () => UnknownType.new();
 
 export const not = (base: Type) => NotType.new(base);
 
-export const generic = () => GenericType.new();
+export const generic = (variable: string) => GenericType.new(variable);

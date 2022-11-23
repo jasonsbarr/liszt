@@ -238,12 +238,12 @@ export class NotType extends BaseType {
 }
 
 export class GenericType extends BaseType {
-  constructor(constant = false, nullable = false) {
+  constructor(public variable: string, constant = false, nullable = false) {
     super("Generic", constant, nullable);
   }
 
-  public static new(constant = false, nullable = false) {
-    return new GenericType(constant, nullable);
+  public static new(variable: string, constant = false, nullable = false) {
+    return new GenericType(variable, constant, nullable);
   }
 }
 
