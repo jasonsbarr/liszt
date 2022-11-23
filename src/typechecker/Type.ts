@@ -24,6 +24,7 @@ module Type {
   export type Unknown = Types.UnknownType;
   export type Intersection = Types.IntersectionType;
   export type Not = Types.NotType;
+  export type Generic = Types.GenericType;
 
   export type Type = Types.Type;
 
@@ -45,6 +46,7 @@ module Type {
   export const unknown = Constructors.unknown;
   export const intersection = i;
   export const not = Constructors.not;
+  export const generic = Constructors.generic;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -64,6 +66,7 @@ module Type {
   export const isUnknown = Validators.isUnknown;
   export const isIntersection = Validators.isIntersection;
   export const isNot = Validators.isNot;
+  export const isGeneric = Validators.isGeneric;
 
   export const distributeUnion = dU;
 }
