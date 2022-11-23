@@ -285,7 +285,7 @@ export class StatementParser extends TypeAnnotationParser {
   }
 
   private parseFuncParameter() {
-    const token = this.reader.peek();
+    let token = this.reader.peek();
 
     if (token.type !== TokenTypes.Identifier) {
       throw new Error(
@@ -296,10 +296,19 @@ export class StatementParser extends TypeAnnotationParser {
     let name = this.parseExpr() as Identifier;
     const start = name.start;
 
-    this.reader.skip(TokenNames.Colon);
+    token = this.reader.peek();
 
-    const annotation = this.parseTypeAnnotation();
-    const end = annotation.end;
+    let annotation: TypeAnnotation | undefined;
+    let end: SrcLoc;
+
+    if (token.name === TokenNames.Colon) {
+      this.reader.skip(TokenNames.Colon);
+
+      annotation = this.parseTypeAnnotation();
+      end = annotation.end;
+    } else {
+      end = name.end;
+    }
 
     return Parameter.new(name, start, end, annotation);
   }
