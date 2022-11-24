@@ -595,6 +595,7 @@ export class StatementParser extends TypeAnnotationParser {
     }
 
     while (token.name === TokenNames.Comma) {
+      // allows trailing comma
       this.reader.skip(TokenNames.Comma);
       token = this.reader.peek();
 

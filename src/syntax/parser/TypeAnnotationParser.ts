@@ -25,6 +25,7 @@ import { NeverKeyword } from "./ast/NeverKeyword";
 import { UnknownKeyword } from "./ast/UnknownKeyword";
 import { TypeVariable } from "./ast/TypeVariable";
 import { TokenTypes } from "../lexer/TokenTypes";
+import { TupleType } from "./ast/TupleType";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -157,6 +158,47 @@ export class TypeAnnotationParser extends LHVParser {
     return SymbolKeyword.new(token, token.location);
   }
 
+  private parseTupleType() {
+    let token = this.reader.next();
+    const start = token.location;
+    let types: TypeAnnotation[] = [];
+    let end: SrcLoc;
+
+    token = this.reader.peek();
+
+    if (token.name === TokenNames.RParen) {
+      // is empty tuple type (weird flex, but ok)
+      end = token.location;
+      return TupleType.new(types, start, end);
+    }
+
+    const first = this.parseTypeAnnotation();
+    types = [first];
+    token = this.reader.peek();
+
+    if (token.name !== TokenNames.Comma) {
+      // Using or method to parse, so this will reset the parser
+      throw new Error(
+        `Tuple type must have a comma after its first element; ${token.name} given`
+      );
+    }
+
+    while (token.name === TokenNames.Comma) {
+      // allows trailing comma
+      this.reader.skip(TokenNames.Comma);
+      token = this.reader.peek();
+      if (token.name !== TokenNames.RParen) {
+        types.push(this.parseTypeAnnotation());
+        token = this.reader.peek();
+      }
+    }
+
+    this.reader.skip(TokenNames.RParen);
+    end = token.location;
+
+    return TupleType.new(types, start, end);
+  }
+
   private parseTypePrimitive() {
     const token = this.reader.peek();
 
@@ -196,8 +238,9 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseTypeLiteral();
       case TokenNames.LParen:
         return this.or(
-          this.parseParenthesizedAnnotation.bind(this),
-          this.parseFunctionType.bind(this)
+          this.parseFunctionType.bind(this),
+          this.parseTupleType.bind(this),
+          this.parseParenthesizedAnnotation.bind(this)
         );
       case TokenNames.TypeVariable:
         return this.parseTypeVariable();
