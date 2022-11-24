@@ -167,8 +167,6 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenTypes.Identifier:
         this.reader.skip(TokenNames.Identifier);
         return Identifier.new(token, token.location);
-      case TokenTypes.Keyword:
-        return this.parseKeyword();
       default: {
         switch (token.name) {
           case TokenNames.LParen:

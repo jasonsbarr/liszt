@@ -24,6 +24,7 @@ import { SyntaxNodes } from "./ast/SyntaxNodes";
 import { NeverKeyword } from "./ast/NeverKeyword";
 import { UnknownKeyword } from "./ast/UnknownKeyword";
 import { TypeVariable } from "./ast/TypeVariable";
+import { TokenTypes } from "../lexer/TokenTypes";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -78,7 +79,7 @@ export class TypeAnnotationParser extends LHVParser {
         );
       }
 
-      const param = this.parseType() as Identifier;
+      const param = this.parseTypePrimitive() as Identifier;
       this.reader.skip(TokenNames.Colon);
       const paramType = this.parseTypeAnnotation();
       const en = paramType.end;
@@ -156,7 +157,7 @@ export class TypeAnnotationParser extends LHVParser {
     return SymbolKeyword.new(token, token.location);
   }
 
-  private parseType() {
+  private parseTypePrimitive() {
     const token = this.reader.peek();
 
     switch (token.name) {
@@ -201,12 +202,18 @@ export class TypeAnnotationParser extends LHVParser {
       case TokenNames.TypeVariable:
         return this.parseTypeVariable();
       default:
-        throw new Error(`No type annotation for token ${token.name}`);
+        switch (token.type) {
+          // allow keywords as object properties
+          case TokenTypes.Keyword:
+            return this.parseIdentifier();
+          default:
+            throw new Error(`No type annotation for token ${token.name}`);
+        }
     }
   }
 
   public parseTypeAnnotation(): TypeAnnotation {
-    const type: AnnotatedType | TypeAnnotation = this.parseType() as
+    const type: AnnotatedType | TypeAnnotation = this.parseTypePrimitive() as
       | AnnotatedType
       | TypeAnnotation;
 
@@ -225,7 +232,7 @@ export class TypeAnnotationParser extends LHVParser {
       while (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
         // any is hack because type system doesn't like having both
         // AnnotatedType and TypeAnnotations in the same array
-        types.push(this.parseType() as any);
+        types.push(this.parseTypePrimitive() as any);
         token = this.reader.peek();
       }
 
@@ -262,16 +269,9 @@ export class TypeAnnotationParser extends LHVParser {
 
     while (token.name !== TokenNames.RBrace) {
       const st = token.location;
-
-      if (token.name !== TokenNames.Identifier) {
-        throw new Error(
-          `Type literal property name must be a valid identifier; ${token.name} given`
-        );
-      }
-
-      const propName = this.parseType() as Identifier;
+      const propName = this.parseTypePrimitive() as Identifier;
       this.reader.skip(TokenNames.Colon);
-      const propType = this.parseType();
+      const propType = this.parseTypePrimitive();
       const en = propType.end;
 
       properties.push(

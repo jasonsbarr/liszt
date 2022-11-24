@@ -1,9 +1,9 @@
 import { LexResult } from "../lexer/LexResult";
 import { ProgramNode } from "./ast/ProgramNode";
 import { SyntaxTree } from "./ast/SyntaxTree";
-import { StatementParser } from "./StatementParser";
+import { TypeParser } from "./TypeParser";
 
-export class Parser extends StatementParser {
+export class Parser extends TypeParser {
   constructor(lexResult: LexResult) {
     super(lexResult);
   }
@@ -33,6 +33,6 @@ export class Parser extends StatementParser {
   }
 
   private parseToplevel() {
-    return this.parseStatement();
+    return this.parseType();
   }
 }

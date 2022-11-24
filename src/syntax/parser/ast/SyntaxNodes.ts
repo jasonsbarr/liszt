@@ -41,4 +41,5 @@ export enum SyntaxNodes {
   LogicalOperation = "LogicalOperation",
   IfExpression = "IfExpression",
   TypeVariable = "TypeVariable",
+  TypeAlias = "TypeAlias",
 }
