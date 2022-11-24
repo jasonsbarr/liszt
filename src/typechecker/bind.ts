@@ -371,6 +371,10 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
           ty = synth(node, env) as Type.Tuple;
         }
 
+        if (Type.isTypeAlias(ty)) {
+          ty = getAliasBase(ty);
+        }
+
         const values = node.values.map((v, i) =>
           bind(v, env, (ty as Type.Tuple).types[i])
         );
