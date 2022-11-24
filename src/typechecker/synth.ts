@@ -129,11 +129,11 @@ const synthMember = (ast: MemberExpression, env: TypeEnv) => {
   const object = synth(ast.object, env);
 
   return map(object, (obj) => {
-    if (!Type.isObject(obj)) {
-      throw new Error(`MemberExpression expects an object; ${obj} given`);
-    }
+    // if (!Type.isObject(obj)) {
+    //   throw new Error(`MemberExpression expects an object; ${obj} given`);
+    // }
 
-    const type = propType(obj, prop.name);
+    const type = propType(obj as Type.Object, prop.name);
 
     if (!type) {
       throw new Error(`No such property ${prop.name} on object`);
