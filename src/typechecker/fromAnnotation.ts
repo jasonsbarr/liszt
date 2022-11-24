@@ -19,7 +19,7 @@ export const fromAnnotation = (
 ): Type => {
   if (type.kind === SyntaxNodes.TypeAlias) {
     if (type instanceof TypeAlias) {
-      return Type.typeAlias(type.name.name, fromAnnotation(type.base));
+      return Type.typeAlias(type.name.name, fromAnnotation(type.base, env));
     }
   } else if (type instanceof TypeAnnotation) {
     switch (type.type.kind) {
@@ -52,13 +52,13 @@ export const fromAnnotation = (
       case SyntaxNodes.UnionType:
         return Type.union(
           ...(type.type as CompoundType).types.map((type) =>
-            fromAnnotation(type)
+            fromAnnotation(type, env)
           )
         );
       case SyntaxNodes.IntersectionType:
         return Type.intersection(
           ...(type.type as CompoundType).types.map((type) =>
-            fromAnnotation(type)
+            fromAnnotation(type, env)
           )
         );
       case SyntaxNodes.Identifier:
@@ -70,30 +70,30 @@ export const fromAnnotation = (
     }
   } else if (type instanceof ObjectPropertyType) {
     const annotation = TypeAnnotation.new(type.type, type.start, type.end);
-    return fromAnnotation(annotation);
+    return fromAnnotation(annotation, env);
   }
   throw new Error(
     "This should never happen but I have to make the type checker happy" // it did, in fact, happen
   );
 };
 
-const generateObjectType = (type: TypeLiteral) => {
+const generateObjectType = (type: TypeLiteral, env?: TypeEnv) => {
   const props = type.properties.map(
     (prop) =>
       ({
         name: prop.name,
-        type: fromAnnotation(prop),
+        type: fromAnnotation(prop, env),
       } as Type.Property)
   );
 
   return Type.object(props);
 };
 
-const generateFunctionType = (type: FunctionType) => {
+const generateFunctionType = (type: FunctionType, env?: TypeEnv) => {
   const args = type.parameters.map((p) => {
-    return fromAnnotation(p.type);
+    return fromAnnotation(p.type, env);
   });
-  const ret = fromAnnotation(type.returnType);
+  const ret = fromAnnotation(type.returnType, env);
 
   return Type.functionType(args, ret);
 };
