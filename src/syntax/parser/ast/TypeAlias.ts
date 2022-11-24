@@ -7,7 +7,7 @@ import { TypeAnnotation } from "./TypeAnnotation";
 export class TypeAlias extends ASTNode {
   constructor(
     public name: Identifier,
-    public type: TypeAnnotation,
+    public base: TypeAnnotation,
     start: SrcLoc,
     end: SrcLoc
   ) {
@@ -16,18 +16,18 @@ export class TypeAlias extends ASTNode {
 
   public static new(
     name: Identifier,
-    type: TypeAnnotation,
+    base: TypeAnnotation,
     start: SrcLoc,
     end: SrcLoc
   ) {
-    return new TypeAlias(name, type, start, end);
+    return new TypeAlias(name, base, start, end);
   }
 
   public get children() {
-    return [this.type];
+    return [this.base];
   }
 
   public toString() {
-    return `TypeAlias ${this.name} - ${this.type.toString()}`;
+    return `TypeAlias ${this.name} - ${this.base.toString()}`;
   }
 }
