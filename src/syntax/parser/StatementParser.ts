@@ -596,8 +596,12 @@ export class StatementParser extends TypeAnnotationParser {
 
     while (token.name === TokenNames.Comma) {
       this.reader.skip(TokenNames.Comma);
-      values.push(this.parseExpr());
       token = this.reader.peek();
+
+      if (token.name !== TokenNames.RParen) {
+        values.push(this.parseExpr());
+        token = this.reader.peek();
+      }
     }
 
     this.reader.skip(TokenNames.RParen);
