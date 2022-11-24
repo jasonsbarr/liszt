@@ -2,6 +2,7 @@ import { TokenNames } from "../syntax/lexer/TokenNames";
 import { AnnotatedType } from "../syntax/parser/ast/AnnotatedType";
 import { CompoundType } from "../syntax/parser/ast/CompoundType";
 import { FunctionType } from "../syntax/parser/ast/FunctionType";
+import { Identifier } from "../syntax/parser/ast/Identifier";
 import { ObjectPropertyType } from "../syntax/parser/ast/ObjectPropertyType";
 import { SingletonType } from "../syntax/parser/ast/SingletonType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
@@ -10,9 +11,11 @@ import { TypeAnnotation } from "../syntax/parser/ast/TypeAnnotation";
 import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
 import { TypeVariable } from "../syntax/parser/ast/TypeVariable";
 import { Type } from "./Type";
+import { TypeEnv } from "./TypeEnv";
 
 export const fromAnnotation = (
-  type: TypeAnnotation | TypeAlias | ObjectPropertyType
+  type: TypeAnnotation | TypeAlias | ObjectPropertyType,
+  env?: TypeEnv
 ): Type => {
   if (type.kind === SyntaxNodes.TypeAlias) {
     if (type instanceof TypeAlias) {
@@ -48,12 +51,18 @@ export const fromAnnotation = (
         return generateSingletonType(type.type as SingletonType);
       case SyntaxNodes.UnionType:
         return Type.union(
-          ...(type.type as CompoundType).types.map(fromAnnotation)
+          ...(type.type as CompoundType).types.map((type) =>
+            fromAnnotation(type)
+          )
         );
       case SyntaxNodes.IntersectionType:
         return Type.intersection(
-          ...(type.type as CompoundType).types.map(fromAnnotation)
+          ...(type.type as CompoundType).types.map((type) =>
+            fromAnnotation(type)
+          )
         );
+      case SyntaxNodes.Identifier:
+        return env?.get((type.type as Identifier).name)!; // if undefined, get will throw error
       case SyntaxNodes.TypeVariable:
         return Type.generic((type.type as TypeVariable).name);
       default:

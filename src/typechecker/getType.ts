@@ -13,9 +13,9 @@ export const getType = (
       return env.get(type.type.name);
     }
 
-    return fromAnnotation(type);
+    return fromAnnotation(type, env);
   } else if (type instanceof TypeAlias) {
-    const alias = fromAnnotation(type);
+    const alias = fromAnnotation(type, env);
 
     if (!env.lookup(type.name.name)) {
       env.set(type.name.name, alias);
