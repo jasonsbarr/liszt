@@ -23,7 +23,7 @@ export class TypeParser extends StatementParser {
       throw new Error(`Type alias name must be a valid identifier`);
     }
 
-    const name = this.parseExpression() as Identifier;
+    const name = this.parseExpr(1000) as Identifier;
     const type = this.parseTypeAnnotation();
     const end = type.end;
 
