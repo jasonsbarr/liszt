@@ -37,6 +37,7 @@ import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { TypeAlias } from "../syntax/parser/ast/TypeAlias";
+import { getType } from "./getType";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -339,7 +340,7 @@ export class TypeChecker {
 
     try {
       const type = node.type
-        ? fromAnnotation(node.type)
+        ? getType(node.type, env)
         : synth(node.right, env, constant);
 
       if (node.type) {
@@ -387,7 +388,7 @@ export class TypeChecker {
     // need to try/catch this in case of legal forward reference
     try {
       const type = node.assignment.type
-        ? fromAnnotation(node.assignment.type)
+        ? getType(node.assignment.type, env)
         : synth(node.assignment.right, env, node.constant);
 
       // Need to set the variable name and type BEFORE checking and binding the assignment node

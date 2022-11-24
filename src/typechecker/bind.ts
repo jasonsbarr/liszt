@@ -53,6 +53,7 @@ import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { BoundIfExpression } from "./bound/BoundIfExpression";
 import { BoundNilLiteral } from "./bound/BoundNilLiteral";
 import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
+import { getType } from "./getType";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -152,7 +153,10 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       return BoundLambdaExpression.new(
         node as LambdaExpression,
         lambdaBody,
-        ty! as Type.Function
+        ty! as Type.Function,
+        (node as LambdaExpression).params.map((p) =>
+          BoundParameter.new(node, p.type ? getType(p.type, env) : Type.any())
+        )
       );
     case SyntaxNodes.CallExpression:
       const callArgs = (node as CallExpression).args.map((arg) =>
@@ -227,7 +231,9 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       if (node instanceof FunctionDeclaration) {
         // gets extended environment from type checker
         const name = bind(node.name, env, ty!) as BoundIdentifier;
-        const boundParams = node.params.map((p) => BoundParameter.new(p));
+        const boundParams = node.params.map((p) =>
+          BoundParameter.new(p, p.type ? getType(p.type, env) : Type.any())
+        );
         const boundBody = bind(
           node.body,
           env,

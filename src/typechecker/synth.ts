@@ -31,6 +31,7 @@ import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { map } from "./map";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { narrow, narrowType } from "./narrow";
+import { getType } from "./getType";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -143,7 +144,7 @@ const synthMember = (ast: MemberExpression, env: TypeEnv) => {
 };
 
 const synthAs = (node: AsExpression, env: TypeEnv) => {
-  const type = fromAnnotation(node.type);
+  const type = getType(node.type, env);
   check(node.expression, type, env);
   return type;
 };
@@ -166,7 +167,7 @@ const synthFunction = (
   let generic = false;
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
-    const type = param?.type ? fromAnnotation(param.type) : Type.any();
+    const type = param?.type ? getType(param.type, env) : Type.any();
 
     if (Type.isGeneric(type)) {
       generic = true;
@@ -186,7 +187,7 @@ const synthFunction = (
       let annotatedType: Type | undefined;
 
       if (node.ret) {
-        annotatedType = fromAnnotation(node.ret);
+        annotatedType = getType(node.ret, env);
         if (!isSubtype(returnType, annotatedType)) {
           throw new Error(
             `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
