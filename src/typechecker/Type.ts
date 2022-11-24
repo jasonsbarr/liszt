@@ -26,6 +26,7 @@ module Type {
   export type Not = Types.NotType;
   export type Generic = Types.GenericType;
   export type GenericFunction = Types.GenericFunction;
+  export type TypeAlias = Types.TypeAlias;
 
   export type Type = Types.Type;
 
@@ -49,6 +50,7 @@ module Type {
   export const not = Constructors.not;
   export const generic = Constructors.generic;
   export const genericFunction = Constructors.genericFunction;
+  export const typeAlias = Constructors.typeAlias;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -70,6 +72,7 @@ module Type {
   export const isNot = Validators.isNot;
   export const isGeneric = Validators.isGeneric;
   export const isGenericFunction = Validators.isGenericFunction;
+  export const isTypeAlias = Validators.isTypeAlias;
 
   export const distributeUnion = dU;
 }

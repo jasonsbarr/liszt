@@ -19,6 +19,7 @@ import {
   StringType,
   SymbolType,
   Type,
+  TypeAlias,
   UNDEFINED,
   UnknownType,
 } from "./Types";
@@ -94,3 +95,6 @@ export const genericFunction = (
   body: ASTNode,
   env: TypeEnv
 ) => GenericFunction.new(args, ret, params, body, env);
+
+export const typeAlias = (name: string, base: Type) =>
+  TypeAlias.new(name, base);

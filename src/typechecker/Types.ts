@@ -279,6 +279,30 @@ export class GenericFunction extends BaseType {
   }
 }
 
+export class TypeAlias extends BaseType {
+  constructor(
+    public name: string,
+    public base: Type,
+    constant = false,
+    nullable = false
+  ) {
+    super("TypeAlias", constant, nullable);
+  }
+
+  public static new(
+    name: string,
+    base: Type,
+    constant = false,
+    nullable = false
+  ) {
+    return new TypeAlias(name, base, constant, nullable);
+  }
+
+  public toString() {
+    return `TypeAlias ${this.name}: ${this.base}`;
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -298,4 +322,5 @@ export type Type =
   | IntersectionType
   | NotType
   | GenericType
-  | GenericFunction;
+  | GenericFunction
+  | TypeAlias;
