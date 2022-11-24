@@ -258,6 +258,6 @@ export class Emitter {
   }
 
   private emitTuple(node: BoundTuple): string {
-    return `[${node.values.map((v) => String(v)).join(", ")}]`;
+    return `[${node.values.map((v) => this.emitNode(v)).join(", ")}]`;
   }
 }
