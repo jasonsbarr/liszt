@@ -303,6 +303,20 @@ export class TypeAlias extends BaseType {
   }
 }
 
+export class TupleType extends BaseType {
+  constructor(public types: Type[]) {
+    super("Tuple", true, false);
+  }
+
+  public static new(types: Type[]) {
+    return new TupleType(types);
+  }
+
+  public toString() {
+    return `Tuple (${this.types.map((t) => t.toString()).join(", ")})`;
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType

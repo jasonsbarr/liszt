@@ -42,4 +42,5 @@ export enum SyntaxNodes {
   IfExpression = "IfExpression",
   TypeVariable = "TypeVariable",
   TypeAlias = "TypeAlias",
+  Tuple = "Tuple",
 }
