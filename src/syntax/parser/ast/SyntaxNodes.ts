@@ -43,4 +43,5 @@ export enum SyntaxNodes {
   TypeVariable = "TypeVariable",
   TypeAlias = "TypeAlias",
   Tuple = "Tuple",
+  TuplePattern = "TuplePattern",
 }
