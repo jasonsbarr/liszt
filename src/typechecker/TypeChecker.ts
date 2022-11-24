@@ -313,7 +313,9 @@ export class TypeChecker {
         isUndefinedFunction(synth(node, env) as Type.Function)
       ) {
         throw new Error(
-          `Function ${(node.func as Identifier).name} is not defined`
+          `Function ${
+            node.func instanceof Identifier ? node.func.name : node.func.kind
+          } is not defined`
         );
       } else {
         throw e;
