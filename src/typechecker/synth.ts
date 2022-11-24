@@ -32,6 +32,7 @@ import { map } from "./map";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { narrow, narrowType } from "./narrow";
 import { getType } from "./getType";
+import { getAliasBase } from "./getAliasBase";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -126,12 +127,16 @@ const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {
 
 const synthMember = (ast: MemberExpression, env: TypeEnv) => {
   const prop = ast.property;
-  const object = synth(ast.object, env);
+  let object = synth(ast.object, env);
+
+  if (Type.isTypeAlias(object)) {
+    object = getAliasBase(object);
+  }
 
   return map(object, (obj) => {
-    // if (!Type.isObject(obj)) {
-    //   throw new Error(`MemberExpression expects an object; ${obj} given`);
-    // }
+    if (!Type.isObject(obj)) {
+      throw new Error(`MemberExpression expects an object; ${obj} given`);
+    }
 
     const type = propType(obj as Type.Object, prop.name);
 
