@@ -224,7 +224,11 @@ const synthFunction = (
 };
 
 const synthCall = (node: CallExpression, env: TypeEnv): Type => {
-  const func: Type = synth(node.func, env);
+  let func: Type = synth(node.func, env);
+
+  if (Type.isTypeAlias(func)) {
+    func = getAliasBase(func);
+  }
 
   return map(func, (f) => {
     if (!Type.isFunction(f) && !Type.isGenericFunction(f)) {
