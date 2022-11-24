@@ -70,5 +70,15 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
     return isSubtype(a, (b as Types.TypeAlias).base);
   }
 
+  if (Type.isTuple(a) && Type.isTuple(b)) {
+    return (
+      (a as Types.TupleType).types.length ===
+        (b as Types.TupleType).types.length &&
+      (a as Types.TupleType).types.every((t, i) =>
+        isSubtype(t, (b as Types.TupleType).types[i])
+      )
+    );
+  }
+
   return false;
 };
