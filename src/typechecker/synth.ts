@@ -138,10 +138,14 @@ const synthMember = (ast: MemberExpression, env: TypeEnv) => {
       throw new Error(`MemberExpression expects an object; ${obj} given`);
     }
 
-    const type = propType(obj as Type.Object, prop.name);
+    let type = propType(obj as Type.Object, prop.name);
 
     if (!type) {
       throw new Error(`No such property ${prop.name} on object`);
+    }
+
+    if (Type.isTypeAlias(type)) {
+      type = getAliasBase(type);
     }
 
     return type;
