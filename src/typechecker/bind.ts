@@ -166,7 +166,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         ty! as Type.Function,
         (node as LambdaExpression).params.map((p) =>
           BoundParameter.new(
-            node as Parameter,
+            p as Parameter,
             p.type ? getType(p.type, env) : Type.any()
           )
         )

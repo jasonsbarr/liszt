@@ -1,5 +1,4 @@
 import { Parameter } from "../../syntax/parser/ast/Parameter";
-import { fromAnnotation } from "../fromAnnotation";
 import { Type } from "../Type";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundIdentifier } from "./BoundIdentifier";
