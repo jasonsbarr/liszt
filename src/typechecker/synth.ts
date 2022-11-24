@@ -254,7 +254,26 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
 
     if (generic) {
       if (Type.isGenericFunction(f)) {
+        let typeMap: { [key: string]: Type } = {};
+
         f.params.forEach((param, i) => {
+          if (Type.isGeneric(param.type)) {
+            let resolvedType: Type;
+            const argType = synth(node.args[i], env);
+            if (typeMap[(param.type as Type.Generic).variable]) {
+              resolvedType = typeMap[(param.type as Type.Generic).variable];
+            } else {
+              typeMap[(param.type as Type.Generic).variable] = argType;
+              resolvedType = typeMap[(param.type as Type.Generic).variable];
+            }
+
+            if (!isSubtype(argType, resolvedType)) {
+              throw new Error(
+                `Expected ${resolvedType} or its subtype for parameter ${param.name}; got ${argType}`
+              );
+            }
+          }
+
           f.env.set(param.name, f.args[i]);
         });
         return synth(f.body, f.env);
