@@ -257,8 +257,9 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
         let typeMap: { [key: string]: Type } = {};
 
         f.params.forEach((param, i) => {
+          // this will always be overwritten because we know it's a function with generic params
+          let resolvedType: Type = Type.any();
           if (Type.isGeneric(param.type)) {
-            let resolvedType: Type;
             const argType = synth(node.args[i], env);
             if (typeMap[(param.type as Type.Generic).variable]) {
               resolvedType = typeMap[(param.type as Type.Generic).variable];
@@ -274,7 +275,7 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
             }
           }
 
-          f.env.set(param.name, f.args[i]);
+          f.env.set(param.name, resolvedType);
         });
         return synth(f.body, f.env);
       }
