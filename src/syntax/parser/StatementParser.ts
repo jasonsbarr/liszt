@@ -576,7 +576,7 @@ export class StatementParser extends TypeAnnotationParser {
     let end: SrcLoc;
     token = this.reader.peek();
 
-    if ((token.name = TokenNames.RParen)) {
+    if (token.name === TokenNames.RParen) {
       // empty tuple
       end = token.location;
       return Tuple.new([], start, end);
@@ -600,7 +600,7 @@ export class StatementParser extends TypeAnnotationParser {
       token = this.reader.peek();
     }
 
-    this.reader.skip(TokenNames.Comma);
+    this.reader.skip(TokenNames.RParen);
     end = token.location;
 
     return Tuple.new(values, start, end);
