@@ -199,62 +199,6 @@ export class TypeAnnotationParser extends LHVParser {
     return TupleType.new(types, start, end);
   }
 
-  private parseTypePrimitive() {
-    const token = this.reader.peek();
-
-    switch (token.name) {
-      case TokenNames.IntegerKeyword:
-        return this.parseIntegerKeyword();
-      case TokenNames.FloatKeyword:
-        return this.parseFloatKeyword();
-      case TokenNames.NumberKeyword:
-        return this.parseNumberKeyword();
-      case TokenNames.BooleanKeyword:
-        return this.parseBooleanKeyword();
-      case TokenNames.StringKeyword:
-        return this.parseStringKeyword();
-      case TokenNames.SymbolKeyword:
-        return this.parseSymbolKeyword();
-      case TokenNames.Nil:
-        return this.parseNilLiteral();
-      case TokenNames.Identifier:
-        return this.parseIdentifier();
-      case TokenNames.AnyKeyword:
-        return this.parseAnyKeyword();
-      case TokenNames.NeverKeyword:
-        return this.parseNeverKeyword();
-      case TokenNames.UnknownKeyword:
-        return this.parseUnknownKeyword();
-      case TokenNames.Integer:
-        return this.parseIntegerSingleton();
-      case TokenNames.Float:
-        return this.parseFloatSingleton();
-      case TokenNames.String:
-        return this.parseStringSingleton();
-      case TokenNames.True:
-      case TokenNames.False:
-        return this.parseBooleanSingleton();
-      case TokenNames.LBrace:
-        return this.parseTypeLiteral();
-      case TokenNames.LParen:
-        return this.or(
-          this.parseFunctionType.bind(this),
-          this.parseTupleType.bind(this),
-          this.parseParenthesizedAnnotation.bind(this)
-        );
-      case TokenNames.TypeVariable:
-        return this.parseTypeVariable();
-      default:
-        switch (token.type) {
-          // allow keywords as object properties
-          case TokenTypes.Keyword:
-            return this.parseIdentifier();
-          default:
-            throw new Error(`No type annotation for token ${token.name}`);
-        }
-    }
-  }
-
   public parseTypeAnnotation(): TypeAnnotation {
     const type: AnnotatedType | TypeAnnotation = this.parseTypePrimitive() as
       | AnnotatedType
@@ -332,6 +276,62 @@ export class TypeAnnotationParser extends LHVParser {
     const end = token.location;
 
     return TypeLiteral.new(properties, start, end);
+  }
+
+  private parseTypePrimitive() {
+    const token = this.reader.peek();
+
+    switch (token.name) {
+      case TokenNames.IntegerKeyword:
+        return this.parseIntegerKeyword();
+      case TokenNames.FloatKeyword:
+        return this.parseFloatKeyword();
+      case TokenNames.NumberKeyword:
+        return this.parseNumberKeyword();
+      case TokenNames.BooleanKeyword:
+        return this.parseBooleanKeyword();
+      case TokenNames.StringKeyword:
+        return this.parseStringKeyword();
+      case TokenNames.SymbolKeyword:
+        return this.parseSymbolKeyword();
+      case TokenNames.Nil:
+        return this.parseNilLiteral();
+      case TokenNames.Identifier:
+        return this.parseIdentifier();
+      case TokenNames.AnyKeyword:
+        return this.parseAnyKeyword();
+      case TokenNames.NeverKeyword:
+        return this.parseNeverKeyword();
+      case TokenNames.UnknownKeyword:
+        return this.parseUnknownKeyword();
+      case TokenNames.Integer:
+        return this.parseIntegerSingleton();
+      case TokenNames.Float:
+        return this.parseFloatSingleton();
+      case TokenNames.String:
+        return this.parseStringSingleton();
+      case TokenNames.True:
+      case TokenNames.False:
+        return this.parseBooleanSingleton();
+      case TokenNames.LBrace:
+        return this.parseTypeLiteral();
+      case TokenNames.LParen:
+        return this.or(
+          this.parseFunctionType.bind(this),
+          this.parseTupleType.bind(this),
+          this.parseParenthesizedAnnotation.bind(this)
+        );
+      case TokenNames.TypeVariable:
+        return this.parseTypeVariable();
+      default:
+        switch (token.type) {
+          // allow keywords as object properties
+          case TokenTypes.Keyword:
+            return this.parseIdentifier();
+          default:
+            throw new Error(`No type annotation for token ${token.name}`);
+        }
+    }
   }
 
   private parseTypeVariable() {
