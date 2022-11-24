@@ -36,6 +36,7 @@ import { LogicalOperation } from "../syntax/parser/ast/LogicalOperation";
 import { UnaryOperation } from "../syntax/parser/ast/UnaryOperation";
 import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
+import { TypeAlias } from "../syntax/parser/ast/TypeAlias";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -134,7 +135,14 @@ export class TypeChecker {
     let boundProgram = BoundProgramNode.new(node.start, node.end);
 
     for (let node of nodes) {
-      boundProgram.append(this.checkNode(node, env));
+      if (node.kind === SyntaxNodes.TypeAlias) {
+        if (node instanceof TypeAlias) {
+          // always true, but type checker doesn't recognize the node from the enum... alas!
+          env.set(node.name.name, fromAnnotation(node));
+        }
+      } else {
+        boundProgram.append(this.checkNode(node, env));
+      }
     }
 
     return boundProgram;
