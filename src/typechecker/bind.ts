@@ -54,6 +54,7 @@ import { BoundIfExpression } from "./bound/BoundIfExpression";
 import { BoundNilLiteral } from "./bound/BoundNilLiteral";
 import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
 import { getType } from "./getType";
+import { Parameter } from "../syntax/parser/ast/Parameter";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -155,7 +156,10 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
         lambdaBody,
         ty! as Type.Function,
         (node as LambdaExpression).params.map((p) =>
-          BoundParameter.new(node, p.type ? getType(p.type, env) : Type.any())
+          BoundParameter.new(
+            node as Parameter,
+            p.type ? getType(p.type, env) : Type.any()
+          )
         )
       );
     case SyntaxNodes.CallExpression:
