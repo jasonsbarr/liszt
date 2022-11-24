@@ -55,6 +55,7 @@ import { BoundNilLiteral } from "./bound/BoundNilLiteral";
 import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
 import { getType } from "./getType";
 import { Parameter } from "../syntax/parser/ast/Parameter";
+import { getAliasBase } from "./getAliasBase";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -108,9 +109,15 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       const obj = (node as MemberExpression).object;
       const prop = (node as MemberExpression).property as Identifier;
       const synthObjType = synth(obj, env);
-      const propertyType = propType(synthObjType as ObjectType, prop.name);
+      const objBase = Type.isTypeAlias(synthObjType)
+        ? getAliasBase(synthObjType)
+        : synthObjType;
+      const propertyType = propType(objBase as ObjectType, prop.name);
+      const propertyTypeBase = Type.isTypeAlias(propertyType as Type)
+        ? getAliasBase(propertyType as Type.TypeAlias)
+        : propertyType;
 
-      if (!propertyType) {
+      if (!propertyTypeBase) {
         throw new Error(
           `Property ${
             (node as MemberExpression).property.name
@@ -119,7 +126,7 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
       }
 
       // Should never happen
-      if (!isSubtype(ty!, propertyType)) {
+      if (!isSubtype(ty!, propertyTypeBase)) {
         throw new Error(
           `Synthesized type ${ty} is not compatible with synthesized property type ${propertyType}`
         );
@@ -127,8 +134,8 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
 
       return BoundMemberExpression.new(
         ty!, // is being passed in by TypeChecker
-        bind(obj, env, synthObjType),
-        bind(prop, env, propertyType),
+        bind(obj, env, objBase),
+        bind(prop, env, propertyTypeBase),
         node as MemberExpression
       );
 
