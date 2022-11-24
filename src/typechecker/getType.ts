@@ -9,6 +9,10 @@ export const getType = (
   env: TypeEnv
 ) => {
   if (type instanceof TypeAnnotation) {
+    if (type.type instanceof Identifier) {
+      return env.get(type.type.name);
+    }
+
     return fromAnnotation(type);
   } else if (type instanceof TypeAlias) {
     const alias = fromAnnotation(type);

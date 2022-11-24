@@ -1,6 +1,8 @@
 import { TokenNames } from "../syntax/lexer/TokenNames";
+import { AnnotatedType } from "../syntax/parser/ast/AnnotatedType";
 import { CompoundType } from "../syntax/parser/ast/CompoundType";
 import { FunctionType } from "../syntax/parser/ast/FunctionType";
+import { ObjectPropertyType } from "../syntax/parser/ast/ObjectPropertyType";
 import { SingletonType } from "../syntax/parser/ast/SingletonType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { TypeAlias } from "../syntax/parser/ast/TypeAlias";
@@ -9,7 +11,9 @@ import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
 import { TypeVariable } from "../syntax/parser/ast/TypeVariable";
 import { Type } from "./Type";
 
-export const fromAnnotation = (type: TypeAnnotation | TypeAlias): Type => {
+export const fromAnnotation = (
+  type: TypeAnnotation | TypeAlias | ObjectPropertyType
+): Type => {
   if (type.kind === SyntaxNodes.TypeAlias) {
     if (type instanceof TypeAlias) {
       return Type.typeAlias(type.name.name, fromAnnotation(type.base));
@@ -55,9 +59,12 @@ export const fromAnnotation = (type: TypeAnnotation | TypeAlias): Type => {
       default:
         throw new Error(`No type definition found for type ${type.type.kind}`);
     }
+  } else if (type instanceof ObjectPropertyType) {
+    const annotation = TypeAnnotation.new(type.type, type.start, type.end);
+    return fromAnnotation(annotation);
   }
   throw new Error(
-    "This should never happen but I have to make the type checker happy"
+    "This should never happen but I have to make the type checker happy" // it did, in fact, happen
   );
 };
 

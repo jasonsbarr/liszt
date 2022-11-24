@@ -139,7 +139,7 @@ export class TypeChecker {
       if (node.kind === SyntaxNodes.TypeAlias) {
         if (node instanceof TypeAlias) {
           // always true, but type checker doesn't recognize the node from the enum... alas!
-          env.set(node.name.name, fromAnnotation(node));
+          env.set(node.name.name, getType(node, env));
         }
       } else {
         boundProgram.append(this.checkNode(node, env));
