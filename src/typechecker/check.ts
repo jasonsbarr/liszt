@@ -8,6 +8,7 @@ import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { Tuple } from "../syntax/parser/ast/Tuple";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { isSubtype } from "./isSubtype";
 import { narrow } from "./narrow";
@@ -176,4 +177,15 @@ const checkIfExpression = (
     check(node.then, type, narrow(node.test, env, true)) &&
     check(node.else, type, narrow(node.test, env, false))
   );
+};
+
+const checkTuple = (node: Tuple, type: Type.Tuple, env: TypeEnv) => {
+  return node.values.reduce((valid, v, i) => {
+    if (valid) {
+      return check(v, type.types[i], env);
+    }
+
+    // will never execute because the above check will throw error if it fails
+    return valid;
+  }, true);
 };
