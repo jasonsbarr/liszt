@@ -312,7 +312,7 @@ export class TupleType extends BaseType {
     return new TupleType(types);
   }
 
-  public toString() {
+  public toString(): string {
     return `Tuple (${this.types.map((t) => t.toString()).join(", ")})`;
   }
 }

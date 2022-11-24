@@ -18,6 +18,7 @@ import {
   SingletonType,
   StringType,
   SymbolType,
+  TupleType,
   Type,
   TypeAlias,
   UNDEFINED,
@@ -98,3 +99,5 @@ export const genericFunction = (
 
 export const typeAlias = (name: string, base: Type) =>
   TypeAlias.new(name, base);
+
+export const tuple = (types: Type[]) => TupleType.new(types);
