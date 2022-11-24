@@ -6,6 +6,7 @@ import { Identifier } from "../syntax/parser/ast/Identifier";
 import { ObjectPropertyType } from "../syntax/parser/ast/ObjectPropertyType";
 import { SingletonType } from "../syntax/parser/ast/SingletonType";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
+import { TupleType } from "../syntax/parser/ast/TupleType";
 import { TypeAlias } from "../syntax/parser/ast/TypeAlias";
 import { TypeAnnotation } from "../syntax/parser/ast/TypeAnnotation";
 import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
@@ -65,6 +66,8 @@ export const fromAnnotation = (
         return env?.get((type.type as Identifier).name)!; // if undefined, get will throw error
       case SyntaxNodes.TypeVariable:
         return Type.generic((type.type as TypeVariable).name);
+      case SyntaxNodes.TupleType:
+        return generateTupleType((type.type as TupleType).types, env);
       default:
         throw new Error(`No type definition found for type ${type.type.kind}`);
     }
@@ -112,4 +115,9 @@ const generateSingletonType = (type: SingletonType) => {
       : // must be a string value
         token.value;
   return Type.singleton(value);
+};
+
+const generateTupleType = (types: TypeAnnotation[], env?: TypeEnv) => {
+  const ts = types.map((t) => fromAnnotation(t, env));
+  return Type.tuple(ts);
 };
