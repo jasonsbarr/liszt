@@ -33,6 +33,7 @@ import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { narrow, narrowType } from "./narrow";
 import { getType } from "./getType";
 import { getAliasBase } from "./getAliasBase";
+import { Tuple } from "../syntax/parser/ast/Tuple";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -81,6 +82,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthUnary(ast as UnaryOperation, env);
     case SyntaxNodes.IfExpression:
       return synthIfExpression(ast as IfExpression, env);
+    case SyntaxNodes.Tuple:
+      return synthTuple(ast as Tuple, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -728,4 +731,9 @@ const synthIfExpression = (node: IfExpression, env: TypeEnv): Type => {
   }
 
   return Type.union(then, elseType);
+};
+
+const synthTuple = (node: Tuple, env: TypeEnv) => {
+  const types = node.values.map((v) => synth(v, env));
+  return Type.tuple(types);
 };
