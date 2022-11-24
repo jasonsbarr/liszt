@@ -443,7 +443,6 @@ export class TypeChecker {
           }
         }
         const funcType = synth(node, funcEnv) as Type.Function;
-        console.log(funcType);
         check(node, funcType, funcEnv);
         env.set(name, funcType);
         return bind(node, funcEnv, funcType);
