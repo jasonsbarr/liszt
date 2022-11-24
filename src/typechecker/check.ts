@@ -10,6 +10,7 @@ import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
 import { Tuple } from "../syntax/parser/ast/Tuple";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
+import { getAliasBase } from "./getAliasBase";
 import { isSubtype } from "./isSubtype";
 import { narrow } from "./narrow";
 import { propType } from "./propType";
@@ -57,6 +58,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   if (ast.kind === SyntaxNodes.IfExpression) {
     return checkIfExpression(ast as IfExpression, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.Tuple) {
+    return checkTuple(ast as Tuple, t, env);
   }
 
   if (Type.isUNDEFINED(t)) {
@@ -179,13 +184,21 @@ const checkIfExpression = (
   );
 };
 
-const checkTuple = (node: Tuple, type: Type.Tuple, env: TypeEnv) => {
-  return node.values.reduce((valid, v, i) => {
-    if (valid) {
-      return check(v, type.types[i], env);
-    }
+const checkTuple = (node: Tuple, type: Type, env: TypeEnv): boolean => {
+  if (Type.isTypeAlias(type)) {
+    type = getAliasBase(type);
+  }
 
-    // will never execute because the above check will throw error if it fails
-    return valid;
-  }, true);
+  if (Type.isTuple(type)) {
+    return node.values.reduce((valid, v, i) => {
+      if (valid) {
+        return check(v, (type as Type.Tuple).types[i], env);
+      }
+
+      // will never execute because the above check will throw error if it fails
+      return valid;
+    }, true);
+  }
+
+  return check(node, type, env);
 };

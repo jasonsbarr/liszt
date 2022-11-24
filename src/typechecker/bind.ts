@@ -56,6 +56,8 @@ import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
 import { getType } from "./getType";
 import { Parameter } from "../syntax/parser/ast/Parameter";
 import { getAliasBase } from "./getAliasBase";
+import { Tuple } from "../syntax/parser/ast/Tuple";
+import { BoundTuple } from "./bound/BoundTuple";
 
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
@@ -359,6 +361,21 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
           node.start,
           node.end
         );
+      }
+
+      throw new Error("WTF?");
+
+    case SyntaxNodes.Tuple:
+      if (node instanceof Tuple) {
+        if (!ty) {
+          ty = synth(node, env) as Type.Tuple;
+        }
+
+        const values = node.values.map((v, i) =>
+          bind(v, env, (ty as Type.Tuple).types[i])
+        );
+
+        return BoundTuple.new(values, ty as Type.Tuple, node.start, node.end);
       }
 
       throw new Error("WTF?");

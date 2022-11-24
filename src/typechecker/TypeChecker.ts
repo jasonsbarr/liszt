@@ -23,7 +23,6 @@ import { Type } from "./Type";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
-import { fromAnnotation } from "./fromAnnotation";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 import {
@@ -38,6 +37,7 @@ import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { TypeAlias } from "../syntax/parser/ast/TypeAlias";
 import { getType } from "./getType";
+import { Tuple } from "../syntax/parser/ast/Tuple";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -126,6 +126,8 @@ export class TypeChecker {
         );
       case SyntaxNodes.IfExpression:
         return this.checkIfExpression(node as IfExpression, env);
+      case SyntaxNodes.Tuple:
+        return this.checkTuple(node as Tuple, env);
       default:
         throw new Error(`Unknown AST node type ${node.kind}`);
     }
@@ -440,6 +442,10 @@ export class TypeChecker {
       env.set(name, funcType);
       return bind(node, funcEnv, funcType);
     } catch (e: any) {
+      if (isSecondPass) {
+        throw e;
+      }
+
       if (!isSecondPass) {
         for (let expr of node.body.expressions) {
           if (expr.kind === SyntaxNodes.CallExpression) {
@@ -469,6 +475,12 @@ export class TypeChecker {
   }
 
   private checkIfExpression(node: IfExpression, env: TypeEnv) {
+    const type = synth(node, env);
+    check(node, type, env);
+    return bind(node, env, type);
+  }
+
+  private checkTuple(node: Tuple, env: TypeEnv) {
     const type = synth(node, env);
     check(node, type, env);
     return bind(node, env, type);
