@@ -337,4 +337,5 @@ export type Type =
   | NotType
   | GenericType
   | GenericFunction
-  | TypeAlias;
+  | TypeAlias
+  | TupleType;
