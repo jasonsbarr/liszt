@@ -38,6 +38,23 @@ import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { TypeAlias } from "../syntax/parser/ast/TypeAlias";
 import { getType } from "./getType";
 import { Tuple } from "../syntax/parser/ast/Tuple";
+import { BoundASTNode } from "./bound/BoundASTNode";
+import { PrimitiveNode } from "../syntax/parser/ast/PrimitiveNode";
+import { BoundIntegerLiteral } from "./bound/BoundIntegerLiteral";
+import { BoundFloatLiteral } from "./bound/BoundFloatLiteral";
+import { BoundStringLiteral } from "./bound/BoundStringLiteral";
+import { BoundBooleanLiteral } from "./bound/BoundBooleanLiteral";
+import { BoundSymbolLiteral } from "./bound/BoundSymbolLiteral";
+import { BoundNilLiteral } from "./bound/BoundNilLiteral";
+import { BoundObjectLiteral } from "./bound/BoundObjectLiteral";
+import { BoundIdentifier } from "./bound/BoundIdentifier";
+import { ObjectProperty } from "../syntax/parser/ast/ObjectProperty";
+import { Property } from "./Types";
+import { BoundObjectProperty } from "./bound/BoundObjectProperty";
+import { getAliasBase } from "./getAliasBase";
+import { propType } from "./propType";
+import { isSubtype } from "./isSubtype";
+import { BoundMemberExpression } from "./bound/BoundMemberExpression";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -78,58 +95,40 @@ export class TypeChecker {
     );
   }
 
-  private checkNode(node: ASTNode, env: TypeEnv) {
+  private checkNode(node: ASTNode, env: TypeEnv, type?: Type): BoundASTNode {
     switch (node.kind) {
       case SyntaxNodes.ProgramNode:
         return this.checkProgram(node as ProgramNode, env);
+
       case SyntaxNodes.IntegerLiteral:
         return this.checkIntegerLiteral(node as IntegerLiteral, env);
+
       case SyntaxNodes.FloatLiteral:
         return this.checkFloatLiteral(node as FloatLiteral, env);
+
       case SyntaxNodes.StringLiteral:
         return this.checkStringLiteral(node as StringLiteral, env);
+
       case SyntaxNodes.BooleanLiteral:
         return this.checkBooleanLiteral(node as BooleanLiteral, env);
+
       case SyntaxNodes.SymbolLiteral:
         return this.checkSymbolLiteral(node as SymbolLiteral, env);
+
       case SyntaxNodes.NilLiteral:
         return this.checkNilLiteral(node as NilLiteral, env);
+
+      case SyntaxNodes.Identifier:
+        return this.checkIdentifier(node as Identifier, env, type);
+
       case SyntaxNodes.ObjectLiteral:
         return this.checkObjectLiteral(node as ObjectLiteral, env);
-      case SyntaxNodes.Identifier:
-        return this.checkIdentifier(node as Identifier, env);
+
       case SyntaxNodes.MemberExpression:
         return this.checkMemberExpression(node as MemberExpression, env);
-      case SyntaxNodes.AsExpression:
-        return this.checkAsExpression(node as AsExpression, env);
-      case SyntaxNodes.ParenthesizedExpression:
-        return this.checkParenthesizedExpression(
-          node as ParenthesizedExpression,
-          env
-        );
-      case SyntaxNodes.LambdaExpression:
-        return this.checkLambdaExpression(node as LambdaExpression, env);
-      case SyntaxNodes.CallExpression:
-        return this.checkCallExpression(node as CallExpression, env);
-      case SyntaxNodes.AssignmentExpression:
-        return this.checkAssignment(node as AssignmentExpression, env);
-      case SyntaxNodes.VariableDeclaration:
-        return this.checkVariableDeclaration(node as VariableDeclaration, env);
-      case SyntaxNodes.FunctionDeclaration:
-        return this.checkFunctionDeclaration(node as FunctionDeclaration, env);
-      case SyntaxNodes.BinaryOperation:
-      case SyntaxNodes.LogicalOperation:
-      case SyntaxNodes.UnaryOperation:
-        return this.checkOperation(
-          node as BinaryOperation | LogicalOperation | UnaryOperation,
-          env
-        );
-      case SyntaxNodes.IfExpression:
-        return this.checkIfExpression(node as IfExpression, env);
-      case SyntaxNodes.Tuple:
-        return this.checkTuple(node as Tuple, env);
+
       default:
-        throw new Error(`Unknown AST node type ${node.kind}`);
+        throw new Error(`Unknown AST node kind ${node.kind}`);
     }
   }
 
@@ -138,116 +137,150 @@ export class TypeChecker {
     let boundProgram = BoundProgramNode.new(node.start, node.end);
 
     for (let node of nodes) {
-      if (node.kind === SyntaxNodes.TypeAlias) {
-        if (node instanceof TypeAlias) {
-          // always true, but type checker doesn't recognize the node from the enum... alas!
-          env.set(node.name.name, getType(node, env));
-        }
-      } else {
-        boundProgram.append(this.checkNode(node, env));
+      let boundNode: BoundASTNode | undefined = this.checkNode(node, env);
+
+      if (boundNode) {
+        boundProgram.append(boundNode);
       }
     }
 
     return boundProgram;
   }
 
-  private checkLiteral(node: ASTNode, env: TypeEnv) {
-    const synthType = synth(node, env);
-    check(node, synthType, env);
+  private checkLiteral(node: PrimitiveNode, env: TypeEnv) {
+    const type = synth(node, env);
+    check(node, type, env);
+    return type;
   }
 
   private checkIntegerLiteral(node: IntegerLiteral, env: TypeEnv) {
     this.checkLiteral(node, env);
-    return bind(node, env);
+    return BoundIntegerLiteral.new(node);
   }
 
   private checkFloatLiteral(node: FloatLiteral, env: TypeEnv) {
     this.checkLiteral(node, env);
-    return bind(node, env);
+    return BoundFloatLiteral.new(node);
   }
 
   private checkStringLiteral(node: StringLiteral, env: TypeEnv) {
     this.checkLiteral(node, env);
-    return bind(node, env);
+    return BoundStringLiteral.new(node);
   }
 
   private checkBooleanLiteral(node: BooleanLiteral, env: TypeEnv) {
     this.checkLiteral(node, env);
-    return bind(node, env);
+    return BoundBooleanLiteral.new(node);
   }
 
   private checkSymbolLiteral(node: SymbolLiteral, env: TypeEnv) {
     this.checkLiteral(node, env);
-    return bind(node, env);
+    return BoundSymbolLiteral.new(node);
   }
 
   private checkNilLiteral(node: NilLiteral, env: TypeEnv) {
     this.checkLiteral(node, env);
-    return bind(node, env);
+    return BoundNilLiteral.new(node);
   }
 
-  private checkObjectLiteral(node: ObjectLiteral, env: TypeEnv) {
-    const synthType = synth(node, env);
-    check(node, synthType, env);
-
-    return bind(node, env, synthType);
-  }
-
-  private checkIdentifier(node: Identifier, env: TypeEnv) {
+  private checkIdentifier(node: Identifier, env: TypeEnv, type?: Type) {
     try {
-      let type: Type = env.get(node.name);
+      type = type ? type : env.get(node.name);
 
       if (isSecondPass) {
-        // any undefined identifier reference has been set in its scope to undefined
-        // to check for variable reference before definition - we need to delete
-        // these undefined types until we get to the scope the identifier
-        // was originally declared in
-        let varTypeInCurrentScope: Type | undefined = env.get(node.name);
         let currentScope: TypeEnv | undefined = env;
 
+        // any undefined identifier reference has been set in its scope to undefined
+        // to check for variable reference before definition - we need to delete
+        // these undefined types until we get to the scope the identifier was
+        // originally declared in - at which point the loop condition will
+        // be false. If we go all the way up the scope chain and never
+        // resolve a reference that isn't undefined, throw an error.
         while (
-          Type.isUNDEFINED(varTypeInCurrentScope) ||
-          (Type.isFunction(varTypeInCurrentScope) &&
-            isUndefinedFunction(varTypeInCurrentScope))
+          Type.isUNDEFINED(type) ||
+          (Type.isFunction(type) && isUndefinedFunction(type))
         ) {
           env.delete(node.name);
           currentScope = env.parent;
-          varTypeInCurrentScope = currentScope?.get(node.name);
+          type = currentScope?.get(node.name);
 
-          if (!varTypeInCurrentScope) break;
-        }
-
-        if (varTypeInCurrentScope) {
-          type = varTypeInCurrentScope;
+          if (!type) {
+            throw new Error(`Identifier ${node.name} is undefined`);
+          }
         }
       }
 
-      return bind(node, env, type);
+      return BoundIdentifier.new(type, node);
     } catch (e: any) {
-      if (isSecondPass) {
-        // if this is the second pass, identifier is undefined and that's an error
-        throw e;
-      }
-
-      // This should only happen on the first pass and with a binding that hasn't been declared yet
-      // We set the identifier to undefined in its current scope so we can check for variable
-      // references before its definition
-      if (!isSecondPass && !env.has(node.name)) {
+      if (!isSecondPass) {
         const loc = node.start;
         const type = Type.undefinedType(loc);
         env.set(node.name, type);
-        return bind(node, env, type);
+        return BoundIdentifier.new(type, node);
       }
 
-      throw new Error("I don't know what happened");
+      throw e;
     }
   }
 
-  private checkMemberExpression(node: MemberExpression, env: TypeEnv) {
-    const synthType = synth(node, env);
-    check(node, synthType, env);
+  private checkObjectLiteral(node: ObjectLiteral, env: TypeEnv) {
+    const type = synth(node, env) as Type.Object;
+    const properties = node.properties.map((prop, i) =>
+      this.checkObjectProperty(prop, env, type.properties[i])
+    );
 
-    return bind(node, env, synthType);
+    return BoundObjectLiteral.new(type, properties, node);
+  }
+
+  private checkObjectProperty(
+    node: ObjectProperty,
+    env: TypeEnv,
+    prop: Property
+  ) {
+    const type = prop.type;
+    const key = this.checkNode(node.key, env, type);
+    const value = this.checkNode(node.value, env);
+    return BoundObjectProperty.new(key, value, type, node);
+  }
+
+  private checkMemberExpression(node: MemberExpression, env: TypeEnv) {
+    const type = synth(node, env);
+    check(node, type, env);
+    const obj = node.object;
+    const prop = node.property;
+    let objType = synth(obj, env);
+
+    objType = Type.isTypeAlias(objType) ? getAliasBase(objType) : objType;
+    let pt = propType(objType as Type.Object, prop.name); // need to change what this function takes when I allow strings and symbols as property names
+
+    if (!pt) {
+      throw new Error(`${prop.name} is not a valid property on the object`);
+    }
+
+    pt = Type.isTypeAlias(pt) ? getAliasBase(pt) : pt;
+
+    if (!isSubtype(type, pt)) {
+      throw new Error(
+        `Derived type ${type} is not compatible with property type ${pt}`
+      );
+    }
+
+    const boundObj = this.checkNode(obj, env, objType);
+    const boundProp = this.checkNode(prop, env, pt);
+
+    return BoundMemberExpression.new(type, boundObj, boundProp, node);
+  }
+}
+
+export class TypeCheckerOld {
+  public diagnostics: DiagnosticBag;
+
+  constructor(public tree: SyntaxTree) {
+    this.diagnostics = DiagnosticBag.from(tree.diagnostics);
+  }
+
+  public static new(tree: SyntaxTree) {
+    return new TypeChecker(tree);
   }
 
   private checkAsExpression(node: AsExpression, env: TypeEnv) {
