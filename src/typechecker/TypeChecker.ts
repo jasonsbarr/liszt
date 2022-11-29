@@ -56,6 +56,8 @@ import { propType } from "./propType";
 import { isSubtype } from "./isSubtype";
 import { BoundMemberExpression } from "./bound/BoundMemberExpression";
 import { BoundParenthesizedExpression } from "./bound/BoundParenthesizedExpression";
+import { BoundLambdaExpression } from "./bound/BoundLambdaExpression";
+import { BoundParameter } from "./bound/BoundParameter";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -139,6 +141,9 @@ export class TypeChecker {
 
       case SyntaxNodes.CallExpression:
         return this.checkCallExpression(node as CallExpression, env);
+
+      case SyntaxNodes.LambdaExpression:
+        return this.checkLambdaExpression(node as LambdaExpression, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -342,6 +347,26 @@ export class TypeChecker {
       }
     }
   }
+
+  private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
+    const scopeName = `lambda${getScopeNumber(env.name) + 1}`;
+    const lambdaEnv = !isSecondPass
+      ? env.extend(scopeName)
+      : env.getChildEnv(scopeName);
+
+    if (!lambdaEnv) {
+      throw new Error(`Could not resolve environment ${scopeName}`);
+    }
+
+    const lambdaType = synth(node, lambdaEnv) as Type.Function;
+    check(node, lambdaType, lambdaEnv);
+    const lambdaBody = this.checkNode(node.body, lambdaEnv);
+    const lambdaArgs = node.params.map((p) =>
+      BoundParameter.new(p, p.type ? getType(p.type, lambdaEnv) : Type.any())
+    );
+
+    return BoundLambdaExpression.new(node, lambdaBody, lambdaType, lambdaArgs);
+  }
 }
 
 export class TypeCheckerOld {
@@ -377,7 +402,7 @@ export class TypeCheckerOld {
 
       if (node.body instanceof CallExpression) {
         // undefined function will be set in the environment here
-        this.checkCallExpression(node.body, lambdaEnv, true);
+        // this.checkCallExpression(node.body, lambdaEnv, true);
         const lambdaType = synth(node, lambdaEnv) as Type.Function;
         check(node, lambdaType, lambdaEnv);
 
@@ -517,11 +542,11 @@ export class TypeCheckerOld {
         for (let expr of node.body.expressions) {
           if (expr.kind === SyntaxNodes.CallExpression) {
             // undefined function will be set in the environment here
-            this.checkCallExpression(
-              expr as CallExpression,
-              funcEnv,
-              true
-            ) as BoundCallExpression;
+            // this.checkCallExpression(
+            //   expr as CallExpression,
+            //   funcEnv,
+            //   true
+            // ) as BoundCallExpression;
           }
         }
         const funcType = synth(node, funcEnv) as Type.Function;
