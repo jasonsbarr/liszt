@@ -55,6 +55,7 @@ import { getAliasBase } from "./getAliasBase";
 import { propType } from "./propType";
 import { isSubtype } from "./isSubtype";
 import { BoundMemberExpression } from "./bound/BoundMemberExpression";
+import { BoundParenthesizedExpression } from "./bound/BoundParenthesizedExpression";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -129,6 +130,12 @@ export class TypeChecker {
 
       case SyntaxNodes.AsExpression:
         return this.checkAsExpression(node as AsExpression, env);
+
+      case SyntaxNodes.ParenthesizedExpression:
+        return this.checkParenthesizedExpression(
+          node as ParenthesizedExpression,
+          env
+        );
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -278,6 +285,15 @@ export class TypeChecker {
     const type = synth(node, env);
     return this.checkNode(node.expression, env, type);
   }
+
+  private checkParenthesizedExpression(
+    node: ParenthesizedExpression,
+    env: TypeEnv
+  ) {
+    const type = synth(node.expression, env);
+    const expr = this.checkNode(node.expression, env, type);
+    return BoundParenthesizedExpression.new(expr, node.start, node.end);
+  }
 }
 
 export class TypeCheckerOld {
@@ -289,13 +305,6 @@ export class TypeCheckerOld {
 
   public static new(tree: SyntaxTree) {
     return new TypeChecker(tree);
-  }
-
-  private checkParenthesizedExpression(
-    node: ParenthesizedExpression,
-    env: TypeEnv
-  ) {
-    return bind(node, env);
   }
 
   private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
