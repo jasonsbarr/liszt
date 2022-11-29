@@ -137,6 +137,9 @@ export class TypeChecker {
           env
         );
 
+      case SyntaxNodes.CallExpression:
+        return this.checkCallExpression(node as CallExpression, env);
+
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
     }
@@ -294,6 +297,51 @@ export class TypeChecker {
     const expr = this.checkNode(node.expression, env, type);
     return BoundParenthesizedExpression.new(expr, node.start, node.end);
   }
+
+  private checkCallExpression(node: CallExpression, env: TypeEnv) {
+    try {
+      const type = synth(node, env);
+      const callArgs = node.args.map((arg) => this.checkNode(arg, env));
+      const callFunc = this.checkNode(node.func, env);
+
+      return BoundCallExpression.new(
+        callArgs,
+        callFunc,
+        type,
+        node.start,
+        node.end
+      );
+    } catch (e: any) {
+      if (!isSecondPass && node.func instanceof Identifier) {
+        const argTypes = node.args.map((arg) => synth(arg, env));
+
+        env.set(node.func.name, UNDEFINED_FUNCTION(argTypes, node.start));
+
+        const type = synth(node, env);
+        const callArgs = node.args.map((arg) => this.checkNode(arg, env));
+        const callFunc = this.checkNode(node.func, env);
+
+        return BoundCallExpression.new(
+          callArgs,
+          callFunc,
+          type,
+          node.start,
+          node.end
+        );
+      } else if (
+        isSecondPass &&
+        isUndefinedFunction(synth(node, env) as Type.Function)
+      ) {
+        throw new Error(
+          `Function ${
+            node.func instanceof Identifier ? node.func.name : node.func.kind
+          } is not defined`
+        );
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 export class TypeCheckerOld {
@@ -337,34 +385,6 @@ export class TypeCheckerOld {
       }
 
       throw e;
-    }
-  }
-
-  private checkCallExpression(
-    node: CallExpression,
-    env: TypeEnv,
-    isFwRef = false
-  ) {
-    try {
-      return bind(node, env, synth(node, env));
-    } catch (e: any) {
-      if (!isSecondPass && node.func instanceof Identifier && isFwRef) {
-        const args = node.args.map((arg) => synth(arg, env));
-        env.set(node.func.name, UNDEFINED_FUNCTION(args, node.start));
-
-        return bind(node, env, synth(node, env));
-      } else if (
-        isSecondPass &&
-        isUndefinedFunction(synth(node, env) as Type.Function)
-      ) {
-        throw new Error(
-          `Function ${
-            node.func instanceof Identifier ? node.func.name : node.func.kind
-          } is not defined`
-        );
-      } else {
-        throw e;
-      }
     }
   }
 

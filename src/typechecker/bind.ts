@@ -76,24 +76,6 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
           )
         )
       );
-    case SyntaxNodes.CallExpression:
-      const callArgs = (node as CallExpression).args.map((arg) =>
-        bind(arg, env)
-      );
-      const callFunc = bind((node as CallExpression).func, env);
-
-      if (!ty) {
-        // Shouldn't need this because TypeChecker should pass this in
-        ty = synth(node, env);
-      }
-
-      return BoundCallExpression.new(
-        callArgs,
-        callFunc,
-        ty,
-        node.start,
-        node.end
-      );
 
     case SyntaxNodes.AssignmentExpression:
       if (node instanceof AssignmentExpression) {
