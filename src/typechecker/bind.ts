@@ -62,22 +62,6 @@ import { BoundTuple } from "./bound/BoundTuple";
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
   switch (node.kind) {
-    case SyntaxNodes.AsExpression:
-      if (!ty) {
-        ty = synth(node, env);
-      }
-      return bind((node as AsExpression).expression, env, ty);
-    case SyntaxNodes.ParenthesizedExpression:
-      if (!ty) {
-        ty = synth((node as ParenthesizedExpression).expression, env);
-      }
-
-      return BoundParenthesizedExpression.new(
-        bind((node as ParenthesizedExpression).expression, env, ty),
-        node.start,
-        node.end
-      );
-
     case SyntaxNodes.LambdaExpression:
       // gets extended lambdaEnvironment from type checker
       const lambdaBody = bind((node as LambdaExpression).body, env);

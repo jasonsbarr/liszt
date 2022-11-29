@@ -127,6 +127,9 @@ export class TypeChecker {
       case SyntaxNodes.MemberExpression:
         return this.checkMemberExpression(node as MemberExpression, env);
 
+      case SyntaxNodes.AsExpression:
+        return this.checkAsExpression(node as AsExpression, env);
+
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
     }
@@ -244,8 +247,8 @@ export class TypeChecker {
   }
 
   private checkMemberExpression(node: MemberExpression, env: TypeEnv) {
-    const type = synth(node, env);
-    check(node, type, env);
+    const ty = synth(node, env);
+    check(node, ty, env);
     const obj = node.object;
     const prop = node.property;
     let objType = synth(obj, env);
@@ -259,16 +262,21 @@ export class TypeChecker {
 
     pt = Type.isTypeAlias(pt) ? getAliasBase(pt) : pt;
 
-    if (!isSubtype(type, pt)) {
+    if (!isSubtype(ty, pt)) {
       throw new Error(
-        `Derived type ${type} is not compatible with property type ${pt}`
+        `Derived type ${ty} is not compatible with property type ${pt}`
       );
     }
 
     const boundObj = this.checkNode(obj, env, objType);
     const boundProp = this.checkNode(prop, env, pt);
 
-    return BoundMemberExpression.new(type, boundObj, boundProp, node);
+    return BoundMemberExpression.new(ty, boundObj, boundProp, node);
+  }
+
+  private checkAsExpression(node: AsExpression, env: TypeEnv) {
+    const type = synth(node, env);
+    return this.checkNode(node.expression, env, type);
   }
 }
 
@@ -281,11 +289,6 @@ export class TypeCheckerOld {
 
   public static new(tree: SyntaxTree) {
     return new TypeChecker(tree);
-  }
-
-  private checkAsExpression(node: AsExpression, env: TypeEnv) {
-    const synthType = synth(node, env);
-    return bind(node, env, synthType);
   }
 
   private checkParenthesizedExpression(
