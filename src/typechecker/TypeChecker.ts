@@ -146,6 +146,9 @@ export class TypeChecker {
       case SyntaxNodes.LambdaExpression:
         return this.checkLambdaExpression(node as LambdaExpression, env);
 
+      case SyntaxNodes.AssignmentExpression:
+        return this.checkAssignment(node as AssignmentExpression, env);
+
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
     }
