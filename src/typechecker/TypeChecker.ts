@@ -58,6 +58,7 @@ import { BoundMemberExpression } from "./bound/BoundMemberExpression";
 import { BoundParenthesizedExpression } from "./bound/BoundParenthesizedExpression";
 import { BoundLambdaExpression } from "./bound/BoundLambdaExpression";
 import { BoundParameter } from "./bound/BoundParameter";
+import { BoundAssignmentExpression } from "./bound/BoundAssignmentExpression";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -367,6 +368,55 @@ export class TypeChecker {
 
     return BoundLambdaExpression.new(node, lambdaBody, lambdaType, lambdaArgs);
   }
+
+  private checkAssignment(node: AssignmentExpression, env: TypeEnv) {
+    let constant = false;
+    if (node.left instanceof Identifier) {
+      constant = node.left.constant;
+
+      // if this is a variable declaration, it won't be set in the environment yet
+      // so if it is set, it's been previously defined and we need to make sure
+      // it's not an attempt to reassign a constant
+      if (env.lookup(node.left.name) && env.get(node.left.name)?.constant) {
+        throw new Error(
+          `Illegal assignment to constant variable ${node.left.name}`
+        );
+      }
+    }
+
+    const type = node.type
+      ? getType(node.type, env)
+      : synth(node.right, env, constant);
+
+    if (node.type) {
+      check(node.right, type, env);
+    }
+
+    if (node.left instanceof Identifier) {
+      if (env.lookup(node.left.name)) {
+        // if already defined, need to make sure we're not assigning
+        // an incompatible type to the same variable name
+        const checkType = env.get(node.left.name);
+
+        if (!isSubtype(type, checkType)) {
+          throw new Error(
+            `Cannot assign value of type ${type} to variable of type ${checkType}`
+          );
+        }
+      }
+    }
+
+    const left = this.checkNode(node.left, env, type);
+    const right = this.checkNode(node.right, env, type);
+    return BoundAssignmentExpression.new(
+      left,
+      right,
+      node.operator,
+      node.start,
+      node.end,
+      type
+    );
+  }
 }
 
 export class TypeCheckerOld {
@@ -378,90 +428,6 @@ export class TypeCheckerOld {
 
   public static new(tree: SyntaxTree) {
     return new TypeChecker(tree);
-  }
-
-  private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
-    const scopeName = `lambda${getScopeNumber(env.name) + 1}`;
-    const lambdaEnv = !isSecondPass
-      ? env.extend(scopeName)
-      : env.getChildEnv(scopeName);
-
-    if (!lambdaEnv) {
-      throw new Error(`Could not resolve environment ${scopeName}`);
-    }
-
-    try {
-      const lambdaType = synth(node, lambdaEnv) as Type.Function;
-      check(node, lambdaType, lambdaEnv);
-      const bound = bind(node, lambdaEnv, lambdaType);
-      return bound;
-    } catch (e: any) {
-      if (isSecondPass) {
-        throw e;
-      }
-
-      if (node.body instanceof CallExpression) {
-        // undefined function will be set in the environment here
-        // this.checkCallExpression(node.body, lambdaEnv, true);
-        const lambdaType = synth(node, lambdaEnv) as Type.Function;
-        check(node, lambdaType, lambdaEnv);
-
-        return bind(node, lambdaEnv, lambdaType);
-      }
-
-      throw e;
-    }
-  }
-
-  private checkAssignment(node: AssignmentExpression, env: TypeEnv) {
-    // there will only be a type annotation in a variable declaration
-    let constant = false;
-    if (node.left instanceof Identifier) {
-      constant = node.left.constant;
-
-      // if this is a variable declaration, it won't be set in the environment yet
-      // so if it is set, it's been previously defined and we need to make sure
-      // it's not an attempt to reassign a constant
-      if (
-        env.lookup(node.left.name) &&
-        env.get(node.left.name)?.constant === true
-      ) {
-        throw new Error(
-          `Illegal assignment to constant variable ${node.left.name}`
-        );
-      }
-    }
-
-    try {
-      const type = node.type
-        ? getType(node.type, env)
-        : synth(node.right, env, constant);
-
-      if (node.type) {
-        check(node.right, type, env);
-      }
-
-      return bind(node, env, type);
-    } catch (e: any) {
-      if (isSecondPass) {
-        throw e;
-      }
-
-      if (node.right instanceof LambdaExpression) {
-        // this should set the undefined function type in the lambda env if it's a forward reference
-        this.checkLambdaExpression(node.right, env);
-        const lambdaEnv =
-          env.getChildEnv(`lambda${getScopeNumber(env.name) + 1}`) ??
-          // this should never happen, but putting it here to make the type checker happy
-          env.extend(`lambda${getScopeNumber(env.name) + 1}`);
-        const lambdaType = synth(node.right, lambdaEnv);
-        env.set((node.left as Identifier).name, lambdaType);
-
-        return bind(node, lambdaEnv, lambdaType);
-      }
-
-      throw e;
-    }
   }
 
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
@@ -500,7 +466,7 @@ export class TypeCheckerOld {
 
       if (node.assignment.right instanceof LambdaExpression) {
         // this should set the undefined function type in the lambda env if it's a forward reference
-        this.checkLambdaExpression(node.assignment.right, env);
+        // this.checkLambdaExpression(node.assignment.right, env);
         const lambdaEnv =
           env.getChildEnv(`lambda${getScopeNumber(env.name) + 1}`) ??
           // this should never happen, but putting it here to make the type checker happy

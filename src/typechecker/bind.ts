@@ -62,37 +62,6 @@ import { BoundTuple } from "./bound/BoundTuple";
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
   switch (node.kind) {
-    case SyntaxNodes.AssignmentExpression:
-      if (node instanceof AssignmentExpression) {
-        // Type checker always passes in the type here
-        if (node.left instanceof Identifier) {
-          const isDefined = env.lookup(node.left.name);
-
-          if (isDefined) {
-            const checkType = env.get(node.left.name)!;
-
-            if (!isSubtype(ty!, checkType)) {
-              throw new Error(
-                `Cannot assign value of type ${ty} to variable of type ${checkType}`
-              );
-            }
-          }
-        }
-
-        const left = bind(node.left, env, ty!);
-        const right = bind(node.right, env, ty!);
-        return BoundAssignmentExpression.new(
-          left,
-          right,
-          node.operator,
-          node.start,
-          node.end,
-          ty!
-        );
-      }
-      // Should never happen
-      throw new Error("WTF");
-
     case SyntaxNodes.VariableDeclaration:
       if (node instanceof VariableDeclaration) {
         // Type checker always passes in the type here
