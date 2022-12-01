@@ -26,7 +26,8 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
   if (Type.isBoolean(a) && Type.isBoolean(b)) return true;
   if (Type.isNumber(a) && Type.isNumber(b)) return true;
   if (Type.isString(a) && Type.isString(b)) return true;
-  if (Type.isUNDEFINED(a) && Type.isUNDEFINED(b)) return true;
+  // A type should only be undefined on the first pass through the checker
+  if (Type.isUNDEFINED(a) || Type.isUNDEFINED(b)) return true;
 
   if (Type.isObject(a) && Type.isObject(b)) {
     return (b as Types.ObjectType).properties.every(
