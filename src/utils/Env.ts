@@ -10,12 +10,8 @@ export class Env<T> {
     return new Env<T>(name, parent);
   }
 
-  protected get children() {
+  public get children() {
     return this._children;
-  }
-
-  public get vars() {
-    return this._vars;
   }
 
   public get entries() {
@@ -24,6 +20,10 @@ export class Env<T> {
 
   public get names() {
     return Array.from(this.vars.keys());
+  }
+
+  public get vars() {
+    return this._vars;
   }
 
   public delete(name: string) {

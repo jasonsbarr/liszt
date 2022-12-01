@@ -255,12 +255,15 @@ export class TypeChecker {
         // originally declared in - at which point the loop condition will
         // be false. If we go all the way up the scope chain and never
         // resolve a reference that isn't undefined, throw an error.
+        // This breaks in REPL with a lambda value with a forward
+        // reference because the forward reference is undefined.
         while (
-          Type.isUNDEFINED(type) ||
-          (Type.isFunction(type) && isUndefinedFunction(type))
+          type &&
+          (Type.isUNDEFINED(type) ||
+            (Type.isFunction(type) && isUndefinedFunction(type)))
         ) {
           env.delete(node.name);
-          currentScope = env.parent;
+          currentScope = currentScope?.parent;
           type = currentScope?.get(node.name);
 
           if (!type) {
@@ -350,18 +353,25 @@ export class TypeChecker {
       const callArgs = node.args.map((arg) => this.checkNode(arg, env));
       const callFunc = this.checkNode(node.func, env);
 
-      return BoundCallExpression.new(
+      const bce = BoundCallExpression.new(
         callArgs,
         callFunc,
         type,
         node.start,
         node.end
       );
+      return bce;
     } catch (e: any) {
       if (!isSecondPass && node.func instanceof Identifier) {
         const argTypes = node.args.map((arg) => synth(arg, env));
 
-        env.set(node.func.name, UNDEFINED_FUNCTION(argTypes, node.start));
+        // I think this needs to be set on the parent env since it needs to be
+        // visible in the surrounding scope. There should always be a parent
+        // scope here because if we get here we're setting a function type.
+        env.parent?.set(
+          node.func.name,
+          UNDEFINED_FUNCTION(argTypes, node.start)
+        );
 
         const type = synth(node, env);
         const callArgs = node.args.map((arg) => this.checkNode(arg, env));
@@ -486,7 +496,14 @@ export class TypeChecker {
       }
 
       if (env.has(name) && !isSecondPass) {
-        throw new Error(`Variable ${name} has already been declared`);
+        const t = env.get(name);
+
+        if (
+          (!Type.isUNDEFINED(t) && !Type.isFunction(t)) ||
+          (Type.isFunction(t) && !isUndefinedFunction(t))
+        ) {
+          throw new Error(`Variable ${name} has already been declared`);
+        }
       }
     }
 

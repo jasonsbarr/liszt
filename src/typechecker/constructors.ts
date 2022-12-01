@@ -58,8 +58,8 @@ export const object = (
   }
 };
 
-export const functionType = (args: Type[], ret: Type) =>
-  FunctionType.new(args, ret);
+export const functionType = (args: Type[], ret: Type, constant = false) =>
+  FunctionType.new(args, ret, constant);
 
 export const any = () => AnyType.new();
 
