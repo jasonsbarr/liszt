@@ -154,10 +154,10 @@ export class TypeChecker {
         return this.checkCallExpression(node as CallExpression, env);
 
       case SyntaxNodes.LambdaExpression:
-        return this.checkLambdaExpression(node as LambdaExpression, env);
+        return this.checkLambdaExpression(node as LambdaExpression, env, type);
 
       case SyntaxNodes.AssignmentExpression:
-        return this.checkAssignment(node as AssignmentExpression, env);
+        return this.checkAssignment(node as AssignmentExpression, env, type);
 
       case SyntaxNodes.VariableDeclaration:
         return this.checkVariableDeclaration(node as VariableDeclaration, env);
@@ -406,7 +406,11 @@ export class TypeChecker {
     const lambdaType = type
       ? (type as Type.Function)
       : (synth(node, lambdaEnv) as Type.Function);
-    check(node, lambdaType, lambdaEnv);
+
+    if (type) {
+      check(node, lambdaType, lambdaEnv);
+    }
+
     const lambdaBody = this.checkNode(node.body, lambdaEnv);
     const lambdaArgs = node.params.map((p) =>
       BoundParameter.new(p, p.type ? getType(p.type, lambdaEnv) : Type.any())
