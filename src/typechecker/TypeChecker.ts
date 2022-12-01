@@ -403,6 +403,12 @@ export class TypeChecker {
       throw new Error(`Could not resolve environment ${scopeName}`);
     }
 
+    const lambdaArgs = node.params.map((p) => {
+      const pType = p.type ? getType(p.type, lambdaEnv) : Type.any();
+      lambdaEnv.set(p.name.name, pType);
+      return BoundParameter.new(p, pType);
+    });
+    const lambdaBody = this.checkNode(node.body, lambdaEnv);
     const lambdaType = type
       ? (type as Type.Function)
       : (synth(node, lambdaEnv) as Type.Function);
@@ -410,11 +416,6 @@ export class TypeChecker {
     if (type) {
       check(node, lambdaType, lambdaEnv);
     }
-
-    const lambdaBody = this.checkNode(node.body, lambdaEnv);
-    const lambdaArgs = node.params.map((p) =>
-      BoundParameter.new(p, p.type ? getType(p.type, lambdaEnv) : Type.any())
-    );
 
     return BoundLambdaExpression.new(node, lambdaBody, lambdaType, lambdaArgs);
   }
