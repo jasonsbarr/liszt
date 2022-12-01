@@ -24,6 +24,8 @@ import { SyntaxNodes } from "./ast/SyntaxNodes";
 import { NeverKeyword } from "./ast/NeverKeyword";
 import { UnknownKeyword } from "./ast/UnknownKeyword";
 import { TypeVariable } from "./ast/TypeVariable";
+import { TokenTypes } from "../lexer/TokenTypes";
+import { TupleType } from "./ast/TupleType";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -78,7 +80,7 @@ export class TypeAnnotationParser extends LHVParser {
         );
       }
 
-      const param = this.parseType() as Identifier;
+      const param = this.parseTypePrimitive() as Identifier;
       this.reader.skip(TokenNames.Colon);
       const paramType = this.parseTypeAnnotation();
       const en = paramType.end;
@@ -156,7 +158,127 @@ export class TypeAnnotationParser extends LHVParser {
     return SymbolKeyword.new(token, token.location);
   }
 
-  private parseType() {
+  private parseTupleType() {
+    let token = this.reader.next();
+    const start = token.location;
+    let types: TypeAnnotation[] = [];
+    let end: SrcLoc;
+
+    token = this.reader.peek();
+
+    if (token.name === TokenNames.RParen) {
+      // is empty tuple type (weird flex, but ok)
+      end = token.location;
+      return TupleType.new(types, start, end);
+    }
+
+    const first = this.parseTypeAnnotation();
+    types = [first];
+    token = this.reader.peek();
+
+    if (token.name !== TokenNames.Comma) {
+      // Using or method to parse, so this will reset the parser
+      throw new Error(
+        `Tuple type must have a comma after its first element; ${token.name} given`
+      );
+    }
+
+    while (token.name === TokenNames.Comma) {
+      // allows trailing comma
+      this.reader.skip(TokenNames.Comma);
+      token = this.reader.peek();
+      if (token.name !== TokenNames.RParen) {
+        types.push(this.parseTypeAnnotation());
+        token = this.reader.peek();
+      }
+    }
+
+    this.reader.skip(TokenNames.RParen);
+    end = token.location;
+
+    return TupleType.new(types, start, end);
+  }
+
+  public parseTypeAnnotation(): TypeAnnotation {
+    const type: AnnotatedType | TypeAnnotation = this.parseTypePrimitive() as
+      | AnnotatedType
+      | TypeAnnotation;
+
+    let token = this.reader.peek();
+
+    if (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
+      let types: (AnnotatedType | TypeAnnotation)[] = [type];
+      let compoundType =
+        token.name === TokenNames.Amp
+          ? CompoundTypes.Intersection
+          : CompoundTypes.Union;
+
+      // need to advance the token stream
+      this.reader.next();
+
+      while (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
+        // any is hack because type system doesn't like having both
+        // AnnotatedType and TypeAnnotations in the same array
+        types.push(this.parseTypePrimitive() as any);
+        token = this.reader.peek();
+      }
+
+      const annotations = types.map((ty) => {
+        if (ty instanceof TypeAnnotation) {
+          return ty;
+        }
+        return TypeAnnotation.new(ty as AnnotatedType, ty.start, ty.end);
+      });
+      const annotatedType = CompoundType.new(
+        compoundType === CompoundTypes.Union
+          ? SyntaxNodes.UnionType
+          : SyntaxNodes.IntersectionType,
+        annotations,
+        type.start,
+        types[types.length - 1].end
+      );
+
+      return TypeAnnotation.new(
+        annotatedType,
+        annotatedType.start,
+        annotatedType.end
+      );
+    }
+
+    return TypeAnnotation.new(type as AnnotatedType, type.start, type.end);
+  }
+
+  private parseTypeLiteral() {
+    let token = this.reader.next();
+    let properties: ObjectPropertyType[] = [];
+    const start = token.location;
+    token = this.reader.peek();
+
+    while (token.name !== TokenNames.RBrace) {
+      const st = token.location;
+      const propName = this.parseTypePrimitive() as Identifier;
+      this.reader.skip(TokenNames.Colon);
+      const propType = this.parseTypePrimitive();
+      const en = propType.end;
+
+      properties.push(
+        ObjectPropertyType.new(propName, propType as AnnotatedType, st, en)
+      );
+      token = this.reader.peek();
+
+      if (token.name !== TokenNames.RBrace) {
+        this.reader.skip(TokenNames.Comma);
+        token = this.reader.peek();
+      }
+    }
+
+    token = this.reader.next();
+    const end = token.location;
+
+    return TypeLiteral.new(properties, start, end);
+  }
+
+  private parseTypePrimitive() {
     const token = this.reader.peek();
 
     switch (token.name) {
@@ -195,100 +317,21 @@ export class TypeAnnotationParser extends LHVParser {
         return this.parseTypeLiteral();
       case TokenNames.LParen:
         return this.or(
-          this.parseParenthesizedAnnotation.bind(this),
-          this.parseFunctionType.bind(this)
+          this.parseFunctionType.bind(this),
+          this.parseTupleType.bind(this),
+          this.parseParenthesizedAnnotation.bind(this)
         );
       case TokenNames.TypeVariable:
         return this.parseTypeVariable();
       default:
-        throw new Error(`No type annotation for token ${token.name}`);
-    }
-  }
-
-  public parseTypeAnnotation(): TypeAnnotation {
-    const type: AnnotatedType | TypeAnnotation = this.parseType() as
-      | AnnotatedType
-      | TypeAnnotation;
-
-    let token = this.reader.peek();
-
-    if (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
-      let types: (AnnotatedType | TypeAnnotation)[] = [type];
-      let compoundType =
-        token.name === TokenNames.Amp
-          ? CompoundTypes.Intersection
-          : CompoundTypes.Union;
-
-      // need to advance the token stream
-      this.reader.next();
-
-      while (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
-        // any is hack because type system doesn't like having both
-        // AnnotatedType and TypeAnnotations in the same array
-        types.push(this.parseType() as any);
-        token = this.reader.peek();
-      }
-
-      const annotations = types.map((ty) => {
-        if (ty instanceof TypeAnnotation) {
-          return ty;
+        switch (token.type) {
+          // allow keywords as object properties
+          case TokenTypes.Keyword:
+            return this.parseIdentifier();
+          default:
+            throw new Error(`No type annotation for token ${token.name}`);
         }
-        return TypeAnnotation.new(ty as AnnotatedType, ty.start, ty.end);
-      });
-      const annotatedType = CompoundType.new(
-        compoundType === CompoundTypes.Union
-          ? SyntaxNodes.UnionType
-          : SyntaxNodes.IntersectionType,
-        annotations,
-        type.start,
-        types[types.length - 1].end
-      );
-
-      return TypeAnnotation.new(
-        annotatedType,
-        annotatedType.start,
-        annotatedType.end
-      );
     }
-
-    return TypeAnnotation.new(type as AnnotatedType, type.start, type.end);
-  }
-
-  private parseTypeLiteral() {
-    let token = this.reader.next();
-    let properties: ObjectPropertyType[] = [];
-    const start = token.location;
-    token = this.reader.peek();
-
-    while (token.name !== TokenNames.RBrace) {
-      const st = token.location;
-
-      if (token.name !== TokenNames.Identifier) {
-        throw new Error(
-          `Type literal property name must be a valid identifier; ${token.name} given`
-        );
-      }
-
-      const propName = this.parseType() as Identifier;
-      this.reader.skip(TokenNames.Colon);
-      const propType = this.parseType();
-      const en = propType.end;
-
-      properties.push(
-        ObjectPropertyType.new(propName, propType as AnnotatedType, st, en)
-      );
-      token = this.reader.peek();
-
-      if (token.name !== TokenNames.RBrace) {
-        this.reader.skip(TokenNames.Comma);
-        token = this.reader.peek();
-      }
-    }
-
-    token = this.reader.next();
-    const end = token.location;
-
-    return TypeLiteral.new(properties, start, end);
   }
 
   private parseTypeVariable() {

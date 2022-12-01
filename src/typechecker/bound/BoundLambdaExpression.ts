@@ -5,23 +5,22 @@ import { BoundNodes } from "./BoundNodes";
 import { BoundParameter } from "./BoundParameter";
 
 export class BoundLambdaExpression extends BoundASTNode {
-  public args: BoundParameter[];
-
   constructor(
     node: LambdaExpression,
     public body: BoundASTNode,
-    public type: Type.Function
+    public type: Type.Function,
+    public args: BoundParameter[]
   ) {
     super(BoundNodes.BoundLambdaExpression, node.start, node.end);
-    this.args = node.params.map((param) => BoundParameter.new(param));
   }
 
   public static new(
     node: LambdaExpression,
     body: BoundASTNode,
-    type: Type.Function
+    type: Type.Function,
+    args: BoundParameter[]
   ) {
-    return new BoundLambdaExpression(node, body, type);
+    return new BoundLambdaExpression(node, body, type, args);
   }
 
   public get children() {

@@ -5,5 +5,9 @@ import { Type } from "../typechecker/Type";
 export const UNDEFINED_FUNCTION = (args: Type[], location: SrcLoc) =>
   Type.functionType(args, Type.undefinedType(location));
 
-export const isUndefinedFunction = (funcType: Type.Function) =>
-  Type.isUNDEFINED(funcType.ret);
+export const isUndefinedFunction = (funcType: Type) => {
+  if (!Type.isFunction(funcType)) {
+    return false;
+  }
+  return Type.isUNDEFINED(funcType.ret);
+};

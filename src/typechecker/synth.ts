@@ -31,6 +31,9 @@ import { SymbolLiteral } from "../syntax/parser/ast/SymbolLiteral";
 import { map } from "./map";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { narrow, narrowType } from "./narrow";
+import { getType } from "./getType";
+import { getAliasBase } from "./getAliasBase";
+import { Tuple } from "../syntax/parser/ast/Tuple";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -79,6 +82,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthUnary(ast as UnaryOperation, env);
     case SyntaxNodes.IfExpression:
       return synthIfExpression(ast as IfExpression, env);
+    case SyntaxNodes.Tuple:
+      return synthTuple(ast as Tuple, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -125,17 +130,25 @@ const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {
 
 const synthMember = (ast: MemberExpression, env: TypeEnv) => {
   const prop = ast.property;
-  const object = synth(ast.object, env);
+  let object = synth(ast.object, env);
 
   return map(object, (obj) => {
+    if (Type.isTypeAlias(obj)) {
+      obj = getAliasBase(obj);
+    }
+
     if (!Type.isObject(obj)) {
       throw new Error(`MemberExpression expects an object; ${obj} given`);
     }
 
-    const type = propType(obj, prop.name);
+    let type = propType(obj, prop.name);
 
     if (!type) {
       throw new Error(`No such property ${prop.name} on object`);
+    }
+
+    if (Type.isTypeAlias(type)) {
+      type = getAliasBase(type);
     }
 
     return type;
@@ -143,7 +156,7 @@ const synthMember = (ast: MemberExpression, env: TypeEnv) => {
 };
 
 const synthAs = (node: AsExpression, env: TypeEnv) => {
-  const type = fromAnnotation(node.type);
+  const type = getType(node.type, env);
   check(node.expression, type, env);
   return type;
 };
@@ -166,7 +179,7 @@ const synthFunction = (
   let generic = false;
   const paramTypes = node.params.map((param) => {
     const name = param.name.name;
-    const type = param?.type ? fromAnnotation(param.type) : Type.any();
+    const type = param?.type ? getType(param.type, env) : Type.any();
 
     if (Type.isGeneric(type)) {
       generic = true;
@@ -186,7 +199,7 @@ const synthFunction = (
       let annotatedType: Type | undefined;
 
       if (node.ret) {
-        annotatedType = fromAnnotation(node.ret);
+        annotatedType = getType(node.ret, env);
         if (!isSubtype(returnType, annotatedType)) {
           throw new Error(
             `Return type ${returnType} is not a subtype of annotated type ${annotatedType}`
@@ -211,7 +224,11 @@ const synthFunction = (
 };
 
 const synthCall = (node: CallExpression, env: TypeEnv): Type => {
-  const func: Type = synth(node.func, env);
+  let func: Type = synth(node.func, env);
+
+  if (Type.isTypeAlias(func)) {
+    func = getAliasBase(func);
+  }
 
   return map(func, (f) => {
     if (!Type.isFunction(f) && !Type.isGenericFunction(f)) {
@@ -237,8 +254,28 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
 
     if (generic) {
       if (Type.isGenericFunction(f)) {
+        let typeMap: { [key: string]: Type } = {};
+
         f.params.forEach((param, i) => {
-          f.env.set(param.name, f.args[i]);
+          // this will always be overwritten because we know it's a function with generic params
+          let resolvedType: Type = Type.any();
+          if (Type.isGeneric(param.type)) {
+            const argType = synth(node.args[i], env);
+            if (typeMap[(param.type as Type.Generic).variable]) {
+              resolvedType = typeMap[(param.type as Type.Generic).variable];
+            } else {
+              typeMap[(param.type as Type.Generic).variable] = argType;
+              resolvedType = typeMap[(param.type as Type.Generic).variable];
+            }
+
+            if (!isSubtype(argType, resolvedType)) {
+              throw new Error(
+                `Expected ${resolvedType} or its subtype for parameter ${param.name}; got ${argType}`
+              );
+            }
+          }
+
+          f.env.set(param.name, resolvedType);
         });
         return synth(f.body, f.env);
       }
@@ -718,4 +755,9 @@ const synthIfExpression = (node: IfExpression, env: TypeEnv): Type => {
   }
 
   return Type.union(then, elseType);
+};
+
+const synthTuple = (node: Tuple, env: TypeEnv) => {
+  const types = node.values.map((v) => synth(v, env));
+  return Type.tuple(types);
 };

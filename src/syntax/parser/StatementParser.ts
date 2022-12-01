@@ -31,6 +31,7 @@ import { UnaryOperation } from "./ast/UnaryOperation";
 import { LogicalOperation } from "./ast/LogicalOperation";
 import { SymbolLiteral } from "./ast/SymbolLiteral";
 import { IfExpression } from "./ast/IfExpression";
+import { Tuple } from "./ast/Tuple";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -167,13 +168,12 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenTypes.Identifier:
         this.reader.skip(TokenNames.Identifier);
         return Identifier.new(token, token.location);
-      case TokenTypes.Keyword:
-        return this.parseKeyword();
       default: {
         switch (token.name) {
           case TokenNames.LParen:
             return this.or(
               this.parseLambda.bind(this),
+              this.parseTuple.bind(this),
               this.parseParenthesizedExpression.bind(this)
             );
           case TokenNames.LBrace:
@@ -255,7 +255,7 @@ export class StatementParser extends TypeAnnotationParser {
     return CallExpression.new(left, args, start, end);
   }
 
-  private parseExpr(rbp: number = 0, { constant = false } = {}) {
+  protected parseExpr(rbp: number = 0, { constant = false } = {}) {
     let left = this.parseAtom();
     let prec = this.getLedPrecedence();
 
@@ -568,6 +568,47 @@ export class StatementParser extends TypeAnnotationParser {
     }
 
     return this.parseExpression();
+  }
+
+  private parseTuple() {
+    let token = this.reader.next();
+    const start = token.location;
+    let end: SrcLoc;
+    token = this.reader.peek();
+
+    if (token.name === TokenNames.RParen) {
+      // empty tuple
+      end = token.location;
+      return Tuple.new([], start, end);
+    }
+
+    const first = this.parseExpr();
+    const values = [first];
+
+    // Tuple must have a comma even if there's only one element
+    // no trailing commas though
+    token = this.reader.peek();
+
+    if (token.name !== TokenNames.Comma) {
+      // We'll be using the or method to parse tuples, so this will rewind the input
+      throw new Error("First tuple element must be followed by a comma");
+    }
+
+    while (token.name === TokenNames.Comma) {
+      // allows trailing comma
+      this.reader.skip(TokenNames.Comma);
+      token = this.reader.peek();
+
+      if (token.name !== TokenNames.RParen) {
+        values.push(this.parseExpr());
+        token = this.reader.peek();
+      }
+    }
+
+    this.reader.skip(TokenNames.RParen);
+    end = token.location;
+
+    return Tuple.new(values, start, end);
   }
 
   private parseUnaryOperation() {

@@ -33,7 +33,8 @@ export const repl = () => {
       if (
         (e.message as string).includes(
           "Unrecognized token (type: EOFToken, name: EOF)"
-        )
+        ) ||
+        (e.message as string).includes("No type annotation for token EOF")
       ) {
         input += os.EOL;
         prompt = ".....  ";

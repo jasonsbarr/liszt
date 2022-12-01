@@ -116,12 +116,12 @@ export class ObjectType extends BaseType {
 }
 
 export class FunctionType extends BaseType {
-  constructor(public args: Type[], public ret: Type) {
-    super("Function", true, false);
+  constructor(public args: Type[], public ret: Type, constant = false) {
+    super("Function", constant, false);
   }
 
-  public static new(args: Type[], ret: Type) {
-    return new FunctionType(args, ret);
+  public static new(args: Type[], ret: Type, constant = false) {
+    return new FunctionType(args, ret, constant);
   }
 
   public toString(): string {
@@ -279,6 +279,44 @@ export class GenericFunction extends BaseType {
   }
 }
 
+export class TypeAlias extends BaseType {
+  constructor(
+    public name: string,
+    public base: Type,
+    constant = false,
+    nullable = false
+  ) {
+    super("TypeAlias", constant, nullable);
+  }
+
+  public static new(
+    name: string,
+    base: Type,
+    constant = false,
+    nullable = false
+  ) {
+    return new TypeAlias(name, base, constant, nullable);
+  }
+
+  public toString() {
+    return `TypeAlias ${this.name}: ${this.base}`;
+  }
+}
+
+export class TupleType extends BaseType {
+  constructor(public types: Type[], constant = false) {
+    super("Tuple", constant, false);
+  }
+
+  public static new(types: Type[], constant = false) {
+    return new TupleType(types, constant);
+  }
+
+  public toString(): string {
+    return `Tuple (${this.types.map((t) => t.toString()).join(", ")})`;
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -298,4 +336,6 @@ export type Type =
   | IntersectionType
   | NotType
   | GenericType
-  | GenericFunction;
+  | GenericFunction
+  | TypeAlias
+  | TupleType;

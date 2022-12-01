@@ -10,6 +10,7 @@ import { FunctionType } from "./FunctionType";
 import { NumberKeyword } from "./NumberKeyword";
 import { CompoundType } from "./CompoundType";
 import { TypeVariable } from "./TypeVariable";
+import { TupleType } from "./TupleType";
 
 export type AnnotatedType =
   | IntegerKeyword
@@ -23,4 +24,5 @@ export type AnnotatedType =
   | AnyKeyword
   | FunctionType
   | CompoundType
-  | TypeVariable;
+  | TypeVariable
+  | TupleType;

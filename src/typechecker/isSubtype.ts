@@ -57,5 +57,28 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
     else return isSubtype((a as Types.SingletonType).base, b);
   }
 
+  if (Type.isTypeAlias(a)) {
+    if (Type.isTypeAlias(b)) {
+      return isSubtype(
+        (a as Types.TypeAlias).base,
+        (b as Types.TypeAlias).base
+      );
+    }
+    return isSubtype((a as Types.TypeAlias).base, b);
+  }
+  if (Type.isTypeAlias(b)) {
+    return isSubtype(a, (b as Types.TypeAlias).base);
+  }
+
+  if (Type.isTuple(a) && Type.isTuple(b)) {
+    return (
+      (a as Types.TupleType).types.length ===
+        (b as Types.TupleType).types.length &&
+      (a as Types.TupleType).types.every((t, i) =>
+        isSubtype(t, (b as Types.TupleType).types[i])
+      )
+    );
+  }
+
   return false;
 };

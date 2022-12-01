@@ -18,7 +18,9 @@ import {
   SingletonType,
   StringType,
   SymbolType,
+  TupleType,
   Type,
+  TypeAlias,
   UNDEFINED,
   UnknownType,
 } from "./Types";
@@ -56,8 +58,8 @@ export const object = (
   }
 };
 
-export const functionType = (args: Type[], ret: Type) =>
-  FunctionType.new(args, ret);
+export const functionType = (args: Type[], ret: Type, constant = false) =>
+  FunctionType.new(args, ret, constant);
 
 export const any = () => AnyType.new();
 
@@ -94,3 +96,8 @@ export const genericFunction = (
   body: ASTNode,
   env: TypeEnv
 ) => GenericFunction.new(args, ret, params, body, env);
+
+export const typeAlias = (name: string, base: Type) =>
+  TypeAlias.new(name, base);
+
+export const tuple = (types: Type[]) => TupleType.new(types);

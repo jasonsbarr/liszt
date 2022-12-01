@@ -27,6 +27,7 @@ export enum SyntaxNodes {
   SingletonType = "SingletonType",
   IntersectionType = "IntersectionType",
   UnionType = "UnionType",
+  TupleType = "TupleType",
   LambdaExpression = "LambdaExpression",
   Parameter = "Parameter",
   CallExpression = "CallExpression",
@@ -41,4 +42,7 @@ export enum SyntaxNodes {
   LogicalOperation = "LogicalOperation",
   IfExpression = "IfExpression",
   TypeVariable = "TypeVariable",
+  TypeAlias = "TypeAlias",
+  Tuple = "Tuple",
+  TuplePattern = "TuplePattern",
 }
