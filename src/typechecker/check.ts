@@ -125,8 +125,8 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
           resolvedType = typeMap[pType.variable];
         }
 
-        if (!isSubtype(synthType.properties[i].type, resolvedType)) {
-          const prop = synthType.properties[i];
+        const prop = synthType.properties[i];
+        if (!isSubtype(prop.type, resolvedType)) {
           throw new Error(
             `Expected ${resolvedType} or its subtype for property ${prop.name}; got ${prop.type}`
           );
