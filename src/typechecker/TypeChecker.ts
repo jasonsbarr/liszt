@@ -64,6 +64,7 @@ import { Block } from "../syntax/parser/ast/Block";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { BoundReturnStatement } from "./bound/BoundReturnStatement";
 import { BoundBlock } from "./bound/BoundBlock";
+import { BoundFunctionDeclaration } from "./bound/BoundFunctionDeclaration";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -162,6 +163,9 @@ export class TypeChecker {
 
       case SyntaxNodes.ReturnStatement:
         return this.checkReturn(node as ReturnStatement, env, type);
+
+      case SyntaxNodes.FunctionDeclaration:
+        return this.checkFunctionDeclaration(node as FunctionDeclaration, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -510,6 +514,37 @@ export class TypeChecker {
     const expr = this.checkNode(node.expression, env);
 
     return BoundReturnStatement.new(expr, type, node.start, node.end);
+  }
+
+  private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
+    const name = node.name.name;
+    const scopeName = name + (getScopeNumber(env.name) + 1);
+    const funcEnv = !isSecondPass
+      ? env.extend(scopeName)
+      : env.getChildEnv(scopeName);
+
+    if (!funcEnv) {
+      throw new Error(`Could not resolve environment ${scopeName}`);
+    }
+
+    const funcType = synth(node, funcEnv) as Type.Function;
+    check(node, funcType, funcEnv);
+    env.set(name, funcType);
+
+    const funcName = this.checkNode(node.name, env) as BoundIdentifier;
+    const boundParams = node.params.map((p) =>
+      BoundParameter.new(p, p.type ? getType(p.type, env) : Type.any())
+    );
+    const boundBody = this.checkNode(node.body, funcEnv) as BoundBlock;
+
+    return BoundFunctionDeclaration.new(
+      funcName,
+      boundParams,
+      boundBody,
+      funcType.ret,
+      node.start,
+      node.end
+    );
   }
 }
 
