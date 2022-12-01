@@ -65,6 +65,7 @@ import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { BoundReturnStatement } from "./bound/BoundReturnStatement";
 import { BoundBlock } from "./bound/BoundBlock";
 import { BoundFunctionDeclaration } from "./bound/BoundFunctionDeclaration";
+import { BoundBinaryOperation } from "./bound/BoundBinaryOperation";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -166,6 +167,9 @@ export class TypeChecker {
 
       case SyntaxNodes.FunctionDeclaration:
         return this.checkFunctionDeclaration(node as FunctionDeclaration, env);
+
+      case SyntaxNodes.BinaryOperation:
+        return this.checkBinaryOperation(node as BinaryOperation, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -546,6 +550,15 @@ export class TypeChecker {
       node.end
     );
   }
+
+  private checkBinaryOperation(node: BinaryOperation, env: TypeEnv) {
+    const left = this.checkNode(node.left, env);
+    const right = this.checkNode(node.right, env);
+    const op = node.operator;
+    const t = synth(node, env);
+
+    return BoundBinaryOperation.new(left, right, op, node.start, node.end, t);
+  }
 }
 
 export class TypeCheckerOld {
@@ -557,49 +570,6 @@ export class TypeCheckerOld {
 
   public static new(tree: SyntaxTree) {
     return new TypeChecker(tree);
-  }
-
-  private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {
-    // need to figure out how to disallow redefining a
-    // binding that already exists as a new function
-    const name = node.name.name;
-    const scopeName = name + (getScopeNumber(env.name) + 1);
-    const funcEnv = !isSecondPass
-      ? env.extend(scopeName)
-      : env.getChildEnv(scopeName);
-
-    if (!funcEnv) {
-      throw new Error(`Could not resolve environment ${scopeName}`);
-    }
-
-    try {
-      const funcType = synth(node, funcEnv) as Type.Function;
-      check(node, funcType, funcEnv);
-      env.set(name, funcType);
-      return bind(node, funcEnv, funcType);
-    } catch (e: any) {
-      if (isSecondPass) {
-        throw e;
-      }
-
-      if (!isSecondPass) {
-        for (let expr of node.body.expressions) {
-          if (expr.kind === SyntaxNodes.CallExpression) {
-            // undefined function will be set in the environment here
-            // this.checkCallExpression(
-            //   expr as CallExpression,
-            //   funcEnv,
-            //   true
-            // ) as BoundCallExpression;
-          }
-        }
-        const funcType = synth(node, funcEnv) as Type.Function;
-        check(node, funcType, funcEnv);
-        env.set(name, funcType);
-        return bind(node, funcEnv, funcType);
-      }
-      throw e;
-    }
   }
 
   private checkOperation(

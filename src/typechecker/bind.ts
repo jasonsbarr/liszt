@@ -65,24 +65,6 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
 
-    case SyntaxNodes.BinaryOperation:
-      const left = bind((node as BinaryOperation).left, env, ty);
-      const right = bind((node as BinaryOperation).right, env, ty);
-      const op = (node as BinaryOperation).operator;
-
-      if (!ty) {
-        ty = synth(node, env);
-      }
-
-      return BoundBinaryOperation.new(
-        left,
-        right,
-        op,
-        node.start,
-        node.end,
-        ty
-      );
-
     case SyntaxNodes.LogicalOperation:
       const leftL = bind((node as LogicalOperation).left, env, ty);
       const rightL = bind((node as LogicalOperation).right, env, ty);
