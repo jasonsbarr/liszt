@@ -508,7 +508,7 @@ export class StatementParser extends TypeAnnotationParser {
       properties.push(ObjectProperty.new(key as Identifier, value, st, en));
 
       // note that this will allow trailing commas on object literals
-      if (this.reader.peek().name !== TokenNames.RBrace) {
+      if (token.name !== TokenNames.RBrace) {
         this.reader.skip(TokenNames.Comma);
       }
     }
