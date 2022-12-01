@@ -96,4 +96,7 @@ type alias Adder (x: number) => number
 
 ; Curried function type
 type alias AdderMaker (x: number) => (y: number) => number
+
+; Tuple type
+type alias Coord (number, number)
 ```
