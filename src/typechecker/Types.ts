@@ -205,6 +205,10 @@ export class UnionType extends BaseType {
   public static new(types: Type[], constant = false, nullable = false) {
     return new UnionType(types, constant, nullable);
   }
+
+  public toString() {
+    return `${this.types.map((t) => String(t)).join(" | ")}`;
+  }
 }
 
 export class UnknownType extends BaseType {
@@ -224,6 +228,10 @@ export class IntersectionType extends BaseType {
 
   public static new(types: Type[], constant = false, nullable = false) {
     return new IntersectionType(types, constant, nullable);
+  }
+
+  public toString() {
+    return `${this.types.map((t) => String(t)).join(" & ")}`;
   }
 }
 
