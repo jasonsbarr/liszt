@@ -679,6 +679,7 @@ export class TypeChecker {
 
   private setType(node: TypeAlias, env: TypeEnv) {
     const name = node.name.name;
-    env.set(name, getType(node.base, env));
+    const type = getType(node.base, env);
+    env.set(name, type);
   }
 }
