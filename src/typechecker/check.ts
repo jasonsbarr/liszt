@@ -90,6 +90,7 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
     type = getAliasBase(type) as Type.Object;
   }
 
+  const synthType = synth(ast, env) as Type.Object;
   const objProps: ObjectProps[] = ast.properties.map((prop) => ({
     name: prop.key.name,
     expr: prop.value,
@@ -104,14 +105,35 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
     }
   });
 
-  objProps.forEach(({ name, expr }) => {
+  let typeMap: { [key: string]: Type } = {};
+
+  objProps.forEach(({ name, expr }, i) => {
     let pType = propType(type, name);
 
     if (pType) {
+      // this will be overwritten by the concrete type if it's a type variable
+      let resolvedType = pType;
       if (Type.isTypeAlias(pType)) {
         pType = getAliasBase(pType);
       }
-      check(expr, pType, env);
+
+      if (Type.isTypeVariable(pType)) {
+        if (typeMap[pType.variable]) {
+          resolvedType = typeMap[pType.variable];
+        } else {
+          typeMap[pType.variable] = synthType.properties[i].type;
+          resolvedType = typeMap[pType.variable];
+        }
+
+        if (!isSubtype(synthType.properties[i].type, resolvedType)) {
+          const prop = synthType.properties[i];
+          throw new Error(
+            `Expected ${resolvedType} or its subtype for property ${prop.name}; got ${prop.type}`
+          );
+        }
+      }
+
+      check(expr, resolvedType, env);
     }
   });
 
