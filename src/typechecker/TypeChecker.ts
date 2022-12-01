@@ -580,6 +580,15 @@ export class TypeChecker {
       funcEnv.set(p.name.name, pType);
       return BoundParameter.new(p, pType);
     });
+    // temporarily set function return type to Any so the name is
+    // available in the body for recursive calls without letrec
+    env.set(
+      name,
+      Type.functionType(
+        boundParams.map((p) => p.type),
+        node.ret ? getType(node.ret, env) : Type.any()
+      )
+    );
 
     const boundBody = this.checkNode(node.body, funcEnv) as BoundBlock;
     const funcType = synth(node, funcEnv) as Type.Function;
