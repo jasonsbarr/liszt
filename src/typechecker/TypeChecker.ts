@@ -66,6 +66,7 @@ import { BoundReturnStatement } from "./bound/BoundReturnStatement";
 import { BoundBlock } from "./bound/BoundBlock";
 import { BoundFunctionDeclaration } from "./bound/BoundFunctionDeclaration";
 import { BoundBinaryOperation } from "./bound/BoundBinaryOperation";
+import { BoundLogicalOperation } from "./bound/BoundLogicalOperation";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -170,6 +171,9 @@ export class TypeChecker {
 
       case SyntaxNodes.BinaryOperation:
         return this.checkBinaryOperation(node as BinaryOperation, env);
+
+      case SyntaxNodes.LogicalOperation:
+        return this.checkLogicalOperation(node as LogicalOperation, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -558,6 +562,15 @@ export class TypeChecker {
     const t = synth(node, env);
 
     return BoundBinaryOperation.new(left, right, op, node.start, node.end, t);
+  }
+
+  private checkLogicalOperation(node: LogicalOperation, env: TypeEnv) {
+    const left = this.checkNode(node.left, env);
+    const right = this.checkNode(node.right, env);
+    const op = node.operator;
+    const t = synth(node, env);
+
+    return BoundLogicalOperation.new(left, right, op, node.start, node.end, t);
   }
 }
 
