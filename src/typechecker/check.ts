@@ -18,7 +18,7 @@ import { synth } from "./synth";
 import { Type } from "./Type";
 import { TypeEnv } from "./TypeEnv";
 
-export const check = (ast: ASTNode, t: Type, env: TypeEnv): boolean => {
+export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
   if (Type.isIntersection(t)) {
     (t as Type.Intersection).types.forEach((ty) => check(ast, ty, env));
     // this works because it will error if any check fails
@@ -33,10 +33,6 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv): boolean => {
     const synthType = synth(ast, env, true);
     // will only be true if the two have the same value
     return isSubtype(synthType, t);
-  }
-
-  if (Type.isTypeAlias(t)) {
-    return check(ast, t.base, env);
   }
 
   if (ast.kind === SyntaxNodes.ObjectLiteral && Type.isObject(t)) {
