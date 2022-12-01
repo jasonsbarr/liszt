@@ -149,9 +149,10 @@ export class SingletonType extends BaseType {
       | typeof FloatType
       | typeof BooleanType
       | typeof StringType,
-    public value: string | number | bigint | boolean
+    public value: string | number | bigint | boolean,
+    constant = false
   ) {
-    super("Singleton", true, false);
+    super("Singleton", constant, false);
     this.base = base as unknown as
       | IntegerType
       | FloatType
@@ -165,9 +166,10 @@ export class SingletonType extends BaseType {
       | typeof FloatType
       | typeof BooleanType
       | typeof StringType,
-    value: string | number | bigint | boolean
+    value: string | number | bigint | boolean,
+    constant = false
   ) {
-    return new SingletonType(base, value);
+    return new SingletonType(base, value, constant);
   }
 
   public toString() {
