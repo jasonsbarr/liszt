@@ -68,6 +68,7 @@ import { BoundFunctionDeclaration } from "./bound/BoundFunctionDeclaration";
 import { BoundBinaryOperation } from "./bound/BoundBinaryOperation";
 import { BoundLogicalOperation } from "./bound/BoundLogicalOperation";
 import { BoundUnaryOperation } from "./bound/BoundUnaryOperation";
+import { BoundIfExpression } from "./bound/BoundIfExpression";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -178,6 +179,9 @@ export class TypeChecker {
 
       case SyntaxNodes.UnaryOperation:
         return this.checkUnaryOperation(node as UnaryOperation, env);
+
+      case SyntaxNodes.IfExpression:
+        return this.checkIfExpression(node as IfExpression, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -584,6 +588,22 @@ export class TypeChecker {
 
     return BoundUnaryOperation.new(expr, op, node.start, node.end, t);
   }
+
+  private checkIfExpression(node: IfExpression, env: TypeEnv) {
+    const type = synth(node, env);
+    const test = this.checkNode(node.test, env);
+    const then = this.checkNode(node.then, env);
+    const elseNode = this.checkNode(node.else, env);
+
+    return BoundIfExpression.new(
+      test,
+      then,
+      elseNode,
+      type,
+      node.start,
+      node.end
+    );
+  }
 }
 
 export class TypeCheckerOld {
@@ -595,12 +615,6 @@ export class TypeCheckerOld {
 
   public static new(tree: SyntaxTree) {
     return new TypeChecker(tree);
-  }
-
-  private checkIfExpression(node: IfExpression, env: TypeEnv) {
-    const type = synth(node, env);
-    check(node, type, env);
-    return bind(node, env, type);
   }
 
   private checkTuple(node: Tuple, env: TypeEnv) {

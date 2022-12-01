@@ -65,28 +65,6 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
 
-    case SyntaxNodes.IfExpression:
-      if (node instanceof IfExpression) {
-        const testSynth = synth(node.test, env);
-        const thenSynth = synth(node.then, env);
-        const elseSynth = synth(node.else, env);
-
-        if (!ty) {
-          ty = synth(node, env);
-        }
-
-        return BoundIfExpression.new(
-          bind(node.test, env, testSynth),
-          bind(node.then, env, thenSynth),
-          bind(node.else, env, elseSynth),
-          ty,
-          node.start,
-          node.end
-        );
-      }
-
-      throw new Error("WTF?");
-
     case SyntaxNodes.Tuple:
       if (node instanceof Tuple) {
         if (!ty) {
