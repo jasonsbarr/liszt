@@ -450,8 +450,8 @@ export class TypeChecker {
       : node.type
       ? getType(node.type, env)
       : synth(node.right, env, constant);
-    const left = this.checkNode(node.left, env, type);
-    const right = this.checkNode(node.right, env, type);
+    const left = this.checkNode(node.left, env, t);
+    const right = this.checkNode(node.right, env, t);
 
     if (node.type) {
       check(node.right, t, env);
@@ -510,11 +510,14 @@ export class TypeChecker {
     // Need to set the variable name and type BEFORE checking and binding the assignment node
     env.set((node.assignment.left as Identifier).name, type);
 
-    const assign = this.checkNode(
-      node.assignment,
-      env,
+    const assign = BoundAssignmentExpression.new(
+      this.checkNode(node.assignment.left, env, type),
+      this.checkNode(node.assignment.right, env),
+      node.assignment.operator,
+      node.assignment.start,
+      node.assignment.end,
       type
-    ) as BoundAssignmentExpression;
+    );
 
     return BoundVariableDeclaration.new(
       assign,
