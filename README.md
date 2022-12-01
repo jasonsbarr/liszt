@@ -22,6 +22,8 @@ The type checker implementation owes a great deal to Jake Donham's [Reconstructi
 
 ## Syntax
 
+Comments start with a semicolon and continue to the end of the line.
+
 There are literals for Integer, Float, String, Boolean, Symbol, Object, Tuple, and Nil types.
 
 ```ruby
