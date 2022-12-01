@@ -103,7 +103,7 @@ export class TypeAnnotationParser extends LHVParser {
     return FunctionType.new(parameters, returnType, start, end);
   }
 
-  private parseIdentifier() {
+  protected parseIdentifier() {
     const token = this.reader.next();
     return Identifier.new(token, token.location);
   }

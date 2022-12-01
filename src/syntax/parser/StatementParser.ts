@@ -493,15 +493,19 @@ export class StatementParser extends TypeAnnotationParser {
     const start = this.reader.next();
     let properties: ObjectProperty[] = [];
 
-    while (this.reader.peek().name !== TokenNames.RBrace) {
-      const st = this.reader.peek().location;
-      const key = this.parseExpr();
+    let token = this.reader.peek();
+    while (token.name !== TokenNames.RBrace) {
+      const st = token.location;
+      // allow keywords as object property names
+      const key =
+        token.type === TokenTypes.Keyword
+          ? this.parseIdentifier()
+          : this.parseExpr();
       this.reader.skip(TokenNames.Colon);
       const value = this.parseExpression();
-      const en = this.reader.peek();
-      properties.push(
-        ObjectProperty.new(key as Identifier, value, st, en.location)
-      );
+      token = this.reader.peek();
+      const en = token.location;
+      properties.push(ObjectProperty.new(key as Identifier, value, st, en));
 
       // note that this will allow trailing commas on object literals
       if (this.reader.peek().name !== TokenNames.RBrace) {
