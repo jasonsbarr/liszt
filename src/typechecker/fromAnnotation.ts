@@ -106,7 +106,7 @@ const generateSingletonType = (type: SingletonType) => {
   const value =
     token.name === TokenNames.Integer
       ? BigInt(token.value)
-      : TokenNames.Float
+      : token.name === TokenNames.Float
       ? Number(token.value)
       : token.name === TokenNames.True
       ? true
