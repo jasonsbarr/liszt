@@ -515,6 +515,10 @@ export class TypeChecker {
     // Need to set the variable name and type BEFORE checking and binding the assignment node
     env.set((node.assignment.left as Identifier).name, type);
 
+    if (node.assignment.type) {
+      check(node, type, env);
+    }
+
     const assign = BoundAssignmentExpression.new(
       this.checkNode(node.assignment.left, env, type),
       this.checkNode(node.assignment.right, env),

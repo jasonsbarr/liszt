@@ -86,6 +86,10 @@ type ObjectProps = {
 };
 
 const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
+  if (Type.isTypeAlias(type)) {
+    type = getAliasBase(type) as Type.Object;
+  }
+
   const objProps: ObjectProps[] = ast.properties.map((prop) => ({
     name: prop.key.name,
     expr: prop.value,
@@ -101,9 +105,12 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
   });
 
   objProps.forEach(({ name, expr }) => {
-    const pType = propType(type, name);
+    let pType = propType(type, name);
 
     if (pType) {
+      if (Type.isTypeAlias(pType)) {
+        pType = getAliasBase(pType);
+      }
       check(expr, pType, env);
     }
   });
