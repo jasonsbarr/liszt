@@ -59,6 +59,7 @@ import { BoundParenthesizedExpression } from "./bound/BoundParenthesizedExpressi
 import { BoundLambdaExpression } from "./bound/BoundLambdaExpression";
 import { BoundParameter } from "./bound/BoundParameter";
 import { BoundAssignmentExpression } from "./bound/BoundAssignmentExpression";
+import { BoundVariableDeclaration } from "./bound/BoundVariableDeclaration";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -148,6 +149,9 @@ export class TypeChecker {
 
       case SyntaxNodes.AssignmentExpression:
         return this.checkAssignment(node as AssignmentExpression, env);
+
+      case SyntaxNodes.VariableDeclaration:
+        return this.checkVariableDeclaration(node as VariableDeclaration, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -420,18 +424,6 @@ export class TypeChecker {
       type
     );
   }
-}
-
-export class TypeCheckerOld {
-  public diagnostics: DiagnosticBag;
-
-  constructor(public tree: SyntaxTree) {
-    this.diagnostics = DiagnosticBag.from(tree.diagnostics);
-  }
-
-  public static new(tree: SyntaxTree) {
-    return new TypeChecker(tree);
-  }
 
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
     if (node.assignment.left instanceof Identifier) {
@@ -448,40 +440,45 @@ export class TypeCheckerOld {
       }
     }
 
-    // need to try/catch this in case of legal forward reference
-    try {
-      const type = node.assignment.type
-        ? getType(node.assignment.type, env)
-        : synth(node.assignment.right, env, node.constant);
+    const type = node.assignment.type
+      ? getType(node.assignment.type, env)
+      : synth(node.assignment.right, env, node.constant);
 
-      // Need to set the variable name and type BEFORE checking and binding the assignment node
-      env.set((node.assignment.left as Identifier).name, type);
+    // Need to set the variable name and type BEFORE checking and binding the assignment node
+    env.set((node.assignment.left as Identifier).name, type);
 
-      if (node.assignment.type) {
-        check(node, type, env);
-      }
-
-      return bind(node, env, type);
-    } catch (e: any) {
-      if (isSecondPass) {
-        throw e;
-      }
-
-      if (node.assignment.right instanceof LambdaExpression) {
-        // this should set the undefined function type in the lambda env if it's a forward reference
-        // this.checkLambdaExpression(node.assignment.right, env);
-        const lambdaEnv =
-          env.getChildEnv(`lambda${getScopeNumber(env.name) + 1}`) ??
-          // this should never happen, but putting it here to make the type checker happy
-          env.extend(`lambda${getScopeNumber(env.name) + 1}`);
-        const lambdaType = synth(node.assignment.right, lambdaEnv);
-        env.set((node.assignment.left as Identifier).name, lambdaType);
-
-        return bind(node, lambdaEnv, lambdaType);
-      }
-
-      throw e;
+    if (node.assignment.type) {
+      check(node, type, env);
     }
+
+    const assign = BoundAssignmentExpression.new(
+      this.checkNode(node.assignment.left, env, type),
+      this.checkNode(node.assignment.right, env),
+      node.assignment.operator,
+      node.assignment.start,
+      node.assignment.end,
+      type
+    );
+
+    return BoundVariableDeclaration.new(
+      assign,
+      node.constant,
+      type,
+      node.start,
+      node.end
+    );
+  }
+}
+
+export class TypeCheckerOld {
+  public diagnostics: DiagnosticBag;
+
+  constructor(public tree: SyntaxTree) {
+    this.diagnostics = DiagnosticBag.from(tree.diagnostics);
+  }
+
+  public static new(tree: SyntaxTree) {
+    return new TypeChecker(tree);
   }
 
   private checkFunctionDeclaration(node: FunctionDeclaration, env: TypeEnv) {

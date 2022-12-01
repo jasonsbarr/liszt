@@ -62,25 +62,6 @@ import { BoundTuple } from "./bound/BoundTuple";
 export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
   let key, value, synthType;
   switch (node.kind) {
-    case SyntaxNodes.VariableDeclaration:
-      if (node instanceof VariableDeclaration) {
-        // Type checker always passes in the type here
-        const assignment = bind(
-          node.assignment,
-          env,
-          ty!
-        ) as BoundAssignmentExpression;
-        return BoundVariableDeclaration.new(
-          assignment,
-          node.constant,
-          ty!,
-          node.start,
-          node.end
-        );
-      }
-      // Should never happen
-      throw new Error("Again, WTF?");
-
     case SyntaxNodes.FunctionDeclaration:
       if (node instanceof FunctionDeclaration) {
         // gets extended environment from type checker
