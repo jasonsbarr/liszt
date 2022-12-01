@@ -389,7 +389,11 @@ export class TypeChecker {
     }
   }
 
-  private checkLambdaExpression(node: LambdaExpression, env: TypeEnv) {
+  private checkLambdaExpression(
+    node: LambdaExpression,
+    env: TypeEnv,
+    type?: Type
+  ) {
     const scopeName = `lambda${getScopeNumber(env.name) + 1}`;
     const lambdaEnv = !isSecondPass
       ? env.extend(scopeName)
@@ -399,7 +403,9 @@ export class TypeChecker {
       throw new Error(`Could not resolve environment ${scopeName}`);
     }
 
-    const lambdaType = synth(node, lambdaEnv) as Type.Function;
+    const lambdaType = type
+      ? (type as Type.Function)
+      : (synth(node, lambdaEnv) as Type.Function);
     check(node, lambdaType, lambdaEnv);
     const lambdaBody = this.checkNode(node.body, lambdaEnv);
     const lambdaArgs = node.params.map((p) =>
@@ -409,7 +415,11 @@ export class TypeChecker {
     return BoundLambdaExpression.new(node, lambdaBody, lambdaType, lambdaArgs);
   }
 
-  private checkAssignment(node: AssignmentExpression, env: TypeEnv) {
+  private checkAssignment(
+    node: AssignmentExpression,
+    env: TypeEnv,
+    type?: Type
+  ) {
     let constant = false;
     if (node.left instanceof Identifier) {
       constant = node.left.constant;
@@ -424,14 +434,16 @@ export class TypeChecker {
       }
     }
 
-    const type = node.type
+    const t = type
+      ? type
+      : node.type
       ? getType(node.type, env)
       : synth(node.right, env, constant);
     const left = this.checkNode(node.left, env, type);
     const right = this.checkNode(node.right, env, type);
 
     if (node.type) {
-      check(node.right, type, env);
+      check(node.right, t, env);
     }
 
     if (node.left instanceof Identifier) {
@@ -440,9 +452,9 @@ export class TypeChecker {
         // an incompatible type to the same variable name
         const checkType = env.get(node.left.name);
 
-        if (!isSubtype(type, checkType)) {
+        if (!isSubtype(t, checkType)) {
           throw new Error(
-            `Cannot assign value of type ${type} to variable of type ${checkType}`
+            `Cannot assign value of type ${t} to variable of type ${checkType}`
           );
         }
       }
@@ -454,7 +466,7 @@ export class TypeChecker {
       node.operator,
       node.start,
       node.end,
-      type
+      t
     );
   }
 
@@ -476,7 +488,6 @@ export class TypeChecker {
     const type = node.assignment.type
       ? getType(node.assignment.type, env)
       : synth(node.assignment.right, env, node.constant);
-    console.log(type);
 
     // Need to set the variable name and type BEFORE checking and binding the assignment node
     env.set((node.assignment.left as Identifier).name, type);
