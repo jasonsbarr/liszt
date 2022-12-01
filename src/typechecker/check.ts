@@ -74,6 +74,11 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   const synthType = synth(ast, env);
 
+  if (Type.isUNDEFINED(synthType)) {
+    // is first pass through checker and undefined will be erased in 2nd pass
+    return true;
+  }
+
   if (isSubtype(synthType, t)) return true;
 
   throw new Error(`Expected ${t as Type}, got ${synthType}`);
