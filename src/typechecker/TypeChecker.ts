@@ -467,12 +467,7 @@ export class TypeChecker {
         // if already defined, need to make sure we're not assigning
         // an incompatible type to the same variable name
         const checkType = env.get(node.left.name);
-
-        if (!isSubtype(t, checkType)) {
-          throw new Error(
-            `Cannot assign value of type ${t} to variable of type ${checkType}`
-          );
-        }
+        check(node.right, checkType, env);
       }
     }
 
@@ -519,14 +514,11 @@ export class TypeChecker {
       check(node, type, env);
     }
 
-    const assign = BoundAssignmentExpression.new(
-      this.checkNode(node.assignment.left, env, type),
-      this.checkNode(node.assignment.right, env),
-      node.assignment.operator,
-      node.assignment.start,
-      node.assignment.end,
+    const assign = this.checkNode(
+      node.assignment,
+      env,
       type
-    );
+    ) as BoundAssignmentExpression;
 
     return BoundVariableDeclaration.new(
       assign,
