@@ -196,6 +196,7 @@ export class TypeChecker {
     let boundProgram = BoundProgramNode.new(node.start, node.end);
 
     for (let node of nodes) {
+      // type aliases can only be at top level of file
       if (node.kind === SyntaxNodes.TypeAlias) {
         this.setType(node as TypeAlias, env);
       } else {
