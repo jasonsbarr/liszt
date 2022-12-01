@@ -353,14 +353,13 @@ export class TypeChecker {
       const callArgs = node.args.map((arg) => this.checkNode(arg, env));
       const callFunc = this.checkNode(node.func, env);
 
-      const bce = BoundCallExpression.new(
+      return BoundCallExpression.new(
         callArgs,
         callFunc,
         type,
         node.start,
         node.end
       );
-      return bce;
     } catch (e: any) {
       if (!isSecondPass && node.func instanceof Identifier) {
         const argTypes = node.args.map((arg) => synth(arg, env));
@@ -384,10 +383,7 @@ export class TypeChecker {
           node.start,
           node.end
         );
-      } else if (
-        isSecondPass &&
-        isUndefinedFunction(synth(node, env) as Type.Function)
-      ) {
+      } else if (isSecondPass && isUndefinedFunction(synth(node, env))) {
         throw new Error(
           `Function ${
             node.func instanceof Identifier ? node.func.name : node.func.kind
@@ -532,7 +528,13 @@ export class TypeChecker {
   private checkBlock(node: Block, env: TypeEnv, type?: Type) {
     const expressions = node.expressions;
     const boundNodes = expressions.map((expr, i, a) => {
-      let t = synth(expr, env);
+      let t: Type;
+
+      try {
+        t = synth(expr, env);
+      } catch (e: any) {
+        t = Type.any();
+      }
       if (i === a.length - 1) {
         if (type) {
           if (!isSubtype(t, type)) {
@@ -540,7 +542,7 @@ export class TypeChecker {
           }
         }
       }
-      return this.checkNode(expr, env, t);
+      return this.checkNode(expr, env);
     });
     const returnType = expressions.reduce(
       (_: Type, curr: ASTNode) => synth(curr, env),
@@ -573,15 +575,19 @@ export class TypeChecker {
       throw new Error(`Could not resolve environment ${scopeName}`);
     }
 
-    const funcType = synth(node, funcEnv) as Type.Function;
-    check(node, funcType, funcEnv);
-    env.set(name, funcType);
+    const boundParams = node.params.map((p) => {
+      const pType = p.type ? getType(p.type, funcEnv) : Type.any();
+      funcEnv.set(p.name.name, pType);
+      return BoundParameter.new(p, pType);
+    });
 
-    const funcName = this.checkNode(node.name, env) as BoundIdentifier;
-    const boundParams = node.params.map((p) =>
-      BoundParameter.new(p, p.type ? getType(p.type, env) : Type.any())
-    );
     const boundBody = this.checkNode(node.body, funcEnv) as BoundBlock;
+    const funcType = synth(node, funcEnv) as Type.Function;
+    // redundant check?
+    check(node, funcType, funcEnv);
+    // now set the REAL function type
+    env.set(name, funcType);
+    const funcName = this.checkNode(node.name, env) as BoundIdentifier;
 
     return BoundFunctionDeclaration.new(
       funcName,
