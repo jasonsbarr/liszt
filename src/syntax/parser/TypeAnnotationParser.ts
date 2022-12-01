@@ -213,10 +213,9 @@ export class TypeAnnotationParser extends LHVParser {
           ? CompoundTypes.Intersection
           : CompoundTypes.Union;
 
-      // need to advance the token stream
-      this.reader.next();
-
       while (token.name === TokenNames.Amp || token.name === TokenNames.Pipe) {
+        // need to advance the token stream
+        this.reader.next();
         // any is hack because type system doesn't like having both
         // AnnotatedType and TypeAnnotations in the same array
         types.push(this.parseTypePrimitive() as any);
