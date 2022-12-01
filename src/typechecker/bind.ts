@@ -65,16 +65,6 @@ export const bind = (node: ASTNode, env: TypeEnv, ty?: Type): BoundASTNode => {
     default:
       throw new Error(`Cannot bind node of kind ${node.kind}`);
 
-    case SyntaxNodes.UnaryOperation:
-      const expr = bind((node as UnaryOperation).expression, env, ty);
-      const operator = (node as UnaryOperation).operator;
-
-      if (!ty) {
-        ty = synth(node, env);
-      }
-
-      return BoundUnaryOperation.new(expr, operator, node.start, node.end, ty);
-
     case SyntaxNodes.IfExpression:
       if (node instanceof IfExpression) {
         const testSynth = synth(node.test, env);
