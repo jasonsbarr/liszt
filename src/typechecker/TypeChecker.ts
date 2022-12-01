@@ -196,10 +196,14 @@ export class TypeChecker {
     let boundProgram = BoundProgramNode.new(node.start, node.end);
 
     for (let node of nodes) {
-      let boundNode: BoundASTNode | undefined = this.checkNode(node, env);
+      if (node.kind === SyntaxNodes.TypeAlias) {
+        this.setType(node as TypeAlias, env);
+      } else {
+        let boundNode: BoundASTNode = this.checkNode(node, env);
 
-      if (boundNode) {
-        boundProgram.append(boundNode);
+        if (boundNode) {
+          boundProgram.append(boundNode);
+        }
       }
     }
 
@@ -666,5 +670,10 @@ export class TypeChecker {
     );
 
     return BoundTuple.new(values, type, node.start, node.end);
+  }
+
+  private setType(node: TypeAlias, env: TypeEnv) {
+    const name = node.name.name;
+    env.set(name, getType(node.base, env));
   }
 }
