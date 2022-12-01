@@ -65,7 +65,7 @@ export const fromAnnotation = (
       case SyntaxNodes.Identifier:
         return env?.get((type.type as Identifier).name)!; // if undefined, get will throw error
       case SyntaxNodes.TypeVariable:
-        return Type.generic((type.type as TypeVariable).name);
+        return Type.typeVariable((type.type as TypeVariable).name);
       case SyntaxNodes.TupleType:
         return generateTupleType((type.type as TupleType).types, env);
       default:

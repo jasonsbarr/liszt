@@ -239,17 +239,17 @@ export class NotType extends BaseType {
   }
 }
 
-export class GenericType extends BaseType {
+export class TypeVariable extends BaseType {
   constructor(public variable: string, constant = false, nullable = false) {
-    super("Generic", constant, nullable);
+    super("TypeVariable", constant, nullable);
   }
 
   public static new(variable: string, constant = false, nullable = false) {
-    return new GenericType(variable, constant, nullable);
+    return new TypeVariable(variable, constant, nullable);
   }
 
   public toString() {
-    return `GenericType '${this.variable}`;
+    return `TypeVariable '${this.variable}`;
   }
 }
 
@@ -335,7 +335,7 @@ export type Type =
   | UnknownType
   | IntersectionType
   | NotType
-  | GenericType
+  | TypeVariable
   | GenericFunction
   | TypeAlias
   | TupleType;

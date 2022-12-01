@@ -181,7 +181,7 @@ const synthFunction = (
     const name = param.name.name;
     const type = param?.type ? getType(param.type, env) : Type.any();
 
-    if (Type.isGeneric(type)) {
+    if (Type.isTypeVariable(type)) {
       generic = true;
     }
 
@@ -243,7 +243,7 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
 
     let generic = false;
     f.args.forEach((argType, i) => {
-      if (Type.isGeneric(argType)) {
+      if (Type.isTypeVariable(argType)) {
         const synthType = synth(node.args[i], env);
         isSubtype(synthType, argType);
         generic = true;
@@ -259,13 +259,15 @@ const synthCall = (node: CallExpression, env: TypeEnv): Type => {
         f.params.forEach((param, i) => {
           // this will always be overwritten because we know it's a function with generic params
           let resolvedType: Type = Type.any();
-          if (Type.isGeneric(param.type)) {
+          if (Type.isTypeVariable(param.type)) {
             const argType = synth(node.args[i], env);
-            if (typeMap[(param.type as Type.Generic).variable]) {
-              resolvedType = typeMap[(param.type as Type.Generic).variable];
+            if (typeMap[(param.type as Type.TypeVariable).variable]) {
+              resolvedType =
+                typeMap[(param.type as Type.TypeVariable).variable];
             } else {
-              typeMap[(param.type as Type.Generic).variable] = argType;
-              resolvedType = typeMap[(param.type as Type.Generic).variable];
+              typeMap[(param.type as Type.TypeVariable).variable] = argType;
+              resolvedType =
+                typeMap[(param.type as Type.TypeVariable).variable];
             }
 
             if (!isSubtype(argType, resolvedType)) {

@@ -7,7 +7,7 @@ import {
   FloatType,
   FunctionType,
   GenericFunction,
-  GenericType,
+  TypeVariable,
   IntegerType,
   NeverType,
   NilType,
@@ -87,7 +87,7 @@ export const unknown = () => UnknownType.new();
 
 export const not = (base: Type) => NotType.new(base);
 
-export const generic = (variable: string) => GenericType.new(variable);
+export const typeVariable = (variable: string) => TypeVariable.new(variable);
 
 export const genericFunction = (
   args: Type[],
