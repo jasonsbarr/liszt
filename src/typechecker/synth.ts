@@ -93,25 +93,25 @@ const synthInteger = (node: IntegerLiteral, constant: boolean) => {
   if (constant) {
     return Type.singleton(BigInt(node.token.value));
   }
-  return Type.integer(false);
+  return Type.integer(constant);
 };
 const synthFloat = (node: FloatLiteral, constant: boolean) => {
   if (constant) {
     return Type.singleton(Number(node.token.value));
   }
-  return Type.float(false);
+  return Type.float(constant);
 };
 const synthString = (node: StringLiteral, constant: boolean) => {
   if (constant) {
     return Type.singleton(node.token.value);
   }
-  return Type.string(false);
+  return Type.string(constant);
 };
 const synthBoolean = (node: BooleanLiteral, constant: boolean) => {
   if (constant) {
     return Type.singleton(node.token.name === TokenNames.True ? true : false);
   }
-  return Type.boolean(false);
+  return Type.boolean(constant);
 };
 
 const synthSymbol = (node: SymbolLiteral, constant: boolean) => {
