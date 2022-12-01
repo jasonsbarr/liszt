@@ -28,6 +28,7 @@ There are literals for Integer, Float, String, Boolean, Symbol, Object, Tuple, a
 17
 3.14
 "hello, world"
+true
 :thisIsASymbol
 { type: "Person", name: "Jason", age: 42 }
 (1, false, "hello", { value: 42 })
