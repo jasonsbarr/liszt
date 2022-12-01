@@ -116,12 +116,12 @@ export class ObjectType extends BaseType {
 }
 
 export class FunctionType extends BaseType {
-  constructor(public args: Type[], public ret: Type) {
-    super("Function", true, false);
+  constructor(public args: Type[], public ret: Type, constant = false) {
+    super("Function", constant, false);
   }
 
-  public static new(args: Type[], ret: Type) {
-    return new FunctionType(args, ret);
+  public static new(args: Type[], ret: Type, constant = false) {
+    return new FunctionType(args, ret, constant);
   }
 
   public toString(): string {
