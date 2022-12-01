@@ -13,7 +13,6 @@ import { StringLiteral } from "../syntax/parser/ast/StringLiteral";
 import { BooleanLiteral } from "../syntax/parser/ast/BooleanLiteral";
 import { NilLiteral } from "../syntax/parser/ast/NilLiteral";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
-import { bind } from "./bind";
 import { MemberExpression } from "../syntax/parser/ast/MemberExpression";
 import { AsExpression } from "../syntax/parser/ast/AsExpression";
 import { ParenthesizedExpression } from "../syntax/parser/ast/ParenthesizedExpression";
@@ -183,6 +182,9 @@ export class TypeChecker {
 
       case SyntaxNodes.IfExpression:
         return this.checkIfExpression(node as IfExpression, env);
+
+      case SyntaxNodes.Tuple:
+        return this.checkTuple(node as Tuple, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
