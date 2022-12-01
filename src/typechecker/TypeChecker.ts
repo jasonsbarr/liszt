@@ -60,6 +60,10 @@ import { BoundLambdaExpression } from "./bound/BoundLambdaExpression";
 import { BoundParameter } from "./bound/BoundParameter";
 import { BoundAssignmentExpression } from "./bound/BoundAssignmentExpression";
 import { BoundVariableDeclaration } from "./bound/BoundVariableDeclaration";
+import { Block } from "../syntax/parser/ast/Block";
+import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
+import { BoundReturnStatement } from "./bound/BoundReturnStatement";
+import { BoundBlock } from "./bound/BoundBlock";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -152,6 +156,12 @@ export class TypeChecker {
 
       case SyntaxNodes.VariableDeclaration:
         return this.checkVariableDeclaration(node as VariableDeclaration, env);
+
+      case SyntaxNodes.Block:
+        return this.checkBlock(node as Block, env, type);
+
+      case SyntaxNodes.ReturnStatement:
+        return this.checkReturn(node as ReturnStatement, env, type);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -467,6 +477,39 @@ export class TypeChecker {
       node.start,
       node.end
     );
+  }
+
+  private checkBlock(node: Block, env: TypeEnv, type?: Type) {
+    const expressions = node.expressions;
+    const boundNodes = expressions.map((expr, i, a) => {
+      let t = synth(expr, env);
+      if (i === a.length - 1) {
+        if (type) {
+          if (!isSubtype(t, type)) {
+            throw new Error(`${type} is not a valid subtype of ${t}`);
+          }
+        }
+      }
+      return this.checkNode(expr, env, t);
+    });
+    const returnType = expressions.reduce(
+      (_: Type, curr: ASTNode) => synth(curr, env),
+      Type.any() as Type
+    );
+
+    return BoundBlock.new(boundNodes, returnType, node.start, node.end);
+  }
+
+  private checkReturn(node: ReturnStatement, env: TypeEnv, type?: Type) {
+    if (type) {
+      check(node, type, env);
+    } else {
+      type = synth(node, env);
+    }
+
+    const expr = this.checkNode(node.expression, env);
+
+    return BoundReturnStatement.new(expr, type, node.start, node.end);
   }
 }
 
