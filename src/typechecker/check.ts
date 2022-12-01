@@ -25,6 +25,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
     return true;
   }
 
+  if (Type.isUnion(t)) {
+    return checkUnion(ast, t, env);
+  }
+
   if (Type.isSingleton(t)) {
     const synthType = synth(ast, env, true);
     // will only be true if the two have the same value
@@ -236,4 +240,16 @@ const checkTuple = (node: Tuple, type: Type, env: TypeEnv): boolean => {
   }
 
   return check(node, type, env);
+};
+
+const checkUnion = (node: ASTNode, type: Type.Union, env: TypeEnv): boolean => {
+  for (let t of type.types) {
+    try {
+      return check(node, t, env);
+    } catch (_e: any) {
+      // ignore
+    }
+  }
+  // if it gets here, no union arm matched
+  throw new Error(`Expected type ${type}; got ${synth(node, env)}`);
 };
