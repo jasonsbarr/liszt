@@ -69,6 +69,7 @@ import { BoundBinaryOperation } from "./bound/BoundBinaryOperation";
 import { BoundLogicalOperation } from "./bound/BoundLogicalOperation";
 import { BoundUnaryOperation } from "./bound/BoundUnaryOperation";
 import { BoundIfExpression } from "./bound/BoundIfExpression";
+import { BoundTuple } from "./bound/BoundTuple";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -604,22 +605,19 @@ export class TypeChecker {
       node.end
     );
   }
-}
-
-export class TypeCheckerOld {
-  public diagnostics: DiagnosticBag;
-
-  constructor(public tree: SyntaxTree) {
-    this.diagnostics = DiagnosticBag.from(tree.diagnostics);
-  }
-
-  public static new(tree: SyntaxTree) {
-    return new TypeChecker(tree);
-  }
 
   private checkTuple(node: Tuple, env: TypeEnv) {
-    const type = synth(node, env);
+    let type = synth(node, env) as Type.Tuple;
     check(node, type, env);
-    return bind(node, env, type);
+
+    if (Type.isTypeAlias(type)) {
+      type = getAliasBase(type) as Type.Tuple;
+    }
+
+    const values = node.values.map((v, i) =>
+      this.checkNode(v, env, type.types[i])
+    );
+
+    return BoundTuple.new(values, type, node.start, node.end);
   }
 }
