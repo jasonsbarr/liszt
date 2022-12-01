@@ -64,6 +64,7 @@ def fib(n: integer): integer
         1
     else
         n * fib(n - 1)
+end
 ```
 
 You can also just assign a lambda to a variable (though a lambda must use an explicit block if you want its body to include more than a single expression). Note the function type annotation - it's not necessary, but it does help the type checker out! When there's no function type annotation, function parameters that are not individually annotated get typed as Any.
