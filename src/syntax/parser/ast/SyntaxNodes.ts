@@ -10,7 +10,7 @@ export enum SyntaxNodes {
   ParenthesizedExpression = "ParenthesizedExpression",
   ObjectLiteral = "ObjectLiteral",
   ObjectProperty = "ObjectProperty",
-  ArrayLiteral = "ArrayLiteral",
+  ListLiteral = "ListLiteral",
   MemberExpression = "MemberExpression",
   SliceExpression = "SliceExpression",
   AsExpression = "AsExpression",

@@ -2,13 +2,13 @@ import { SrcLoc } from "../../lexer/SrcLoc";
 import { ASTNode } from "./ASTNode";
 import { SyntaxNodes } from "./SyntaxNodes";
 
-export class ArrayLiteral extends ASTNode {
+export class ListLiteral extends ASTNode {
   constructor(public members: ASTNode[], start: SrcLoc, end: SrcLoc) {
-    super(SyntaxNodes.ArrayLiteral, start, end);
+    super(SyntaxNodes.ListLiteral, start, end);
   }
 
   public static new(members: ASTNode[], start: SrcLoc, end: SrcLoc) {
-    return new ArrayLiteral(members, start, end);
+    return new ListLiteral(members, start, end);
   }
 
   public get children() {
