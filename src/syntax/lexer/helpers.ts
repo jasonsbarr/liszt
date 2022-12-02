@@ -68,7 +68,6 @@ export const KEYWORDS = {
   end: TokenNames.End,
   return: TokenNames.Return,
   type: TokenNames.Type,
-  alias: TokenNames.Alias,
   self: TokenNames.Self,
   if: TokenNames.If,
   else: TokenNames.Else,
