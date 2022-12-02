@@ -24,6 +24,7 @@ export class TypeParser extends StatementParser {
     }
 
     const name = this.parseExpr(1000) as Identifier;
+    this.reader.skip(TokenNames.Equals);
     const type = this.parseTypeAnnotation();
     const end = type.end;
 
