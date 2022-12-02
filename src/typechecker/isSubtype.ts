@@ -1,6 +1,7 @@
 import * as Types from "./Types";
 import { propType } from "./propType";
 import * as Type from "./validators";
+import { Type } from "./Type";
 
 export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
   if (Type.isAny(a) || Type.isAny(b)) return true;
@@ -79,6 +80,10 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
         isSubtype(t, (b as Types.TupleType).types[i])
       )
     );
+  }
+
+  if (Type.isList(a) && Type.isList(b)) {
+    return isSubtype((a as Types.ListType).type, (b as Types.ListType).type);
   }
 
   return false;
