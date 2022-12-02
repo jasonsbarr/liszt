@@ -17,7 +17,7 @@ import {
   UnknownType,
   IntersectionType,
   NotType,
-  GenericType,
+  TypeVariable,
   GenericFunction,
   TypeAlias,
   TupleType,
@@ -60,7 +60,8 @@ export const isIntersection = (t: Type): t is IntersectionType =>
 
 export const isNot = (t: Type): t is NotType => t.name === "Not";
 
-export const isGeneric = (t: Type): t is GenericType => t.name === "Generic";
+export const isTypeVariable = (t: Type): t is TypeVariable =>
+  t.name === "TypeVariable";
 
 export const isGenericFunction = (t: Type): t is GenericFunction =>
   t.name === "GenericFunction";

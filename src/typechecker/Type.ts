@@ -24,7 +24,7 @@ module Type {
   export type Unknown = Types.UnknownType;
   export type Intersection = Types.IntersectionType;
   export type Not = Types.NotType;
-  export type Generic = Types.GenericType;
+  export type TypeVariable = Types.TypeVariable;
   export type GenericFunction = Types.GenericFunction;
   export type TypeAlias = Types.TypeAlias;
   export type Tuple = Types.TupleType;
@@ -49,7 +49,7 @@ module Type {
   export const unknown = Constructors.unknown;
   export const intersection = i;
   export const not = Constructors.not;
-  export const generic = Constructors.generic;
+  export const typeVariable = Constructors.typeVariable;
   export const genericFunction = Constructors.genericFunction;
   export const typeAlias = Constructors.typeAlias;
   export const tuple = Constructors.tuple;
@@ -72,7 +72,7 @@ module Type {
   export const isUnknown = Validators.isUnknown;
   export const isIntersection = Validators.isIntersection;
   export const isNot = Validators.isNot;
-  export const isGeneric = Validators.isGeneric;
+  export const isTypeVariable = Validators.isTypeVariable;
   export const isGenericFunction = Validators.isGenericFunction;
   export const isTypeAlias = Validators.isTypeAlias;
   export const isTuple = Validators.isTuple;

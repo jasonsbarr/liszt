@@ -7,7 +7,7 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
   if (Type.isNever(a)) return true;
   if (Type.isUnknown(b)) return true;
 
-  if (Type.isGeneric(a)) {
+  if (Type.isTypeVariable(a)) {
     return true;
   }
 

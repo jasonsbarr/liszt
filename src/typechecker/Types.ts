@@ -149,9 +149,10 @@ export class SingletonType extends BaseType {
       | typeof FloatType
       | typeof BooleanType
       | typeof StringType,
-    public value: string | number | bigint | boolean
+    public value: string | number | bigint | boolean,
+    constant = false
   ) {
-    super("Singleton", true, false);
+    super("Singleton", constant, false);
     this.base = base as unknown as
       | IntegerType
       | FloatType
@@ -165,9 +166,10 @@ export class SingletonType extends BaseType {
       | typeof FloatType
       | typeof BooleanType
       | typeof StringType,
-    value: string | number | bigint | boolean
+    value: string | number | bigint | boolean,
+    constant = false
   ) {
-    return new SingletonType(base, value);
+    return new SingletonType(base, value, constant);
   }
 
   public toString() {
@@ -203,6 +205,10 @@ export class UnionType extends BaseType {
   public static new(types: Type[], constant = false, nullable = false) {
     return new UnionType(types, constant, nullable);
   }
+
+  public toString() {
+    return `${this.types.map((t) => String(t)).join(" | ")}`;
+  }
 }
 
 export class UnknownType extends BaseType {
@@ -223,6 +229,10 @@ export class IntersectionType extends BaseType {
   public static new(types: Type[], constant = false, nullable = false) {
     return new IntersectionType(types, constant, nullable);
   }
+
+  public toString() {
+    return `${this.types.map((t) => String(t)).join(" & ")}`;
+  }
 }
 
 export class NotType extends BaseType {
@@ -239,17 +249,17 @@ export class NotType extends BaseType {
   }
 }
 
-export class GenericType extends BaseType {
+export class TypeVariable extends BaseType {
   constructor(public variable: string, constant = false, nullable = false) {
-    super("Generic", constant, nullable);
+    super("TypeVariable", constant, nullable);
   }
 
   public static new(variable: string, constant = false, nullable = false) {
-    return new GenericType(variable, constant, nullable);
+    return new TypeVariable(variable, constant, nullable);
   }
 
   public toString() {
-    return `GenericType '${this.variable}`;
+    return `TypeVariable '${this.variable}`;
   }
 }
 
@@ -335,7 +345,7 @@ export type Type =
   | UnknownType
   | IntersectionType
   | NotType
-  | GenericType
+  | TypeVariable
   | GenericFunction
   | TypeAlias
   | TupleType;

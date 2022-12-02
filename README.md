@@ -8,7 +8,7 @@ Written with TypeScript v4.8.4.
 
 ## Basic Concepts
 
-Liszt is a statically typed language with bidirectional type checking, which means most type annotations can be omitted. The only required type annotations are for function definition parameters.
+Liszt is a gradually typed language with bidirectional type checking, which means type annotations can be omitted and many types will still be inferred from the expressions. The one place where type annotations are really useful is function parameters and sometimes the function return type, but if you omit these your program will still work (albeit without static type checking).
 
 Liszt is object-oriented with prototypes, but also has first-class functions and other functional programming features.
 
@@ -22,12 +22,15 @@ The type checker implementation owes a great deal to Jake Donham's [Reconstructi
 
 ## Syntax
 
+Comments start with a semicolon and continue to the end of the line.
+
 There are literals for Integer, Float, String, Boolean, Symbol, Object, Tuple, and Nil types.
 
 ```ruby
 17
 3.14
 "hello, world"
+true
 :thisIsASymbol
 { type: "Person", name: "Jason", age: 42 }
 (1, false, "hello", { value: 42 })
@@ -61,6 +64,7 @@ def fib(n: integer): integer
         1
     else
         n * fib(n - 1)
+end
 ```
 
 You can also just assign a lambda to a variable (though a lambda must use an explicit block if you want its body to include more than a single expression). Note the function type annotation - it's not necessary, but it does help the type checker out! When there's no function type annotation, function parameters that are not individually annotated get typed as Any.
@@ -81,22 +85,29 @@ You can also create your own types as aliases for built-in types, tuple types, a
 
 ```ruby
 ; Object type
-type alias Point { x: number, y: number }
+type Point = { x: number, y: number }
 
 ; Intersection type
-type alias Point3D Point & { z: number }
+type Point3D = Point & { z: number }
 
 ; Union type
-type alias Coordinate
+type Coordinate =
     { type: "Cartesian", x: number, y: number }
   | { type: "Polar", angle: number, magnitude: number }
 
 ; Function type
-type alias Adder (x: number) => number
+type Adder = (x: number) => number
 
 ; Curried function type
-type alias AdderMaker (x: number) => (y: number) => number
+type AdderMaker = (x: number) => (y: number) => number
 
 ; Tuple type
-type alias Coord (number, number)
+type Coord = (number, number)
+```
+
+You can also use type variables to create generic types, with no concrete type annotations needed.
+
+```ruby
+type Box = { value: 'a }
+var boxedNum: Box = { value: 5 }
 ```

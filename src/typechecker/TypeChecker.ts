@@ -196,6 +196,7 @@ export class TypeChecker {
     let boundProgram = BoundProgramNode.new(node.start, node.end);
 
     for (let node of nodes) {
+      // type aliases can only be at top level of file
       if (node.kind === SyntaxNodes.TypeAlias) {
         this.setType(node as TypeAlias, env);
       } else {
@@ -435,45 +436,39 @@ export class TypeChecker {
     env: TypeEnv,
     type?: Type
   ) {
-    let constant = false;
+    // right now, all assignment involves identifiers. This will change.
     if (node.left instanceof Identifier) {
-      constant = node.left.constant;
+      const name = node.left.name;
 
-      // if this is a variable declaration, it won't be set in the environment yet
-      // so if it is set, it's been previously defined and we need to make sure
+      // if this is a variable declaration, it's been
+      // previously defined and we need to make sure
       // it's not an attempt to reassign a constant
       if (env.lookup(node.left.name) && env.get(node.left.name)?.constant) {
         throw new Error(
           `Illegal assignment to constant variable ${node.left.name}`
         );
       }
-    }
 
-    const t = type
-      ? type
-      : node.type
-      ? getType(node.type, env)
-      : synth(node.right, env, constant);
-    const left = this.checkNode(node.left, env, t);
-    const right = this.checkNode(node.right, env, t);
+      if (!type) {
+        type = env.get(name);
 
-    if (node.type) {
-      check(node.right, t, env);
-    }
-
-    if (node.left instanceof Identifier) {
-      if (env.lookup(node.left.name)) {
-        // if already defined, need to make sure we're not assigning
-        // an incompatible type to the same variable name
-        const checkType = env.get(node.left.name);
-
-        if (!isSubtype(t, checkType)) {
+        if (!type) {
           throw new Error(
-            `Cannot assign value of type ${t} to variable of type ${checkType}`
+            `Variable ${name} must be initialized prior to assignment`
           );
         }
       }
     }
+
+    if (!type) {
+      throw new Error(`No type found for assignment`);
+    }
+
+    // No matter what the LHV, we should have the type by now
+    check(node.right, type, env);
+
+    const left = this.checkNode(node.left, env, type);
+    const right = this.checkNode(node.right, env, type);
 
     return BoundAssignmentExpression.new(
       left,
@@ -481,7 +476,7 @@ export class TypeChecker {
       node.operator,
       node.start,
       node.end,
-      t
+      type
     );
   }
 
@@ -514,14 +509,11 @@ export class TypeChecker {
     // Need to set the variable name and type BEFORE checking and binding the assignment node
     env.set((node.assignment.left as Identifier).name, type);
 
-    const assign = BoundAssignmentExpression.new(
-      this.checkNode(node.assignment.left, env, type),
-      this.checkNode(node.assignment.right, env),
-      node.assignment.operator,
-      node.assignment.start,
-      node.assignment.end,
+    const assign = this.checkNode(
+      node.assignment,
+      env,
       type
-    );
+    ) as BoundAssignmentExpression;
 
     return BoundVariableDeclaration.new(
       assign,
@@ -674,6 +666,12 @@ export class TypeChecker {
 
   private setType(node: TypeAlias, env: TypeEnv) {
     const name = node.name.name;
-    env.set(name, getType(node.base, env));
+
+    if (env.has(name)) {
+      throw new Error(`Cannot reassign existing variable ${name} as type`);
+    }
+
+    const type = getType(node.base, env);
+    env.set(name, type);
   }
 }

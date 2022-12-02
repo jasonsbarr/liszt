@@ -10,7 +10,8 @@ export const getType = (
 ) => {
   if (type instanceof TypeAnnotation) {
     if (type.type instanceof Identifier) {
-      return env.get(type.type.name);
+      const t = env.get(type.type.name);
+      return t;
     }
 
     return fromAnnotation(type, env);

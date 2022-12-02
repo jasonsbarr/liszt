@@ -25,6 +25,19 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
     return true;
   }
 
+  if (Type.isUnion(t)) {
+    return checkUnion(ast, t, env);
+  }
+
+  if (Type.isSingleton(t)) {
+    const synthType = synth(ast, env, true);
+    // will only be true if the two have the same value
+
+    if (isSubtype(synthType, t)) return true;
+
+    throw new Error(`Expected ${t as Type}, got ${synthType}`);
+  }
+
   if (ast.kind === SyntaxNodes.ObjectLiteral && Type.isObject(t)) {
     return checkObject(ast as ObjectLiteral, t, env);
   }
@@ -86,6 +99,11 @@ type ObjectProps = {
 };
 
 const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
+  if (Type.isTypeAlias(type)) {
+    type = getAliasBase(type) as Type.Object;
+  }
+
+  const synthType = synth(ast, env) as Type.Object;
   const objProps: ObjectProps[] = ast.properties.map((prop) => ({
     name: prop.key.name,
     expr: prop.value,
@@ -100,11 +118,35 @@ const checkObject = (ast: ObjectLiteral, type: Type.Object, env: TypeEnv) => {
     }
   });
 
-  objProps.forEach(({ name, expr }) => {
-    const pType = propType(type, name);
+  let typeMap: { [key: string]: Type } = {};
+
+  objProps.forEach(({ name, expr }, i) => {
+    let pType = propType(type, name);
 
     if (pType) {
-      check(expr, pType, env);
+      // this will be overwritten by the concrete type if it's a type variable
+      let resolvedType = pType;
+      if (Type.isTypeAlias(pType)) {
+        pType = getAliasBase(pType);
+      }
+
+      if (Type.isTypeVariable(pType)) {
+        if (typeMap[pType.variable]) {
+          resolvedType = typeMap[pType.variable];
+        } else {
+          typeMap[pType.variable] = synthType.properties[i].type;
+          resolvedType = typeMap[pType.variable];
+        }
+
+        const prop = synthType.properties[i];
+        if (!isSubtype(prop.type, resolvedType)) {
+          throw new Error(
+            `Expected ${resolvedType} or its subtype for property ${prop.name}; got ${prop.type}`
+          );
+        }
+      }
+
+      check(expr, resolvedType, env);
     }
   });
 
@@ -201,4 +243,16 @@ const checkTuple = (node: Tuple, type: Type, env: TypeEnv): boolean => {
   }
 
   return check(node, type, env);
+};
+
+const checkUnion = (node: ASTNode, type: Type.Union, env: TypeEnv): boolean => {
+  for (let t of type.types) {
+    try {
+      return check(node, t, env);
+    } catch (_e: any) {
+      // ignore
+    }
+  }
+  // if it gets here, no union arm matched
+  throw new Error(`Expected type ${type}; got ${synth(node, env)}`);
 };
