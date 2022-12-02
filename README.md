@@ -8,7 +8,7 @@ Written with TypeScript v4.8.4.
 
 ## Basic Concepts
 
-Liszt is a statically typed language with bidirectional type checking, which means most type annotations can be omitted. The only required type annotations are for function definition parameters.
+Liszt is a gradually typed language with bidirectional type checking, which means type annotations can be omitted and many types will still be inferred from the expressions. The one place where type annotations are really useful is function parameters and sometimes the function return type, but if you omit these your program will still work (albeit without static type checking).
 
 Liszt is object-oriented with prototypes, but also has first-class functions and other functional programming features.
 
