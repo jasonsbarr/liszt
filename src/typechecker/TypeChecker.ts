@@ -436,15 +436,12 @@ export class TypeChecker {
     env: TypeEnv,
     type?: Type
   ) {
-    let constant = false;
-    let name = "";
     // right now, all assignment involves identifiers. This will change.
     if (node.left instanceof Identifier) {
-      constant = node.left.constant;
-      name = node.left.name;
+      const name = node.left.name;
 
-      // if this is a variable declaration, it won't be set in the environment yet
-      // so if it is set, it's been previously defined and we need to make sure
+      // if this is a variable declaration, it's been
+      // previously defined and we need to make sure
       // it's not an attempt to reassign a constant
       if (env.lookup(node.left.name) && env.get(node.left.name)?.constant) {
         throw new Error(
@@ -467,18 +464,8 @@ export class TypeChecker {
       throw new Error(`No type found for assignment`);
     }
 
-    if (node.type) {
-      check(node.right, type, env);
-    }
-
-    if (node.left instanceof Identifier) {
-      if (env.lookup(node.left.name)) {
-        // if already defined, need to make sure we're not assigning
-        // an incompatible type to the same variable name
-        const checkType = env.get(name);
-        check(node.right, checkType, env);
-      }
-    }
+    // No matter what the LHV, we should have the type by now
+    check(node.right, type, env);
 
     const left = this.checkNode(node.left, env, type);
     const right = this.checkNode(node.right, env, type);
