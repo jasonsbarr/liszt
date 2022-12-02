@@ -17,8 +17,6 @@ export class TypeParser extends StatementParser {
     const token = this.reader.next();
     const start = token.location;
 
-    this.reader.skip(TokenNames.Alias);
-
     if (this.reader.peek().type !== TokenTypes.Identifier) {
       throw new Error(`Type alias name must be a valid identifier`);
     }
@@ -36,9 +34,7 @@ export class TypeParser extends StatementParser {
 
     switch (token.name) {
       case TokenNames.Type:
-        if (this.reader.lookahead(1).name === TokenNames.Alias) {
-          return this.parseTypeAlias();
-        }
+        return this.parseTypeAlias();
       default:
         return this.parseStatement();
     }

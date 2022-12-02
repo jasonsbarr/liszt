@@ -85,29 +85,29 @@ You can also create your own types as aliases for built-in types, tuple types, a
 
 ```ruby
 ; Object type
-type alias Point = { x: number, y: number }
+type Point = { x: number, y: number }
 
 ; Intersection type
-type alias Point3D = Point & { z: number }
+type Point3D = Point & { z: number }
 
 ; Union type
-type alias Coordinate =
+type Coordinate =
     { type: "Cartesian", x: number, y: number }
   | { type: "Polar", angle: number, magnitude: number }
 
 ; Function type
-type alias Adder = (x: number) => number
+type Adder = (x: number) => number
 
 ; Curried function type
-type alias AdderMaker = (x: number) => (y: number) => number
+type AdderMaker = (x: number) => (y: number) => number
 
 ; Tuple type
-type alias Coord = (number, number)
+type Coord = (number, number)
 ```
 
 You can also use type variables to create generic types, with no concrete type annotations needed.
 
 ```ruby
-type alias Box = { value: 'a }
+type Box = { value: 'a }
 var boxedNum: Box = { value: 5 }
 ```
