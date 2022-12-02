@@ -437,8 +437,11 @@ export class TypeChecker {
     type?: Type
   ) {
     let constant = false;
+    let name = "";
+    // right now, all assignment involves identifiers. This will change.
     if (node.left instanceof Identifier) {
       constant = node.left.constant;
+      name = node.left.name;
 
       // if this is a variable declaration, it won't be set in the environment yet
       // so if it is set, it's been previously defined and we need to make sure
@@ -448,28 +451,37 @@ export class TypeChecker {
           `Illegal assignment to constant variable ${node.left.name}`
         );
       }
+
+      if (!type) {
+        type = env.get(name);
+
+        if (!type) {
+          throw new Error(
+            `Variable ${name} must be initialized prior to assignment`
+          );
+        }
+      }
     }
 
-    const t = type
-      ? type
-      : node.type
-      ? getType(node.type, env)
-      : synth(node.right, env, constant);
-    const left = this.checkNode(node.left, env, t);
-    const right = this.checkNode(node.right, env, t);
+    if (!type) {
+      throw new Error(`No type found for assignment`);
+    }
 
     if (node.type) {
-      check(node.right, t, env);
+      check(node.right, type, env);
     }
 
     if (node.left instanceof Identifier) {
       if (env.lookup(node.left.name)) {
         // if already defined, need to make sure we're not assigning
         // an incompatible type to the same variable name
-        const checkType = env.get(node.left.name);
+        const checkType = env.get(name);
         check(node.right, checkType, env);
       }
     }
+
+    const left = this.checkNode(node.left, env, type);
+    const right = this.checkNode(node.right, env, type);
 
     return BoundAssignmentExpression.new(
       left,
@@ -477,7 +489,7 @@ export class TypeChecker {
       node.operator,
       node.start,
       node.end,
-      t
+      type
     );
   }
 
@@ -516,8 +528,7 @@ export class TypeChecker {
 
     const assign = this.checkNode(
       node.assignment,
-      env,
-      type
+      env
     ) as BoundAssignmentExpression;
 
     return BoundVariableDeclaration.new(
