@@ -1,7 +1,6 @@
 import * as Types from "./Types";
 import { propType } from "./propType";
 import * as Type from "./validators";
-import { Type } from "./Type";
 
 export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
   if (Type.isAny(a) || Type.isAny(b)) return true;
