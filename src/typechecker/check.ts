@@ -32,7 +32,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
   if (Type.isSingleton(t)) {
     const synthType = synth(ast, env, true);
     // will only be true if the two have the same value
-    return isSubtype(synthType, t);
+
+    if (isSubtype(synthType, t)) return true;
+
+    throw new Error(`Expected ${t as Type}, got ${synthType}`);
   }
 
   if (ast.kind === SyntaxNodes.ObjectLiteral && Type.isObject(t)) {
