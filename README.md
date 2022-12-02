@@ -104,3 +104,10 @@ type alias AdderMaker = (x: number) => (y: number) => number
 ; Tuple type
 type alias Coord = (number, number)
 ```
+
+You can also use type variables to create generic types, with no concrete type annotations needed.
+
+```ruby
+type alias Box = { value: 'a }
+var boxedNum: Box = { value: 5 }
+```
