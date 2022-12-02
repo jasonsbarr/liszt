@@ -666,6 +666,11 @@ export class TypeChecker {
 
   private setType(node: TypeAlias, env: TypeEnv) {
     const name = node.name.name;
+
+    if (env.has(name)) {
+      throw new Error(`Cannot reassign existing variable ${name} as type`);
+    }
+
     const type = getType(node.base, env);
     env.set(name, type);
   }
