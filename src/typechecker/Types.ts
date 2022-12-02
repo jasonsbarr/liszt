@@ -327,6 +327,20 @@ export class TupleType extends BaseType {
   }
 }
 
+export class ListType extends BaseType {
+  constructor(public type: Type, constant = false, nullable = false) {
+    super("List", constant, nullable);
+  }
+
+  public static new(type: Type, constant = false, nullable = false) {
+    return new ListType(type, constant, nullable);
+  }
+
+  public toString() {
+    return `List ${this.type}`;
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -348,4 +362,5 @@ export type Type =
   | TypeVariable
   | GenericFunction
   | TypeAlias
-  | TupleType;
+  | TupleType
+  | ListType;

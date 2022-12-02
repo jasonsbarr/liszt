@@ -21,6 +21,7 @@ import {
   GenericFunction,
   TypeAlias,
   TupleType,
+  ListType,
 } from "./Types";
 
 export const isInteger = (t: Type): t is IntegerType => t.name === "Integer";
@@ -69,3 +70,5 @@ export const isGenericFunction = (t: Type): t is GenericFunction =>
 export const isTypeAlias = (t: Type): t is TypeAlias => t instanceof TypeAlias;
 
 export const isTuple = (t: Type): t is TupleType => t.name === "Tuple";
+
+export const isList = (t: Type): t is ListType => t.name === "List";

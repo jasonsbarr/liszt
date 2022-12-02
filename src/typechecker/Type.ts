@@ -28,6 +28,7 @@ module Type {
   export type GenericFunction = Types.GenericFunction;
   export type TypeAlias = Types.TypeAlias;
   export type Tuple = Types.TupleType;
+  export type List = Types.ListType;
 
   export type Type = Types.Type;
 
@@ -53,6 +54,7 @@ module Type {
   export const genericFunction = Constructors.genericFunction;
   export const typeAlias = Constructors.typeAlias;
   export const tuple = Constructors.tuple;
+  export const list = Constructors.list;
 
   // validators
   export const isNumber = Validators.isNumber;
@@ -76,6 +78,7 @@ module Type {
   export const isGenericFunction = Validators.isGenericFunction;
   export const isTypeAlias = Validators.isTypeAlias;
   export const isTuple = Validators.isTuple;
+  export const isList = Validators.isList;
 
   export const distributeUnion = dU;
 }
