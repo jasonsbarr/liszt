@@ -504,7 +504,7 @@ export class TypeChecker {
           check(lhv, t, env);
         } else if (lhv instanceof SpreadOperation) {
           let t = Type.tuple(type.types.slice(i));
-          check(lhv, t, env);
+          check(lhv.expression, t, env);
         }
 
         i++;

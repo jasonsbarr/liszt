@@ -27,6 +27,7 @@ import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
 import { BoundSymbolLiteral } from "../typechecker/bound/BoundSymbolLiteral";
 import { BoundTree } from "../typechecker/bound/BoundTree";
 import { BoundTuple } from "../typechecker/bound/BoundTuple";
+import { BoundTuplePattern } from "../typechecker/bound/BoundTuplePattern";
 import { BoundUnaryOperation } from "../typechecker/bound/BoundUnaryOperation";
 import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
 import { BoundVector } from "../typechecker/bound/BoundVector";
@@ -101,6 +102,8 @@ export class Emitter {
         return this.emitSliceExpression(node as BoundSliceExpression);
       case BoundNodes.BoundForStatement:
         return this.emitForStatement(node as BoundForStatement);
+      case BoundNodes.BoundTuplePattern:
+        return this.emitTuplePattern(node as BoundTuplePattern);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -296,5 +299,17 @@ export class Emitter {
     code += "}\n";
 
     return code;
+  }
+
+  private emitTuplePattern(node: BoundTuplePattern): string {
+    return `[${node.names
+      .map((n, i, a) => {
+        if (node.rest && i === a.length - 1) {
+          return `...${n.name}`;
+        }
+
+        return n.name;
+      })
+      .join(", ")}]`;
   }
 }

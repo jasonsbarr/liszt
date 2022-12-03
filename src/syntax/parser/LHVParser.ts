@@ -54,6 +54,8 @@ export class LHVParser extends BaseParser {
         value.kind === SyntaxNodes.SpreadOperation
           ? (value as SpreadOperation)
           : (value as Identifier);
+
+      names.push(value as Identifier);
     }
 
     return TuplePattern.new(names, rest, expr.start, expr.end);
