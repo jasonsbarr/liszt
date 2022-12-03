@@ -24,7 +24,7 @@ The type checker implementation owes a great deal to Jake Donham's [Reconstructi
 
 Comments start with a semicolon and continue to the end of the line.
 
-There are literals for Integer, Float, String, Boolean, Symbol, Object, Tuple, and Nil types.
+There are literals for Integer, Float, String, Boolean, Symbol, Object, Tuple, Vector, and Nil types.
 
 ```ruby
 17
@@ -34,6 +34,7 @@ true
 :thisIsASymbol
 { type: "Person", name: "Jason", age: 42 }
 (1, false, "hello", { value: 42 })
+vec[1, 2, 3]
 nil
 ```
 
@@ -79,6 +80,18 @@ You can use type variables in your function definitions for parametric polymorph
 def id(x: 'a)
     x
 end
+```
+
+Iterate over vectors with for statements.
+
+```ruby
+var sum = 0
+
+for n in vec[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  sum = n + 1
+end
+
+sum == 55  ;=> true
 ```
 
 You can also create your own types as aliases for built-in types, tuple types, and object types.
