@@ -191,15 +191,15 @@ export class Emitter {
   private emitAssignment(node: BoundAssignmentExpression): string {
     return `${this.emitNode(node.left)} ${node.operator} ${this.emitNode(
       node.right
-    )}`;
+    )};\n`;
   }
 
   private emitVariableDeclaration(node: BoundVariableDeclaration): string {
     if (node.constant) {
-      return `const ${this.emitNode(node.assignment)};\n`;
+      return `const ${this.emitNode(node.assignment)}`;
     }
 
-    return `let ${this.emitNode(node.assignment)};\n`;
+    return `let ${this.emitNode(node.assignment)}`;
   }
 
   private emitFunctionDeclaration(node: BoundFunctionDeclaration): string {
