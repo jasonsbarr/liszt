@@ -76,6 +76,7 @@ import { BoundSliceExpression } from "./bound/BoundSliceExpression";
 import { ForStatement } from "../syntax/parser/ast/ForStatement";
 import { BoundForStatement } from "./bound/BoundForStatement";
 import { TuplePattern } from "../syntax/parser/ast/TuplePattern";
+import { SpreadOperation } from "../syntax/parser/ast/SpreadOperation";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -502,6 +503,10 @@ export class TypeChecker {
   }
 
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
+    const type = node.assignment.type
+      ? getType(node.assignment.type, env)
+      : synth(node.assignment.right, env, node.constant);
+
     if (node.assignment.left instanceof Identifier) {
       const name = node.assignment.left.name;
 
@@ -521,14 +526,32 @@ export class TypeChecker {
           throw new Error(`Variable ${name} has already been declared`);
         }
       }
+      // Need to set the variable name and type BEFORE checking and binding the assignment node
+      env.set((node.assignment.left as Identifier).name, type);
+    } else if (node.assignment.left instanceof TuplePattern) {
+      if (!Type.isTuple(type)) {
+        throw new Error(
+          `Assignment type for tuple pattern must be a tuple; ${type} given`
+        );
+      }
+
+      let i = 0;
+
+      for (let lhv of node.assignment.left.names) {
+        if (lhv instanceof Identifier) {
+          let t = type.types[i];
+          env.set(lhv.name, t);
+        } else if (lhv instanceof SpreadOperation) {
+          let t = type.types.slice(i);
+          env.set(lhv.expression)
+        }
+        i++;
+      }
+    } else {
+      throw new Error(
+        `Invalid left hand assignment value ${node.assignment.left.kind}`
+      );
     }
-
-    const type = node.assignment.type
-      ? getType(node.assignment.type, env)
-      : synth(node.assignment.right, env, node.constant);
-
-    // Need to set the variable name and type BEFORE checking and binding the assignment node
-    env.set((node.assignment.left as Identifier).name, type);
 
     const assign = this.checkNode(
       node.assignment,
