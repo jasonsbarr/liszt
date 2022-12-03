@@ -323,6 +323,8 @@ export class TypeAnnotationParser extends LHVParser {
         );
       case TokenNames.TypeVariable:
         return this.parseTypeVariable();
+      case TokenNames.VectorKeyword:
+        return this.parseVectorType();
       default:
         switch (token.type) {
           // allow keywords as object properties
