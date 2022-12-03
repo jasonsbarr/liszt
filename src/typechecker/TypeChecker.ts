@@ -473,6 +473,10 @@ export class TypeChecker {
           );
         }
       }
+    } else if (node.left instanceof MemberExpression) {
+      type = synth(node.right, env);
+    } else {
+      throw new Error(`Invalid left hand value ${node.left.kind}`);
     }
 
     if (!type) {
