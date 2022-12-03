@@ -34,6 +34,7 @@ import { narrow, narrowType } from "./narrow";
 import { getType } from "./getType";
 import { getAliasBase } from "./getAliasBase";
 import { Tuple } from "../syntax/parser/ast/Tuple";
+import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -84,6 +85,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthIfExpression(ast as IfExpression, env);
     case SyntaxNodes.Tuple:
       return synthTuple(ast as Tuple, env);
+    case SyntaxNodes.VectorLiteral:
+      return synthVector(ast as VectorLiteral, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -762,4 +765,9 @@ const synthIfExpression = (node: IfExpression, env: TypeEnv): Type => {
 const synthTuple = (node: Tuple, env: TypeEnv) => {
   const types = node.values.map((v) => synth(v, env));
   return Type.tuple(types);
+};
+
+const synthVector = (node: VectorLiteral, env: TypeEnv) => {
+  const types = node.members.map((m) => synth(m, env));
+  return Type.vector(Type.union(...types));
 };
