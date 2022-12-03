@@ -59,6 +59,8 @@ end
 
 If you want to annotate the return type you can do that too; sometimes it's a big help to the type checker (especially with recursive functions).
 
+Note that the if operation is an expression, not a statement, and it MUST have an else branch.
+
 ```ruby
 def fib(n: integer): integer
     if n == 0

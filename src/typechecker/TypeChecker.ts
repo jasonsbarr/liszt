@@ -75,6 +75,7 @@ import { SliceExpression } from "../syntax/parser/ast/SliceExpression";
 import { BoundSliceExpression } from "./bound/BoundSliceExpression";
 import { ForStatement } from "../syntax/parser/ast/ForStatement";
 import { BoundForStatement } from "./bound/BoundForStatement";
+import { TuplePattern } from "../syntax/parser/ast/TuplePattern";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -473,8 +474,12 @@ export class TypeChecker {
           );
         }
       }
+
+      check(node.right, type, env);
     } else if (node.left instanceof MemberExpression) {
       type = synth(node.right, env);
+      check(node.right, type, env);
+    } else if (node.left instanceof TuplePattern) {
     } else {
       throw new Error(`Invalid left hand value ${node.left.kind}`);
     }
@@ -482,9 +487,6 @@ export class TypeChecker {
     if (!type) {
       throw new Error(`No type found for assignment`);
     }
-
-    // No matter what the LHV, we should have the type by now
-    check(node.right, type, env);
 
     const left = this.checkNode(node.left, env, type);
     const right = this.checkNode(node.right, env, type);
