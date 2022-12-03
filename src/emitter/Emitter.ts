@@ -281,6 +281,7 @@ export class Emitter {
 
   private emitForStatement(node: BoundForStatement) {
     let bindings = "";
+    let code = "";
 
     if (node.bindings.left instanceof BoundIdentifier) {
       bindings = node.bindings.left.name;
@@ -290,9 +291,10 @@ export class Emitter {
       );
     }
 
-    return `for (let ${bindings} of ${this.emitNode(node.bindings.right)}) {
-${this.emitNode(node.body)}
-}
-`;
+    code += `for (let ${bindings} of ${this.emitNode(node.bindings.right)}) {`;
+    code += `${this.emitNode(node.body)}`;
+    code += "}\n";
+
+    return code;
   }
 }
