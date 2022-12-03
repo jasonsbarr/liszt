@@ -90,6 +90,11 @@ type led = keyof typeof ledAttributes;
 
 const assignmentOps = {
   [TokenNames.Equals]: "Equals",
+  [TokenNames.PlusEquals]: "PlusEquals",
+  [TokenNames.MinusEquals]: "MinusEquals",
+  [TokenNames.TimesEquals]: "TimesEquals",
+  [TokenNames.DivEquals]: "DivEquals",
+  [TokenNames.ModEquals]: "ModEquals",
 };
 
 export class StatementParser extends TypeAnnotationParser {
