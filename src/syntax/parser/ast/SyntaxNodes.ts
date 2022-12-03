@@ -41,6 +41,7 @@ export enum SyntaxNodes {
   Block = "Block",
   FunctionDeclaration = "FunctionDeclaration",
   ReturnStatement = "ReturnStatement",
+  ForStatement = "ForStatement",
   UnaryOperation = "UnaryOperation",
   LogicalOperation = "LogicalOperation",
   IfExpression = "IfExpression",

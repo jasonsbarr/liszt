@@ -34,6 +34,7 @@ import { IfExpression } from "./ast/IfExpression";
 import { Tuple } from "./ast/Tuple";
 import { VectorLiteral } from "./ast/ListLiteral";
 import { SliceExpression } from "./ast/SliceExpression";
+import { ForStatement } from "./ast/ForStatement";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -293,6 +294,19 @@ export class StatementParser extends TypeAnnotationParser {
     return expr;
   }
 
+  private parseForStatement() {
+    let token = this.reader.peek();
+    const start = token.location;
+
+    this.reader.skip(TokenNames.For);
+
+    const bindings = this.parseExpression();
+    const body = this.parseBlock();
+    const end = body.end;
+
+    return ForStatement.new(bindings, body, start, end);
+  }
+
   private parseFuncParameter() {
     let token = this.reader.peek();
 
@@ -394,6 +408,8 @@ export class StatementParser extends TypeAnnotationParser {
         return this.parseReturnStatement();
       case TokenNames.If:
         return this.parseIfExpression();
+      case TokenNames.For:
+        return this.parseForStatement();
       default:
         return this.parseExpression();
     }
@@ -568,16 +584,6 @@ export class StatementParser extends TypeAnnotationParser {
     return ReturnStatement.new(expression, start, end);
   }
 
-  public parseStatement() {
-    const token = this.reader.peek();
-
-    if (token.type === TokenTypes.Keyword) {
-      return this.parseKeyword();
-    }
-
-    return this.parseExpression();
-  }
-
   private parseSliceExpression(left: ASTNode) {
     const start = left.start;
 
@@ -590,6 +596,16 @@ export class StatementParser extends TypeAnnotationParser {
     this.reader.skip(TokenNames.RBracket);
 
     return SliceExpression.new(left, index, start, end);
+  }
+
+  public parseStatement() {
+    const token = this.reader.peek();
+
+    if (token.type === TokenTypes.Keyword) {
+      return this.parseKeyword();
+    }
+
+    return this.parseExpression();
   }
 
   private parseTuple() {
