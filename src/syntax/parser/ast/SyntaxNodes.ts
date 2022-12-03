@@ -30,6 +30,7 @@ export enum SyntaxNodes {
   IntersectionType = "IntersectionType",
   UnionType = "UnionType",
   TupleType = "TupleType",
+  VectorType = "VectorType",
   LambdaExpression = "LambdaExpression",
   Parameter = "Parameter",
   CallExpression = "CallExpression",

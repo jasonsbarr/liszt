@@ -26,6 +26,7 @@ import { UnknownKeyword } from "./ast/UnknownKeyword";
 import { TypeVariable } from "./ast/TypeVariable";
 import { TokenTypes } from "../lexer/TokenTypes";
 import { TupleType } from "./ast/TupleType";
+import { VectorType } from "./ast/VectorType";
 
 enum CompoundTypes {
   Intersection = "Intersection",
@@ -348,5 +349,20 @@ export class TypeAnnotationParser extends LHVParser {
   private parseUnknownKeyword() {
     const token = this.reader.next();
     return UnknownKeyword.new(token, token.location);
+  }
+
+  private parseVectorType() {
+    let token = this.reader.peek();
+    const start = token.location;
+
+    this.reader.skip(TokenNames.VectorKeyword);
+    this.reader.skip(TokenNames.LBracket);
+
+    const type = this.parseTypeAnnotation();
+    token = this.reader.peek();
+    const end = token.location;
+    this.reader.skip(TokenNames.RBracket);
+
+    return VectorType.new(type, start, end);
   }
 }

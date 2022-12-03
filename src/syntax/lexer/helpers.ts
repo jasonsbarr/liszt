@@ -61,6 +61,7 @@ export const KEYWORDS = {
   any: TokenNames.AnyKeyword,
   never: TokenNames.NeverKeyword,
   unknown: TokenNames.UnknownKeyword,
+  vector: TokenNames.VectorKeyword,
   def: TokenNames.Def,
   var: TokenNames.Var,
   const: TokenNames.Const,

@@ -54,6 +54,7 @@ export enum TokenNames {
   AnyKeyword = "AnyKeyword",
   NeverKeyword = "NeverKeyword",
   UnknownKeyword = "UnknownKeyword",
+  VectorKeyword = "VectorKeyword",
   Def = "Def",
   Var = "Var",
   Const = "Const",
