@@ -35,6 +35,7 @@ import { Tuple } from "./ast/Tuple";
 import { VectorLiteral } from "./ast/ListLiteral";
 import { SliceExpression } from "./ast/SliceExpression";
 import { ForStatement } from "./ast/ForStatement";
+import { SpreadOperation } from "./ast/SpreadOperation";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -193,6 +194,7 @@ export class StatementParser extends TypeAnnotationParser {
           case TokenNames.Minus:
           case TokenNames.TypeOf:
           case TokenNames.BNot:
+          case TokenNames.ThreeDots:
             return this.parseUnaryOperation();
           default:
             throw new Error(
@@ -212,9 +214,7 @@ export class StatementParser extends TypeAnnotationParser {
     // need to advance the token stream
     this.reader.next();
 
-    const right = this.parseExpression(
-      precedence - (assoc === "right" ? 1 : 0)
-    );
+    const right = this.parseExpr(precedence - (assoc === "right" ? 1 : 0));
     const end = right.end;
 
     return BinaryOperation.new(left, right, token.value, start, end);
@@ -282,21 +282,28 @@ export class StatementParser extends TypeAnnotationParser {
   }
 
   public parseExpression(rbp: number = 0, { constant = false } = {}) {
-    let expr = this.parseExpr(rbp, { constant });
+    let [expr, type]: [ASTNode, TypeAnnotation | undefined] =
+      this.parseExprWithMaybeTypeAnnotation(rbp, { constant });
     let token = this.reader.peek();
-
-    let type: TypeAnnotation | undefined;
-    if (token.name === TokenNames.Colon) {
-      this.reader.skip(TokenNames.Colon);
-      type = this.parseTypeAnnotation();
-      token = this.reader.peek();
-    }
 
     if (token.name in assignmentOps) {
       return this.parseAssign(expr, type);
     }
 
     return expr;
+  }
+
+  private parseExprWithMaybeTypeAnnotation(rbp = 0, { constant = false } = {}) {
+    let expr = this.parseExpr(rbp, { constant });
+    let token = this.reader.peek();
+    let type: TypeAnnotation | undefined;
+
+    if (token.name === TokenNames.Colon) {
+      this.reader.skip(TokenNames.Colon);
+      type = this.parseTypeAnnotation();
+    }
+
+    return [expr, type] as [ASTNode, TypeAnnotation | undefined];
   }
 
   private parseForStatement() {
@@ -394,12 +401,12 @@ export class StatementParser extends TypeAnnotationParser {
     const start = token.location;
     const prec = this.getNudPrecedence(token);
     this.reader.skip(TokenNames.If);
-    const ifNode = this.parseExpression(prec);
-    const then = this.parseExpression(prec);
+    const ifNode = this.parseExpr(prec);
+    const then = this.parseExpr(prec);
 
     // Else keyword is required
     this.reader.skip(TokenNames.Else);
-    const elseNode = this.parseExpression(prec);
+    const elseNode = this.parseExpr(prec);
     const end = elseNode.end;
 
     return IfExpression.new(ifNode, then, elseNode, start, end);
@@ -454,7 +461,7 @@ export class StatementParser extends TypeAnnotationParser {
 
     this.reader.skip(TokenNames.FatArrow);
 
-    const body = this.parseExpression();
+    const body = this.parseExpr();
     const end = body.end;
 
     return LambdaExpression.new(parameters, body, start, end, ret);
@@ -533,7 +540,7 @@ export class StatementParser extends TypeAnnotationParser {
           ? this.parseIdentifier()
           : this.parseExpr();
       this.reader.skip(TokenNames.Colon);
-      const value = this.parseExpression();
+      const value = this.parseExpr();
       token = this.reader.peek();
       const en = token.location;
       properties.push(ObjectProperty.new(key as Identifier, value, st, en));
@@ -664,10 +671,12 @@ export class StatementParser extends TypeAnnotationParser {
     const token = this.reader.next();
     const start = token.location;
     const prec = this.getNudPrecedence(token);
-    const expression = this.parseExpression(prec);
+    const expression = this.parseExpr(prec);
     const end = expression.end;
 
-    return UnaryOperation.new(expression, token.value, start, end);
+    return token.name === TokenNames.ThreeDots
+      ? SpreadOperation.new(expression, start, end)
+      : UnaryOperation.new(expression, token.value, start, end);
   }
 
   private parseVariableDeclaration(constant: boolean) {
