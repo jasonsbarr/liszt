@@ -1,11 +1,12 @@
 import { SrcLoc } from "../../syntax/lexer/SrcLoc";
+import { BoundAssignmentExpression } from "./BoundAssignmentExpression";
 import { BoundASTNode } from "./BoundASTNode";
 import { BoundBlock } from "./BoundBlock";
 import { BoundNodes } from "./BoundNodes";
 
 export class BoundForStatement extends BoundASTNode {
   constructor(
-    public bindings: BoundASTNode,
+    public bindings: BoundAssignmentExpression,
     public body: BoundBlock,
     start: SrcLoc,
     end: SrcLoc
@@ -14,7 +15,7 @@ export class BoundForStatement extends BoundASTNode {
   }
 
   public static new(
-    bindings: BoundASTNode,
+    bindings: BoundAssignmentExpression,
     body: BoundBlock,
     start: SrcLoc,
     end: SrcLoc

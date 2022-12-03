@@ -707,6 +707,8 @@ export class TypeChecker {
     const iterType = synth(node.bindings.right, env) as Type.Vector;
     if (node.bindings.left instanceof Identifier) {
       env.set(node.bindings.left.name, iterType.type);
+    } else {
+      throw new Error(`For binding not implemented for ${node.bindings.kind}`);
     }
 
     const boundBindings = this.checkAssignment(node.bindings, env, iterType);

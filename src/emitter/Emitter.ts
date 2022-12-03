@@ -8,6 +8,7 @@ import { BoundBlock } from "../typechecker/bound/BoundBlock";
 import { BoundBooleanLiteral } from "../typechecker/bound/BoundBooleanLiteral";
 import { BoundCallExpression } from "../typechecker/bound/BoundCallExpression";
 import { BoundFloatLiteral } from "../typechecker/bound/BoundFloatLiteral";
+import { BoundForStatement } from "../typechecker/bound/BoundForStatement";
 import { BoundFunctionDeclaration } from "../typechecker/bound/BoundFunctionDeclaration";
 import { BoundIdentifier } from "../typechecker/bound/BoundIdentifier";
 import { BoundIfExpression } from "../typechecker/bound/BoundIfExpression";
@@ -98,6 +99,8 @@ export class Emitter {
         return this.emitVector(node as BoundVector);
       case BoundNodes.BoundSliceExpression:
         return this.emitSliceExpression(node as BoundSliceExpression);
+      case BoundNodes.BoundForStatement:
+        return this.emitForStatement(node as BoundForStatement);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -274,5 +277,22 @@ export class Emitter {
 
   private emitSliceExpression(node: BoundSliceExpression): string {
     return `${this.emitNode(node.obj)}[${this.emitNode(node.index)}]`;
+  }
+
+  private emitForStatement(node: BoundForStatement) {
+    let bindings = "";
+
+    if (node.bindings.left instanceof BoundIdentifier) {
+      bindings = node.bindings.left.name;
+    } else {
+      throw new Error(
+        `Code emitting not yet implemented in for statement binding for ${node.bindings.kind}`
+      );
+    }
+
+    return `for (let ${bindings} of ${this.emitNode(node.bindings.right)}) {
+${this.emitNode(node.body)}
+}
+`;
   }
 }
