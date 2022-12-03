@@ -77,6 +77,7 @@ import { ForStatement } from "../syntax/parser/ast/ForStatement";
 import { BoundForStatement } from "./bound/BoundForStatement";
 import { TuplePattern } from "../syntax/parser/ast/TuplePattern";
 import { SpreadOperation } from "../syntax/parser/ast/SpreadOperation";
+import { BoundTuplePattern } from "./bound/BoundTuplePattern";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -202,6 +203,9 @@ export class TypeChecker {
 
       case SyntaxNodes.ForStatement:
         return this.checkForStatement(node as ForStatement, env);
+
+      case SyntaxNodes.TuplePattern:
+        return this.checkTuplePattern(node as TuplePattern, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -481,7 +485,32 @@ export class TypeChecker {
       type = synth(node.right, env);
       check(node.right, type, env);
     } else if (node.left instanceof TuplePattern) {
+      if (!type) {
+        type = synth(node.right, env);
+      }
+
+      if (!Type.isTuple(type)) {
+        throw new Error(
+          `Tuple pattern assignment must have a tuple type for its right hand value`
+        );
+      }
+      // the type for each variable name will have already
+      // been set while checking the variable declaration
+      let i = 0;
+
+      for (let lhv of node.left.names) {
+        if (lhv instanceof Identifier) {
+          let t = type.types[i];
+          check(lhv, t, env);
+        } else if (lhv instanceof SpreadOperation) {
+          let t = Type.tuple(type.types.slice(i));
+          check(lhv, t, env);
+        }
+
+        i++;
+      }
     } else {
+      // This should never happen because it should be caught in the parser
       throw new Error(`Invalid left hand value ${node.left.kind}`);
     }
 
@@ -750,6 +779,17 @@ export class TypeChecker {
       node.start,
       node.end
     );
+  }
+
+  private checkTuplePattern(node: TuplePattern, env: TypeEnv) {
+    // When we get here, types are already set in the env for each identifier
+    const names = node.names.map((n) => {
+      // This guarantees name instanceof Identifier
+      let name = n instanceof SpreadOperation ? n.expression : n;
+      return this.checkNode(name, env) as BoundIdentifier;
+    });
+
+    return BoundTuplePattern.new(names, node.rest, node.start, node.end);
   }
 
   private setType(node: TypeAlias, env: TypeEnv) {

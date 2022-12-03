@@ -7,14 +7,20 @@ import { SyntaxNodes } from "./SyntaxNodes";
 export class TuplePattern extends ASTNode {
   constructor(
     public names: (Identifier | SpreadOperation)[],
+    public rest: boolean,
     start: SrcLoc,
     end: SrcLoc
   ) {
     super(SyntaxNodes.TuplePattern, start, end);
   }
 
-  public static new(names: Identifier[], start: SrcLoc, end: SrcLoc) {
-    return new TuplePattern(names, start, end);
+  public static new(
+    names: Identifier[],
+    rest: boolean,
+    start: SrcLoc,
+    end: SrcLoc
+  ) {
+    return new TuplePattern(names, rest, start, end);
   }
 
   public get children() {

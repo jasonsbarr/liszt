@@ -56,6 +56,6 @@ export class LHVParser extends BaseParser {
           : (value as Identifier);
     }
 
-    return TuplePattern.new(names, expr.start, expr.end);
+    return TuplePattern.new(names, rest, expr.start, expr.end);
   }
 }
