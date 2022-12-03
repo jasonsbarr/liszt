@@ -5,7 +5,7 @@ import { BoundNodes } from "./BoundNodes";
 
 export class BoundTuplePattern extends BoundASTNode {
   constructor(
-    public names: BoundIdentifier[],
+    public names: (BoundIdentifier | BoundTuplePattern)[],
     public rest: boolean,
     start: SrcLoc,
     end: SrcLoc
@@ -14,7 +14,7 @@ export class BoundTuplePattern extends BoundASTNode {
   }
 
   public static new(
-    names: BoundIdentifier[],
+    names: (BoundIdentifier | BoundTuplePattern)[],
     rest: boolean,
     start: SrcLoc,
     end: SrcLoc

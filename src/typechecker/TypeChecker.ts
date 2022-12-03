@@ -573,6 +573,8 @@ export class TypeChecker {
         } else if (lhv instanceof SpreadOperation) {
           let t = Type.tuple(type.types.slice(i));
           env.set((lhv.expression as Identifier).name, t);
+        } else {
+          this.setNestedTuple(lhv, env, type.types[i] as Type.Tuple);
         }
 
         i++;
@@ -596,6 +598,29 @@ export class TypeChecker {
       node.start,
       node.end
     );
+  }
+
+  private setNestedTuple(node: TuplePattern, env: TypeEnv, type: Type.Tuple) {
+    let i = 0;
+    for (let name of node.names) {
+      if (name instanceof Identifier) {
+        let t = type.types[i];
+        env.set(name.name, t);
+      } else if (name instanceof SpreadOperation) {
+        let t = Type.tuple(type.types.slice(i));
+        env.set((name.expression as Identifier).name, t);
+      } else {
+        // is another tuple pattern
+        if (!Type.isTuple(type.types[i])) {
+          throw new Error(
+            `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
+          );
+        }
+        this.setNestedTuple(name, env, type.types[i] as Type.Tuple);
+      }
+
+      i++;
+    }
   }
 
   private checkBlock(node: Block, env: TypeEnv, type?: Type) {
