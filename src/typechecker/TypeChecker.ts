@@ -71,6 +71,8 @@ import { BoundIfExpression } from "./bound/BoundIfExpression";
 import { BoundTuple } from "./bound/BoundTuple";
 import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
 import { BoundVector } from "./bound/BoundVector";
+import { SliceExpression } from "../syntax/parser/ast/SliceExpression";
+import { BoundSliceExpression } from "./bound/BoundSliceExpression";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -190,6 +192,9 @@ export class TypeChecker {
 
       case SyntaxNodes.VectorLiteral:
         return this.checkVector(node as VectorLiteral, env);
+
+      case SyntaxNodes.SliceExpression:
+        return this.checkSliceExpression(node as SliceExpression, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -667,6 +672,18 @@ export class TypeChecker {
     );
 
     return BoundTuple.new(values, type, node.start, node.end);
+  }
+
+  private checkSliceExpression(node: SliceExpression, env: TypeEnv) {
+    const sliceType = synth(node, env);
+
+    return BoundSliceExpression.new(
+      this.checkNode(node.obj, env),
+      this.checkNode(node.index, env),
+      sliceType,
+      node.start,
+      node.end
+    );
   }
 
   private checkVector(node: VectorLiteral, env: TypeEnv) {

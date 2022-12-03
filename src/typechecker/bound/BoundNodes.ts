@@ -9,6 +9,7 @@ export enum BoundNodes {
   BoundObjectLiteral = "BoundObjectLiteral",
   BoundIdentifier = "BoundIdentifier",
   BoundMemberExpression = "BoundMemberExpression",
+  BoundSliceExpression = "BoundSliceExpression",
   BoundParenthesizedExpression = "BoundParenthesizedExpression",
   BoundLambdaExpression = "BoundLambdaExpression",
   BoundParameter = "BoundParameter",
