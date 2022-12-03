@@ -21,6 +21,7 @@ import { BoundObjectLiteral } from "../typechecker/bound/BoundObjectLiteral";
 import { BoundParenthesizedExpression } from "../typechecker/bound/BoundParenthesizedExpression";
 import { BoundProgramNode } from "../typechecker/bound/BoundProgramNode";
 import { BoundReturnStatement } from "../typechecker/bound/BoundReturnStatement";
+import { BoundSliceExpression } from "../typechecker/bound/BoundSliceExpression";
 import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
 import { BoundSymbolLiteral } from "../typechecker/bound/BoundSymbolLiteral";
 import { BoundTree } from "../typechecker/bound/BoundTree";
@@ -95,6 +96,8 @@ export class Emitter {
         return this.emitTuple(node as BoundTuple);
       case BoundNodes.BoundVector:
         return this.emitVector(node as BoundVector);
+      case BoundNodes.BoundSliceExpression:
+        return this.emitSliceExpression(node as BoundSliceExpression);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -266,5 +269,9 @@ export class Emitter {
 
   private emitVector(node: BoundVector): string {
     return `[${node.members.map((m) => this.emitNode(m)).join(", ")}]`;
+  }
+
+  private emitSliceExpression(node: BoundSliceExpression): string {
+    return `${this.emitNode(node.obj)}[${this.emitNode(node.index)}]`;
   }
 }
