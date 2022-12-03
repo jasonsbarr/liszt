@@ -27,6 +27,7 @@ import { BoundTree } from "../typechecker/bound/BoundTree";
 import { BoundTuple } from "../typechecker/bound/BoundTuple";
 import { BoundUnaryOperation } from "../typechecker/bound/BoundUnaryOperation";
 import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
+import { BoundVector } from "../typechecker/bound/BoundVector";
 
 export class Emitter {
   constructor(public tree: BoundTree) {}
@@ -92,6 +93,8 @@ export class Emitter {
         return this.emitIfExpression(node as BoundIfExpression);
       case BoundNodes.BoundTuple:
         return this.emitTuple(node as BoundTuple);
+      case BoundNodes.BoundVector:
+        return this.emitVector(node as BoundVector);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -259,5 +262,9 @@ export class Emitter {
 
   private emitTuple(node: BoundTuple): string {
     return `[${node.values.map((v) => this.emitNode(v)).join(", ")}]`;
+  }
+
+  private emitVector(node: BoundVector): string {
+    return `[${node.members.map((m) => this.emitNode(m)).join(", ")}]`;
   }
 }
