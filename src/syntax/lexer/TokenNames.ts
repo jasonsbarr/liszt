@@ -67,6 +67,7 @@ export enum TokenNames {
   If = "If",
   Else = "Else",
   Vec = "Vec",
+  For = "For",
   TypeVariable = "TypeVariable",
   EOF = "EOF",
 }
