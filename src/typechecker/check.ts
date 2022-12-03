@@ -205,7 +205,11 @@ const checkBlock = (node: Block, type: Type, env: TypeEnv): boolean => {
 
   for (let expr of exprs) {
     if (expr.kind === SyntaxNodes.ReturnStatement) {
-      if (!check(expr, type, env)) return false;
+      if (!check(expr, type, env)) {
+        throw new Error(
+          `Expected ${type} as return type; got ${synth(expr, env)}`
+        );
+      }
     }
   }
   return check(exprs[exprs.length - 1], type, env);
