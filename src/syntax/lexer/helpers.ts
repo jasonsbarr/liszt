@@ -61,6 +61,7 @@ export const KEYWORDS = {
   any: TokenNames.AnyKeyword,
   never: TokenNames.NeverKeyword,
   unknown: TokenNames.UnknownKeyword,
+  vector: TokenNames.VectorKeyword,
   def: TokenNames.Def,
   var: TokenNames.Var,
   const: TokenNames.Const,
@@ -68,10 +69,11 @@ export const KEYWORDS = {
   end: TokenNames.End,
   return: TokenNames.Return,
   type: TokenNames.Type,
-  alias: TokenNames.Alias,
   self: TokenNames.Self,
   if: TokenNames.If,
   else: TokenNames.Else,
+  vec: TokenNames.Vec,
+  for: TokenNames.For,
 };
 
 export type kw = keyof typeof KEYWORDS;

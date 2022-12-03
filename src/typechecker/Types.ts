@@ -327,6 +327,20 @@ export class TupleType extends BaseType {
   }
 }
 
+export class VectorType extends BaseType {
+  constructor(public type: Type, constant = false, nullable = false) {
+    super("Vector", constant, nullable);
+  }
+
+  public static new(type: Type, constant = false, nullable = false) {
+    return new VectorType(type, constant, nullable);
+  }
+
+  public toString() {
+    return `Vector [${this.type}]`;
+  }
+}
+
 export type Type =
   | IntegerType
   | FloatType
@@ -348,4 +362,5 @@ export type Type =
   | TypeVariable
   | GenericFunction
   | TypeAlias
-  | TupleType;
+  | TupleType
+  | VectorType;

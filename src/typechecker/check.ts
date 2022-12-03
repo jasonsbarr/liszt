@@ -5,6 +5,7 @@ import { FunctionDeclaration } from "../syntax/parser/ast/FunctionDeclaration";
 import { Identifier } from "../syntax/parser/ast/Identifier";
 import { IfExpression } from "../syntax/parser/ast/IfExpression";
 import { LambdaExpression } from "../syntax/parser/ast/LambdaExpression";
+import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
 import { ObjectLiteral } from "../syntax/parser/ast/ObjectLiteral";
 import { ReturnStatement } from "../syntax/parser/ast/ReturnStatement";
 import { SyntaxNodes } from "../syntax/parser/ast/SyntaxNodes";
@@ -75,6 +76,10 @@ export const check = (ast: ASTNode, t: Type, env: TypeEnv) => {
 
   if (ast.kind === SyntaxNodes.Tuple) {
     return checkTuple(ast as Tuple, t, env);
+  }
+
+  if (ast.kind === SyntaxNodes.VectorLiteral) {
+    return checkVector(ast as VectorLiteral, t, env);
   }
 
   if (Type.isUNDEFINED(t)) {
@@ -200,7 +205,11 @@ const checkBlock = (node: Block, type: Type, env: TypeEnv): boolean => {
 
   for (let expr of exprs) {
     if (expr.kind === SyntaxNodes.ReturnStatement) {
-      if (!check(expr, type, env)) return false;
+      if (!check(expr, type, env)) {
+        throw new Error(
+          `Expected ${type} as return type; got ${synth(expr, env)}`
+        );
+      }
     }
   }
   return check(exprs[exprs.length - 1], type, env);
@@ -255,4 +264,16 @@ const checkUnion = (node: ASTNode, type: Type.Union, env: TypeEnv): boolean => {
   }
   // if it gets here, no union arm matched
   throw new Error(`Expected type ${type}; got ${synth(node, env)}`);
+};
+
+const checkVector = (
+  node: VectorLiteral,
+  type: Type,
+  env: TypeEnv
+): boolean => {
+  const baseType = Type.isTypeAlias(type)
+    ? (getAliasBase(type) as Type.Vector)
+    : (type as Type.Vector);
+
+  return node.members.reduce((_, m) => check(m, baseType.type, env), true);
 };

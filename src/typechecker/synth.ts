@@ -34,6 +34,10 @@ import { narrow, narrowType } from "./narrow";
 import { getType } from "./getType";
 import { getAliasBase } from "./getAliasBase";
 import { Tuple } from "../syntax/parser/ast/Tuple";
+import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
+import { SliceExpression } from "../syntax/parser/ast/SliceExpression";
+import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
+import { ForStatement } from "../syntax/parser/ast/ForStatement";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -70,6 +74,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
         return synthConstantDeclaration(ast as VariableDeclaration, env);
       }
       return synthVariableDeclaration(ast as VariableDeclaration, env);
+    case SyntaxNodes.AssignmentExpression:
+      return synthAssignmentExpression(ast as AssignmentExpression, env);
     case SyntaxNodes.FunctionDeclaration:
       return synthFunction(ast as FunctionDeclaration, env);
     case SyntaxNodes.ReturnStatement:
@@ -84,6 +90,12 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthIfExpression(ast as IfExpression, env);
     case SyntaxNodes.Tuple:
       return synthTuple(ast as Tuple, env);
+    case SyntaxNodes.VectorLiteral:
+      return synthVector(ast as VectorLiteral, env);
+    case SyntaxNodes.SliceExpression:
+      return synthSlice(ast as SliceExpression, env);
+    case SyntaxNodes.ForStatement:
+      return synthStatement(ast as ForStatement, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -297,14 +309,19 @@ const synthBlock = (node: Block, env: TypeEnv): Type => {
 
 const synthVariableDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   const type = synth(node.assignment.right, env);
-  env.set((node.assignment.left as Identifier).name, type);
   return type;
 };
 
 const synthConstantDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   const type = synthSingleton(node, env);
-  env.set((node.assignment.left as Identifier).name, type);
   return type;
+};
+
+const synthAssignmentExpression = (
+  node: AssignmentExpression,
+  env: TypeEnv
+) => {
+  return synth(node.right, env);
 };
 
 const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
@@ -763,3 +780,20 @@ const synthTuple = (node: Tuple, env: TypeEnv) => {
   const types = node.values.map((v) => synth(v, env));
   return Type.tuple(types);
 };
+
+const synthVector = (node: VectorLiteral, env: TypeEnv) => {
+  const types = node.members.map((m) => synth(m, env));
+  return Type.vector(Type.union(...types));
+};
+
+const synthSlice = (node: SliceExpression, env: TypeEnv) => {
+  const objType = synth(node.obj, env);
+
+  if (Type.isVector(objType)) {
+    return objType.type;
+  }
+
+  throw new Error(`Slice syntax not implemented for type ${objType}`);
+};
+
+const synthStatement = (_node: ForStatement, _env: TypeEnv) => Type.any();

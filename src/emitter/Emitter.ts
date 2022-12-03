@@ -8,6 +8,7 @@ import { BoundBlock } from "../typechecker/bound/BoundBlock";
 import { BoundBooleanLiteral } from "../typechecker/bound/BoundBooleanLiteral";
 import { BoundCallExpression } from "../typechecker/bound/BoundCallExpression";
 import { BoundFloatLiteral } from "../typechecker/bound/BoundFloatLiteral";
+import { BoundForStatement } from "../typechecker/bound/BoundForStatement";
 import { BoundFunctionDeclaration } from "../typechecker/bound/BoundFunctionDeclaration";
 import { BoundIdentifier } from "../typechecker/bound/BoundIdentifier";
 import { BoundIfExpression } from "../typechecker/bound/BoundIfExpression";
@@ -21,12 +22,14 @@ import { BoundObjectLiteral } from "../typechecker/bound/BoundObjectLiteral";
 import { BoundParenthesizedExpression } from "../typechecker/bound/BoundParenthesizedExpression";
 import { BoundProgramNode } from "../typechecker/bound/BoundProgramNode";
 import { BoundReturnStatement } from "../typechecker/bound/BoundReturnStatement";
+import { BoundSliceExpression } from "../typechecker/bound/BoundSliceExpression";
 import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
 import { BoundSymbolLiteral } from "../typechecker/bound/BoundSymbolLiteral";
 import { BoundTree } from "../typechecker/bound/BoundTree";
 import { BoundTuple } from "../typechecker/bound/BoundTuple";
 import { BoundUnaryOperation } from "../typechecker/bound/BoundUnaryOperation";
 import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
+import { BoundVector } from "../typechecker/bound/BoundVector";
 
 export class Emitter {
   constructor(public tree: BoundTree) {}
@@ -92,6 +95,12 @@ export class Emitter {
         return this.emitIfExpression(node as BoundIfExpression);
       case BoundNodes.BoundTuple:
         return this.emitTuple(node as BoundTuple);
+      case BoundNodes.BoundVector:
+        return this.emitVector(node as BoundVector);
+      case BoundNodes.BoundSliceExpression:
+        return this.emitSliceExpression(node as BoundSliceExpression);
+      case BoundNodes.BoundForStatement:
+        return this.emitForStatement(node as BoundForStatement);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -206,9 +215,10 @@ export class Emitter {
     let code = "(function() {\n";
     code += `${node.expressions
       .map((expr, i, a) => {
+        // this case is redundant, but I'm putting it here for emphasis
         if (expr.kind === BoundNodes.BoundReturnStatement) {
           return this.emitNode(expr);
-        } else if (i === a.length - 1) {
+        } else if (i === a.length - 1 && node.statement) {
           return `return ${this.emitNode(expr)};`;
         }
         return this.emitNode(expr);
@@ -259,5 +269,32 @@ export class Emitter {
 
   private emitTuple(node: BoundTuple): string {
     return `[${node.values.map((v) => this.emitNode(v)).join(", ")}]`;
+  }
+
+  private emitVector(node: BoundVector): string {
+    return `[${node.members.map((m) => this.emitNode(m)).join(", ")}]`;
+  }
+
+  private emitSliceExpression(node: BoundSliceExpression): string {
+    return `${this.emitNode(node.obj)}[${this.emitNode(node.index)}]`;
+  }
+
+  private emitForStatement(node: BoundForStatement) {
+    let bindings = "";
+    let code = "";
+
+    if (node.bindings.left instanceof BoundIdentifier) {
+      bindings = node.bindings.left.name;
+    } else {
+      throw new Error(
+        `Code emitting not yet implemented in for statement binding for ${node.bindings.kind}`
+      );
+    }
+
+    code += `for (let ${bindings} of ${this.emitNode(node.bindings.right)}) {`;
+    code += `${this.emitNode(node.body)}`;
+    code += "}\n";
+
+    return code;
   }
 }

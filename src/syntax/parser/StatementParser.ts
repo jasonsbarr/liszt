@@ -32,6 +32,9 @@ import { LogicalOperation } from "./ast/LogicalOperation";
 import { SymbolLiteral } from "./ast/SymbolLiteral";
 import { IfExpression } from "./ast/IfExpression";
 import { Tuple } from "./ast/Tuple";
+import { VectorLiteral } from "./ast/ListLiteral";
+import { SliceExpression } from "./ast/SliceExpression";
+import { ForStatement } from "./ast/ForStatement";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -55,7 +58,6 @@ const nudAttributes = {
 type nud = keyof typeof nudAttributes;
 
 const ledAttributes = {
-  [TokenNames.Equals]: { prec: 5, assoc: "right" },
   [TokenNames.Or]: { prec: 15, assoc: "left" },
   [TokenNames.And]: { prec: 20, assoc: "left" },
   [TokenNames.Amp]: { prec: 25, assoc: "left" },
@@ -80,7 +82,8 @@ const ledAttributes = {
   [TokenNames.Mod]: { prec: 45, assoc: "left" },
   [TokenNames.Exp]: { prec: 50, assoc: "left" },
   [TokenNames.Dot]: { prec: 90, assoc: "left" },
-  [TokenNames.LParen]: { prec: 100, assoc: "left" },
+  [TokenNames.LParen]: { prec: 90, assoc: "left" },
+  [TokenNames.LBracket]: { prec: 90, assoc: "left" },
 };
 
 type led = keyof typeof ledAttributes;
@@ -120,7 +123,7 @@ export class StatementParser extends TypeAnnotationParser {
   private parseAssign(left: ASTNode, type?: TypeAnnotation, constant = false) {
     left = this.parseLHV(left);
     let token = this.reader.peek();
-    const prec = this.getLedPrecedence();
+    const prec = 5;
     // advance token stream
     this.reader.next();
     const right: ASTNode = this.parseExpression(prec);
@@ -178,6 +181,8 @@ export class StatementParser extends TypeAnnotationParser {
             );
           case TokenNames.LBrace:
             return this.parseObjectLiteral();
+          case TokenNames.Vec:
+            return this.parseVectorLiteral();
           case TokenNames.Not:
           case TokenNames.Plus:
           case TokenNames.Minus:
@@ -210,7 +215,7 @@ export class StatementParser extends TypeAnnotationParser {
     return BinaryOperation.new(left, right, token.value, start, end);
   }
 
-  private parseBlock(): Block {
+  private parseBlock(statement = false): Block {
     let token = this.reader.peek();
     const start = token.location;
     let exprs: ASTNode[] = [];
@@ -224,7 +229,7 @@ export class StatementParser extends TypeAnnotationParser {
     this.reader.skip(TokenNames.End);
     const end = token.location;
 
-    return Block.new(exprs, start, end);
+    return Block.new(exprs, start, end, statement);
   }
 
   private parseCallExpression(left: ASTNode) {
@@ -287,6 +292,25 @@ export class StatementParser extends TypeAnnotationParser {
     }
 
     return expr;
+  }
+
+  private parseForStatement() {
+    let token = this.reader.peek();
+    const start = token.location;
+
+    this.reader.skip(TokenNames.For);
+
+    let bindings = this.parseExpression() as BinaryOperation;
+    bindings.left = this.parseLHV(bindings.left);
+
+    if (bindings.operator !== "in") {
+      throw new Error(`For statement must use in operator to bind its members`);
+    }
+
+    const body = this.parseBlock(true);
+    const end = body.end;
+
+    return ForStatement.new(bindings, body, start, end);
   }
 
   private parseFuncParameter() {
@@ -390,8 +414,10 @@ export class StatementParser extends TypeAnnotationParser {
         return this.parseReturnStatement();
       case TokenNames.If:
         return this.parseIfExpression();
+      case TokenNames.For:
+        return this.parseForStatement();
       default:
-        throw new Error(`Parse rule not found for token name ${token.name}`);
+        return this.parseExpression();
     }
   }
 
@@ -462,8 +488,8 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenNames.LShift:
       case TokenNames.Xor:
         return this.parseBinaryOperation(left);
-      case TokenNames.Equals:
-        return this.parseAssign(left);
+      case TokenNames.LBracket:
+        return this.parseSliceExpression(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }
@@ -564,6 +590,20 @@ export class StatementParser extends TypeAnnotationParser {
     return ReturnStatement.new(expression, start, end);
   }
 
+  private parseSliceExpression(left: ASTNode) {
+    const start = left.start;
+
+    this.reader.skip(TokenNames.LBracket);
+
+    const index = this.parseExpression();
+    const token = this.reader.peek();
+    const end = token.location;
+
+    this.reader.skip(TokenNames.RBracket);
+
+    return SliceExpression.new(left, index, start, end);
+  }
+
   public parseStatement() {
     const token = this.reader.peek();
 
@@ -644,5 +684,38 @@ export class StatementParser extends TypeAnnotationParser {
     const end = assignment.end;
 
     return VariableDeclaration.new(assignment, constant, start, end);
+  }
+
+  private parseVectorLiteral() {
+    let token = this.reader.next();
+    const start = token.location;
+    let end: SrcLoc;
+
+    this.reader.skip(TokenNames.LBracket);
+    token = this.reader.peek();
+
+    if (token.name === TokenNames.RBracket) {
+      // return empty list
+      end = token.location;
+      return VectorLiteral.new([], start, end);
+    }
+
+    let members: ASTNode[] = [];
+
+    while ((token.name as TokenNames) !== TokenNames.RBracket) {
+      let member = this.parseExpr();
+      members.push(member);
+      token = this.reader.peek();
+
+      if (token.name !== TokenNames.RBracket) {
+        this.reader.skip(TokenNames.Comma);
+        token = this.reader.peek();
+      }
+    }
+
+    token = this.reader.next();
+    end = token.location;
+
+    return VectorLiteral.new(members, start, end);
   }
 }

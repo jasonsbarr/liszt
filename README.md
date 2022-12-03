@@ -111,3 +111,5 @@ You can also use type variables to create generic types, with no concrete type a
 type Box = { value: 'a }
 var boxedNum: Box = { value: 5 }
 ```
+
+Note that types are structural, not nominal, so an unannotated object with all the same property types as a defined type will check properly for that type.
