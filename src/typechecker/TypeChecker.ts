@@ -542,9 +542,10 @@ export class TypeChecker {
           let t = type.types[i];
           env.set(lhv.name, t);
         } else if (lhv instanceof SpreadOperation) {
-          let t = type.types.slice(i);
-          env.set(lhv.expression)
+          let t = Type.tuple(type.types.slice(i));
+          env.set((lhv.expression as Identifier).name, t);
         }
+
         i++;
       }
     } else {
