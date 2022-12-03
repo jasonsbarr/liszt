@@ -81,7 +81,7 @@ const ledAttributes = {
   [TokenNames.Mod]: { prec: 45, assoc: "left" },
   [TokenNames.Exp]: { prec: 50, assoc: "left" },
   [TokenNames.Dot]: { prec: 90, assoc: "left" },
-  [TokenNames.LParen]: { prec: 100, assoc: "left" },
+  [TokenNames.LParen]: { prec: 90, assoc: "left" },
 };
 
 type led = keyof typeof ledAttributes;
