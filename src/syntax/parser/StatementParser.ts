@@ -657,21 +657,30 @@ export class StatementParser extends TypeAnnotationParser {
       throw new Error("First tuple element must be followed by a comma");
     }
 
-    while (token.name === TokenNames.Comma) {
-      // allows trailing comma
-      this.reader.skip(TokenNames.Comma);
+    this.reader.skip(TokenNames.Comma);
+
+    while (token.name !== TokenNames.RParen) {
       token = this.reader.peek();
 
       if (token.name !== TokenNames.RParen) {
         values.push(this.parseExpr());
+        console.log("values:", values);
         token = this.reader.peek();
+
+        if (token.name === TokenNames.Comma) {
+          // allows but does not require trailing comma
+          this.reader.skip(TokenNames.Comma);
+          token = this.reader.peek();
+        }
       }
     }
 
     this.reader.skip(TokenNames.RParen);
     end = token.location;
 
-    return Tuple.new(values, start, end);
+    const tpl = Tuple.new(values, start, end);
+    console.log(tpl);
+    return tpl;
   }
 
   private parseUnaryOperation() {
