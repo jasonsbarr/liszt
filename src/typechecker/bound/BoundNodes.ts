@@ -24,4 +24,5 @@ export enum BoundNodes {
   BoundSymbolLiteral = "BoundSymbolLiteral",
   BoundIfExpression = "BoundIfExpression",
   BoundTuple = "BoundTuple",
+  BoundVector = "BoundVector",
 }
