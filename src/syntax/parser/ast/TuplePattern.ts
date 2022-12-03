@@ -6,7 +6,7 @@ import { SyntaxNodes } from "./SyntaxNodes";
 
 export class TuplePattern extends ASTNode {
   constructor(
-    public names: (Identifier | SpreadOperation)[],
+    public names: (Identifier | SpreadOperation | TuplePattern)[],
     public rest: boolean,
     start: SrcLoc,
     end: SrcLoc
@@ -15,7 +15,7 @@ export class TuplePattern extends ASTNode {
   }
 
   public static new(
-    names: Identifier[],
+    names: (Identifier | SpreadOperation | TuplePattern)[],
     rest: boolean,
     start: SrcLoc,
     end: SrcLoc

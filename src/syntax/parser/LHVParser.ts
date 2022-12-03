@@ -30,7 +30,7 @@ export class LHVParser extends BaseParser {
   }
 
   private parseTuplePattern(expr: Tuple) {
-    let names: Identifier[] = [];
+    let names: (Identifier | SpreadOperation | TuplePattern)[] = [];
     let rest = false;
     for (let value of expr.values) {
       if (rest) {
@@ -39,23 +39,23 @@ export class LHVParser extends BaseParser {
 
       if (
         value.kind !== SyntaxNodes.Identifier &&
-        value.kind !== SyntaxNodes.SpreadOperation
+        value.kind !== SyntaxNodes.SpreadOperation &&
+        value.kind !== SyntaxNodes.Tuple
       ) {
         throw new Error(
-          `Tuple pattern assignment expects valid identifiers; ${expr} given`
+          `Tuple pattern assignment requires valid identifiers, rest parameters, or nested tuples; ${expr} given`
         );
+      }
+
+      if (value.kind === SyntaxNodes.Tuple) {
+        value = this.parseTuplePattern(value as Tuple);
       }
 
       if (value.kind === SyntaxNodes.SpreadOperation) {
         rest = true;
       }
 
-      value =
-        value.kind === SyntaxNodes.SpreadOperation
-          ? (value as SpreadOperation)
-          : (value as Identifier);
-
-      names.push(value as Identifier);
+      names.push(value as Identifier | SpreadOperation | TuplePattern);
     }
 
     return TuplePattern.new(names, rest, expr.start, expr.end);
