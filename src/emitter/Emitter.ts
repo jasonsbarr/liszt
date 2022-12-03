@@ -305,7 +305,9 @@ export class Emitter {
     return `[${node.names
       .map((n, i, a) => {
         if (node.rest && i === a.length - 1) {
-          return `...${n.name}`;
+          return `...${(n as BoundIdentifier).name}`;
+        } else if (n instanceof BoundTuplePattern) {
+          return this.emitTuplePattern(n);
         }
 
         return n.name;

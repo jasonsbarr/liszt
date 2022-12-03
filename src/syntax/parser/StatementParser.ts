@@ -664,7 +664,6 @@ export class StatementParser extends TypeAnnotationParser {
 
       if (token.name !== TokenNames.RParen) {
         values.push(this.parseExpr());
-        console.log("values:", values);
         token = this.reader.peek();
 
         if (token.name === TokenNames.Comma) {
@@ -678,9 +677,7 @@ export class StatementParser extends TypeAnnotationParser {
     this.reader.skip(TokenNames.RParen);
     end = token.location;
 
-    const tpl = Tuple.new(values, start, end);
-    console.log(tpl);
-    return tpl;
+    return Tuple.new(values, start, end);
   }
 
   private parseUnaryOperation() {
