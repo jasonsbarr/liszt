@@ -33,6 +33,7 @@ import { SymbolLiteral } from "./ast/SymbolLiteral";
 import { IfExpression } from "./ast/IfExpression";
 import { Tuple } from "./ast/Tuple";
 import { VectorLiteral } from "./ast/ListLiteral";
+import { SliceExpression } from "./ast/SliceExpression";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -82,6 +83,7 @@ const ledAttributes = {
   [TokenNames.Exp]: { prec: 50, assoc: "left" },
   [TokenNames.Dot]: { prec: 90, assoc: "left" },
   [TokenNames.LParen]: { prec: 90, assoc: "left" },
+  [TokenNames.LBracket]: { prec: 90, assoc: "left" },
 };
 
 type led = keyof typeof ledAttributes;
@@ -467,42 +469,11 @@ export class StatementParser extends TypeAnnotationParser {
         return this.parseBinaryOperation(left);
       case TokenNames.Equals:
         return this.parseAssign(left);
+      case TokenNames.LBracket:
+        return this.parseSliceExpression(left);
       default:
         throw new Error(`Token ${token.name} does not have a left denotation`);
     }
-  }
-
-  private parseVectorLiteral() {
-    let token = this.reader.next();
-    const start = token.location;
-    let end: SrcLoc;
-
-    this.reader.skip(TokenNames.LBracket);
-    token = this.reader.peek();
-
-    if (token.name === TokenNames.RBracket) {
-      // return empty list
-      end = token.location;
-      return VectorLiteral.new([], start, end);
-    }
-
-    let members: ASTNode[] = [];
-
-    while ((token.name as TokenNames) !== TokenNames.RBracket) {
-      let member = this.parseExpr();
-      members.push(member);
-      token = this.reader.peek();
-
-      if (token.name !== TokenNames.RBracket) {
-        this.reader.skip(TokenNames.Comma);
-        token = this.reader.peek();
-      }
-    }
-
-    token = this.reader.next();
-    end = token.location;
-
-    return VectorLiteral.new(members, start, end);
   }
 
   private parseLogicalOperation(left: ASTNode) {
@@ -610,6 +581,20 @@ export class StatementParser extends TypeAnnotationParser {
     return this.parseExpression();
   }
 
+  private parseSliceExpression(left: ASTNode) {
+    const start = left.start;
+
+    this.reader.skip(TokenNames.LBracket);
+
+    const index = this.parseExpression();
+    const token = this.reader.peek();
+    const end = token.location;
+
+    this.reader.skip(TokenNames.RBracket);
+
+    return SliceExpression.new(left, index, start, end);
+  }
+
   private parseTuple() {
     let token = this.reader.next();
     const start = token.location;
@@ -680,5 +665,38 @@ export class StatementParser extends TypeAnnotationParser {
     const end = assignment.end;
 
     return VariableDeclaration.new(assignment, constant, start, end);
+  }
+
+  private parseVectorLiteral() {
+    let token = this.reader.next();
+    const start = token.location;
+    let end: SrcLoc;
+
+    this.reader.skip(TokenNames.LBracket);
+    token = this.reader.peek();
+
+    if (token.name === TokenNames.RBracket) {
+      // return empty list
+      end = token.location;
+      return VectorLiteral.new([], start, end);
+    }
+
+    let members: ASTNode[] = [];
+
+    while ((token.name as TokenNames) !== TokenNames.RBracket) {
+      let member = this.parseExpr();
+      members.push(member);
+      token = this.reader.peek();
+
+      if (token.name !== TokenNames.RBracket) {
+        this.reader.skip(TokenNames.Comma);
+        token = this.reader.peek();
+      }
+    }
+
+    token = this.reader.next();
+    end = token.location;
+
+    return VectorLiteral.new(members, start, end);
   }
 }
