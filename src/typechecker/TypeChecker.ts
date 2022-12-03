@@ -558,7 +558,13 @@ export class TypeChecker {
       Type.any() as Type
     );
 
-    return BoundBlock.new(boundNodes, returnType, node.start, node.end);
+    return BoundBlock.new(
+      boundNodes,
+      returnType,
+      node.start,
+      node.end,
+      node.statement
+    );
   }
 
   private checkReturn(node: ReturnStatement, env: TypeEnv, type?: Type) {

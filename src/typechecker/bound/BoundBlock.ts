@@ -8,7 +8,8 @@ export class BoundBlock extends BoundASTNode {
     public expressions: BoundASTNode[],
     public type: Type,
     start: SrcLoc,
-    end: SrcLoc
+    end: SrcLoc,
+    public statement = false
   ) {
     super(BoundNodes.BoundBlock, start, end);
   }
@@ -17,9 +18,10 @@ export class BoundBlock extends BoundASTNode {
     expressions: BoundASTNode[],
     type: Type,
     start: SrcLoc,
-    end: SrcLoc
+    end: SrcLoc,
+    statement = false
   ) {
-    return new BoundBlock(expressions, type, start, end);
+    return new BoundBlock(expressions, type, start, end, statement);
   }
 
   public get children() {

@@ -212,9 +212,10 @@ export class Emitter {
     let code = "(function() {\n";
     code += `${node.expressions
       .map((expr, i, a) => {
+        // this case is redundant, but I'm putting it here for emphasis
         if (expr.kind === BoundNodes.BoundReturnStatement) {
           return this.emitNode(expr);
-        } else if (i === a.length - 1) {
+        } else if (i === a.length - 1 && node.statement) {
           return `return ${this.emitNode(expr)};`;
         }
         return this.emitNode(expr);
