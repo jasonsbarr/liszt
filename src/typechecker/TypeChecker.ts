@@ -69,6 +69,8 @@ import { BoundLogicalOperation } from "./bound/BoundLogicalOperation";
 import { BoundUnaryOperation } from "./bound/BoundUnaryOperation";
 import { BoundIfExpression } from "./bound/BoundIfExpression";
 import { BoundTuple } from "./bound/BoundTuple";
+import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
+import { BoundVector } from "./bound/BoundVector";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -185,6 +187,9 @@ export class TypeChecker {
 
       case SyntaxNodes.Tuple:
         return this.checkTuple(node as Tuple, env);
+
+      case SyntaxNodes.VectorLiteral:
+        return this.checkVector(node as VectorLiteral, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -662,6 +667,13 @@ export class TypeChecker {
     );
 
     return BoundTuple.new(values, type, node.start, node.end);
+  }
+
+  private checkVector(node: VectorLiteral, env: TypeEnv) {
+    const vecType = synth(node, env);
+    const members = node.members.map((m) => this.checkNode(m, env));
+
+    return BoundVector.new(members, vecType, node.start, node.end);
   }
 
   private setType(node: TypeAlias, env: TypeEnv) {
