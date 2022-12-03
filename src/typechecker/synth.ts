@@ -782,5 +782,5 @@ const synthSlice = (node: SliceExpression, env: TypeEnv) => {
     return objType.type;
   }
 
-  throw new Error(`Slice syntax not yet implemented for type ${objType}`);
+  throw new Error(`Slice syntax not implemented for type ${objType}`);
 };
