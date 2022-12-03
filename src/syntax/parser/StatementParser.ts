@@ -215,7 +215,7 @@ export class StatementParser extends TypeAnnotationParser {
     return BinaryOperation.new(left, right, token.value, start, end);
   }
 
-  private parseBlock(): Block {
+  private parseBlock(statement = false): Block {
     let token = this.reader.peek();
     const start = token.location;
     let exprs: ASTNode[] = [];
@@ -229,7 +229,7 @@ export class StatementParser extends TypeAnnotationParser {
     this.reader.skip(TokenNames.End);
     const end = token.location;
 
-    return Block.new(exprs, start, end);
+    return Block.new(exprs, start, end, statement);
   }
 
   private parseCallExpression(left: ASTNode) {
@@ -301,7 +301,7 @@ export class StatementParser extends TypeAnnotationParser {
     this.reader.skip(TokenNames.For);
 
     const bindings = this.parseExpression();
-    const body = this.parseBlock();
+    const body = this.parseBlock(true);
     const end = body.end;
 
     return ForStatement.new(bindings, body, start, end);
