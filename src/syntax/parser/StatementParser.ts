@@ -220,7 +220,7 @@ export class StatementParser extends TypeAnnotationParser {
     return BinaryOperation.new(left, right, token.value, start, end);
   }
 
-  private parseBlock(statement = false): Block {
+  private parseBlock({ statement = false } = {}): Block {
     let token = this.reader.peek();
     const start = token.location;
     let exprs: ASTNode[] = [];
@@ -319,7 +319,7 @@ export class StatementParser extends TypeAnnotationParser {
       throw new Error(`For statement must use in operator to bind its members`);
     }
 
-    const body = this.parseBlock(true);
+    const body = this.parseBlock({ statement: true });
     const end = body.end;
 
     return ForStatement.new(bindings, body, start, end);
