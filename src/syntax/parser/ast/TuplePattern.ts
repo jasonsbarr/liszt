@@ -1,10 +1,15 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { ASTNode } from "./ASTNode";
 import { Identifier } from "./Identifier";
+import { SpreadOperation } from "./SpreadOperation";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class TuplePattern extends ASTNode {
-  constructor(public names: Identifier[], start: SrcLoc, end: SrcLoc) {
+  constructor(
+    public names: (Identifier | SpreadOperation)[],
+    start: SrcLoc,
+    end: SrcLoc
+  ) {
     super(SyntaxNodes.TuplePattern, start, end);
   }
 
