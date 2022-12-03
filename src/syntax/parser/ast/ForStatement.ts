@@ -1,11 +1,12 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { ASTNode } from "./ASTNode";
+import { BinaryOperation } from "./BinaryOperation";
 import { Block } from "./Block";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class ForStatement extends ASTNode {
   constructor(
-    public bindings: ASTNode,
+    public bindings: BinaryOperation,
     public body: Block,
     start: SrcLoc,
     end: SrcLoc
@@ -14,7 +15,7 @@ export class ForStatement extends ASTNode {
   }
 
   public static new(
-    bindings: ASTNode,
+    bindings: BinaryOperation,
     body: Block,
     start: SrcLoc,
     end: SrcLoc

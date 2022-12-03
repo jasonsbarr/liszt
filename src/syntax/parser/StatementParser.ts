@@ -300,7 +300,8 @@ export class StatementParser extends TypeAnnotationParser {
 
     this.reader.skip(TokenNames.For);
 
-    const bindings = this.parseExpression() as BinaryOperation;
+    let bindings = this.parseExpression() as BinaryOperation;
+    bindings.left = this.parseLHV(bindings.left);
 
     if (bindings.operator !== "in") {
       throw new Error(`For statement must use in operator to bind its members`);

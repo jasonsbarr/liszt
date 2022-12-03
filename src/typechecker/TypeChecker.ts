@@ -73,6 +73,8 @@ import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
 import { BoundVector } from "./bound/BoundVector";
 import { SliceExpression } from "../syntax/parser/ast/SliceExpression";
 import { BoundSliceExpression } from "./bound/BoundSliceExpression";
+import { ForStatement } from "../syntax/parser/ast/ForStatement";
+import { BoundForStatement } from "./bound/BoundForStatement";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -195,6 +197,9 @@ export class TypeChecker {
 
       case SyntaxNodes.SliceExpression:
         return this.checkSliceExpression(node as SliceExpression, env);
+
+      case SyntaxNodes.ForStatement:
+        return this.checkForStatement(node as ForStatement, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -442,7 +447,7 @@ export class TypeChecker {
   }
 
   private checkAssignment(
-    node: AssignmentExpression,
+    node: AssignmentExpression | BinaryOperation,
     env: TypeEnv,
     type?: Type
   ) {
@@ -553,10 +558,9 @@ export class TypeChecker {
       }
       return this.checkNode(expr, env);
     });
-    const returnType = expressions.reduce(
-      (_: Type, curr: ASTNode) => synth(curr, env),
-      Type.any() as Type
-    );
+    const returnType = expressions.reduce((_: Type, curr: ASTNode) => {
+      return synth(curr, env);
+    }, Type.any() as Type);
 
     return BoundBlock.new(
       boundNodes,
@@ -697,6 +701,23 @@ export class TypeChecker {
     const members = node.members.map((m) => this.checkNode(m, env));
 
     return BoundVector.new(members, vecType, node.start, node.end);
+  }
+
+  private checkForStatement(node: ForStatement, env: TypeEnv) {
+    const iterType = synth(node.bindings.right, env) as Type.Vector;
+    if (node.bindings.left instanceof Identifier) {
+      env.set(node.bindings.left.name, iterType.type);
+    }
+
+    const boundBindings = this.checkAssignment(node.bindings, env, iterType);
+    const boundBody = this.checkNode(node.body, env) as BoundBlock;
+
+    return BoundForStatement.new(
+      boundBindings,
+      boundBody,
+      node.start,
+      node.end
+    );
   }
 
   private setType(node: TypeAlias, env: TypeEnv) {

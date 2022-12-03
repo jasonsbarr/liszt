@@ -36,6 +36,7 @@ import { getAliasBase } from "./getAliasBase";
 import { Tuple } from "../syntax/parser/ast/Tuple";
 import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
 import { SliceExpression } from "../syntax/parser/ast/SliceExpression";
+import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -72,6 +73,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
         return synthConstantDeclaration(ast as VariableDeclaration, env);
       }
       return synthVariableDeclaration(ast as VariableDeclaration, env);
+    case SyntaxNodes.AssignmentExpression:
+      return synthAssignmentExpression(ast as AssignmentExpression, env);
     case SyntaxNodes.FunctionDeclaration:
       return synthFunction(ast as FunctionDeclaration, env);
     case SyntaxNodes.ReturnStatement:
@@ -303,14 +306,19 @@ const synthBlock = (node: Block, env: TypeEnv): Type => {
 
 const synthVariableDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   const type = synth(node.assignment.right, env);
-  env.set((node.assignment.left as Identifier).name, type);
   return type;
 };
 
 const synthConstantDeclaration = (node: VariableDeclaration, env: TypeEnv) => {
   const type = synthSingleton(node, env);
-  env.set((node.assignment.left as Identifier).name, type);
   return type;
+};
+
+const synthAssignmentExpression = (
+  node: AssignmentExpression,
+  env: TypeEnv
+) => {
+  return synth(node.right, env);
 };
 
 const synthReturnStatement = (node: ReturnStatement, env: TypeEnv) => {
