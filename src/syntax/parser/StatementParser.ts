@@ -32,7 +32,7 @@ import { LogicalOperation } from "./ast/LogicalOperation";
 import { SymbolLiteral } from "./ast/SymbolLiteral";
 import { IfExpression } from "./ast/IfExpression";
 import { Tuple } from "./ast/Tuple";
-import { ListLiteral } from "./ast/ListLiteral";
+import { VectorLiteral } from "./ast/ListLiteral";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -179,8 +179,8 @@ export class StatementParser extends TypeAnnotationParser {
             );
           case TokenNames.LBrace:
             return this.parseObjectLiteral();
-          case TokenNames.LBracket:
-            return this.parseListLiteral();
+          case TokenNames.Vec:
+            return this.parseVectorLiteral();
           case TokenNames.Not:
           case TokenNames.Plus:
           case TokenNames.Minus:
@@ -394,7 +394,7 @@ export class StatementParser extends TypeAnnotationParser {
       case TokenNames.If:
         return this.parseIfExpression();
       default:
-        throw new Error(`Parse rule not found for token name ${token.name}`);
+        return this.parseExpression();
     }
   }
 
@@ -472,16 +472,18 @@ export class StatementParser extends TypeAnnotationParser {
     }
   }
 
-  private parseListLiteral() {
+  private parseVectorLiteral() {
     let token = this.reader.next();
     const start = token.location;
     let end: SrcLoc;
+
+    this.reader.skip(TokenNames.LBracket);
     token = this.reader.peek();
 
     if (token.name === TokenNames.RBracket) {
       // return empty list
       end = token.location;
-      return ListLiteral.new([], start, end);
+      return VectorLiteral.new([], start, end);
     }
 
     let members: ASTNode[] = [];
@@ -500,7 +502,7 @@ export class StatementParser extends TypeAnnotationParser {
     token = this.reader.next();
     end = token.location;
 
-    return ListLiteral.new(members, start, end);
+    return VectorLiteral.new(members, start, end);
   }
 
   private parseLogicalOperation(left: ASTNode) {

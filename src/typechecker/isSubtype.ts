@@ -81,8 +81,11 @@ export const isSubtype = (a: Types.Type, b: Types.Type): boolean => {
     );
   }
 
-  if (Type.isList(a) && Type.isList(b)) {
-    return isSubtype((a as Types.ListType).type, (b as Types.ListType).type);
+  if (Type.isVector(a) && Type.isVector(b)) {
+    return isSubtype(
+      (a as Types.VectorType).type,
+      (b as Types.VectorType).type
+    );
   }
 
   return false;

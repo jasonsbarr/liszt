@@ -71,6 +71,7 @@ export const KEYWORDS = {
   self: TokenNames.Self,
   if: TokenNames.If,
   else: TokenNames.Else,
+  vec: TokenNames.Vec,
 };
 
 export type kw = keyof typeof KEYWORDS;

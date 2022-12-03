@@ -23,7 +23,7 @@ import {
   TypeAlias,
   UNDEFINED,
   UnknownType,
-  ListType,
+  VectorType,
 } from "./Types";
 
 export const integer = (constant = false, nullable = false) =>
@@ -103,4 +103,4 @@ export const typeAlias = (name: string, base: Type) =>
 
 export const tuple = (types: Type[]) => TupleType.new(types);
 
-export const list = (type: Type) => ListType.new(type);
+export const vector = (type: Type) => VectorType.new(type);

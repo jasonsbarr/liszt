@@ -327,17 +327,17 @@ export class TupleType extends BaseType {
   }
 }
 
-export class ListType extends BaseType {
+export class VectorType extends BaseType {
   constructor(public type: Type, constant = false, nullable = false) {
-    super("List", constant, nullable);
+    super("Vector", constant, nullable);
   }
 
   public static new(type: Type, constant = false, nullable = false) {
-    return new ListType(type, constant, nullable);
+    return new VectorType(type, constant, nullable);
   }
 
   public toString() {
-    return `List ${this.type}`;
+    return `Vector [${this.type}]`;
   }
 }
 
@@ -363,4 +363,4 @@ export type Type =
   | GenericFunction
   | TypeAlias
   | TupleType
-  | ListType;
+  | VectorType;
