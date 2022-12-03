@@ -37,6 +37,7 @@ import { Tuple } from "../syntax/parser/ast/Tuple";
 import { VectorLiteral } from "../syntax/parser/ast/ListLiteral";
 import { SliceExpression } from "../syntax/parser/ast/SliceExpression";
 import { AssignmentExpression } from "../syntax/parser/ast/AssignmentExpression";
+import { ForStatement } from "../syntax/parser/ast/ForStatement";
 
 export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
   switch (ast.kind) {
@@ -93,6 +94,8 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
       return synthVector(ast as VectorLiteral, env);
     case SyntaxNodes.SliceExpression:
       return synthSlice(ast as SliceExpression, env);
+    case SyntaxNodes.ForStatement:
+      return synthStatement(ast as ForStatement, env);
     default:
       throw new Error(`Unknown type for expression type ${ast.kind}`);
   }
@@ -792,3 +795,5 @@ const synthSlice = (node: SliceExpression, env: TypeEnv) => {
 
   throw new Error(`Slice syntax not implemented for type ${objType}`);
 };
+
+const synthStatement = (_node: ForStatement, _env: TypeEnv) => Type.any();
