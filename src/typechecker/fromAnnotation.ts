@@ -13,6 +13,7 @@ import { TypeLiteral } from "../syntax/parser/ast/TypeLiteral";
 import { TypeVariable } from "../syntax/parser/ast/TypeVariable";
 import { Type } from "./Type";
 import { TypeEnv } from "./TypeEnv";
+import { VectorType } from "./Types";
 
 export const fromAnnotation = (
   type: TypeAnnotation | TypeAlias | ObjectPropertyType,
@@ -68,6 +69,13 @@ export const fromAnnotation = (
         return Type.typeVariable((type.type as TypeVariable).name);
       case SyntaxNodes.TupleType:
         return generateTupleType((type.type as TupleType).types, env);
+      case SyntaxNodes.VectorType:
+        return Type.vector(
+          fromAnnotation(
+            (type.type as unknown as VectorType)
+              .type as unknown as TypeAnnotation
+          )
+        );
       default:
         throw new Error(`No type definition found for type ${type.type.kind}`);
     }
