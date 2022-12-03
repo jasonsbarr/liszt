@@ -681,8 +681,15 @@ export class StatementParser extends TypeAnnotationParser {
     const expression = this.parseExpr(prec);
     const end = expression.end;
 
+    if (
+      token.name === TokenNames.ThreeDots &&
+      expression.kind !== SyntaxNodes.Identifier
+    ) {
+      throw new Error(`Spread operator can only be used with an identifier`);
+    }
+
     return token.name === TokenNames.ThreeDots
-      ? SpreadOperation.new(expression, start, end)
+      ? SpreadOperation.new(expression as Identifier, start, end)
       : UnaryOperation.new(expression, token.value, start, end);
   }
 

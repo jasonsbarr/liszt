@@ -47,6 +47,15 @@ export class LHVParser extends BaseParser {
       }
 
       if (value.kind === SyntaxNodes.SpreadOperation) {
+        if (
+          (value as SpreadOperation).expression.kind !== SyntaxNodes.Identifier
+        ) {
+          throw new Error(
+            `Rest parameter in tuple pattern assignment must be a valid identifier; ${
+              (value as SpreadOperation).kind
+            } given.`
+          );
+        }
         rest = true;
       }
 
