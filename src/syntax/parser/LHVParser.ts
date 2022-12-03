@@ -30,7 +30,10 @@ export class LHVParser extends BaseParser {
   private parseTuplePattern(expr: Tuple) {
     let names: Identifier[] = [];
     for (let value of expr.values) {
-      if (value.kind !== SyntaxNodes.Identifier) {
+      if (
+        value.kind !== SyntaxNodes.Identifier &&
+        value.kind !== SyntaxNodes.SpreadOperation
+      ) {
         throw new Error(
           `Tuple pattern assignment expects valid identifiers; ${expr} given`
         );
