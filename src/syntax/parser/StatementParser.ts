@@ -326,7 +326,7 @@ export class StatementParser extends TypeAnnotationParser {
       throw new Error(`For statement must use in operator to bind its members`);
     }
 
-    const body = this.parseBlock({ statement: true, isFunc: true });
+    const body = this.parseBlock({ statement: true, isFunc: false });
     const end = body.end;
 
     return ForStatement.new(bindings, body, start, end);
@@ -390,7 +390,7 @@ export class StatementParser extends TypeAnnotationParser {
       returnType = this.parseTypeAnnotation();
     }
 
-    const body = this.parseBlock();
+    const body = this.parseBlock({ isFunc: true });
     const end = body.end;
 
     return FunctionDeclaration.new(
