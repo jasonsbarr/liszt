@@ -314,12 +314,12 @@ export class TypeAlias extends BaseType {
 }
 
 export class TupleType extends BaseType {
-  constructor(public types: Type[], constant = false) {
-    super("Tuple", constant, false);
+  constructor(public types: Type[]) {
+    super("Tuple", true, false);
   }
 
-  public static new(types: Type[], constant = false) {
-    return new TupleType(types, constant);
+  public static new(types: Type[]) {
+    return new TupleType(types);
   }
 
   public toString(): string {
