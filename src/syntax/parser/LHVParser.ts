@@ -22,6 +22,10 @@ export class LHVParser extends BaseParser {
       return expr;
     }
 
+    if (expr.kind === SyntaxNodes.SliceExpression) {
+      return expr;
+    }
+
     if (expr.kind === SyntaxNodes.Tuple) {
       return this.parseTuplePattern(expr as Tuple);
     }
