@@ -221,7 +221,7 @@ export class Emitter {
         // this case is redundant, but I'm putting it here for emphasis
         if (expr.kind === BoundNodes.BoundReturnStatement) {
           return this.emitNode(expr);
-        } else if (i === a.length - 1 && node.statement) {
+        } else if (i === a.length - 1 && !node.statement) {
           return `return ${this.emitNode(expr)};`;
         }
         return this.emitNode(expr);

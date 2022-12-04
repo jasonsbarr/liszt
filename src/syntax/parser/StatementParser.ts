@@ -220,7 +220,7 @@ export class StatementParser extends TypeAnnotationParser {
     return BinaryOperation.new(left, right, token.value, start, end);
   }
 
-  private parseBlock({ statement = false, isFunc = false } = {}): Block {
+  private parseBlock({ statement = false } = {}): Block {
     let token = this.reader.peek();
     const start = token.location;
     let exprs: ASTNode[] = [];
@@ -228,7 +228,7 @@ export class StatementParser extends TypeAnnotationParser {
     while (token.name !== TokenNames.End) {
       let expr = this.parseStatement();
 
-      if (!isFunc && expr.kind === SyntaxNodes.ReturnStatement) {
+      if (statement && expr.kind === SyntaxNodes.ReturnStatement) {
         throw new Error(
           `Return statements are only allowed in function bodies`
         );
@@ -326,7 +326,7 @@ export class StatementParser extends TypeAnnotationParser {
       throw new Error(`For statement must use in operator to bind its members`);
     }
 
-    const body = this.parseBlock({ statement: true, isFunc: false });
+    const body = this.parseBlock({ statement: true });
     const end = body.end;
 
     return ForStatement.new(bindings, body, start, end);
@@ -390,7 +390,7 @@ export class StatementParser extends TypeAnnotationParser {
       returnType = this.parseTypeAnnotation();
     }
 
-    const body = this.parseBlock({ isFunc: true });
+    const body = this.parseBlock();
     const end = body.end;
 
     return FunctionDeclaration.new(
