@@ -20,7 +20,7 @@ Liszt compiles to JavaScript, so it can be used both for browser-based applicati
 
 The type checker implementation owes a great deal to Jake Donham's [Reconstructing TypeScript](https://jaked.org/blog/2021-09-07-Reconstructing-TypeScript-part-0) series.
 
-## Syntax
+## The language
 
 Comments start with a semicolon and continue to the end of the line.
 
