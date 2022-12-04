@@ -54,7 +54,8 @@ export const object = (
     return ObjectType.new(properties, constant);
   } else {
     return object(
-      Object.entries(properties).map(([name, type]) => ({ name, type }))
+      Object.entries(properties).map(([name, type]) => ({ name, type })),
+      constant
     );
   }
 };
@@ -103,4 +104,5 @@ export const typeAlias = (name: string, base: Type) =>
 
 export const tuple = (types: Type[]) => TupleType.new(types);
 
-export const vector = (type: Type) => VectorType.new(type);
+export const vector = (type: Type, constant = false) =>
+  VectorType.new(type, constant);

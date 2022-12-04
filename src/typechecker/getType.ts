@@ -6,7 +6,8 @@ import { TypeEnv } from "./TypeEnv";
 
 export const getType = (
   type: TypeAnnotation | TypeAlias | Identifier,
-  env: TypeEnv
+  env: TypeEnv,
+  constant = false
 ) => {
   if (type instanceof TypeAnnotation) {
     if (type.type instanceof Identifier) {
@@ -14,9 +15,9 @@ export const getType = (
       return t;
     }
 
-    return fromAnnotation(type, env);
+    return fromAnnotation(type, env, constant);
   } else if (type instanceof TypeAlias) {
-    const alias = fromAnnotation(type, env);
+    const alias = fromAnnotation(type, env, constant);
 
     if (!env.lookup(type.name.name)) {
       env.set(type.name.name, alias);

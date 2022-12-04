@@ -54,7 +54,7 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
     case SyntaxNodes.NilLiteral:
       return synthNil();
     case SyntaxNodes.ObjectLiteral:
-      return synthObject(ast as ObjectLiteral, env);
+      return synthObject(ast as ObjectLiteral, env, constant);
     case SyntaxNodes.MemberExpression:
       return synthMember(ast as MemberExpression, env);
     case SyntaxNodes.AsExpression:
@@ -91,7 +91,7 @@ export const synth = (ast: ASTNode, env: TypeEnv, constant = false): Type => {
     case SyntaxNodes.Tuple:
       return synthTuple(ast as Tuple, env);
     case SyntaxNodes.VectorLiteral:
-      return synthVector(ast as VectorLiteral, env);
+      return synthVector(ast as VectorLiteral, env, constant);
     case SyntaxNodes.SliceExpression:
       return synthSlice(ast as SliceExpression, env);
     case SyntaxNodes.ForStatement:
@@ -132,12 +132,12 @@ const synthSymbol = (node: SymbolLiteral, constant: boolean) => {
 
 const synthNil = () => Type.nil();
 
-const synthObject = (obj: ObjectLiteral, env: TypeEnv) => {
+const synthObject = (obj: ObjectLiteral, env: TypeEnv, constant = false) => {
   const props: Property[] = obj.properties.map((prop) => ({
     name: prop.key.name,
-    type: synth(prop.value, env),
+    type: synth(prop.value, env, constant),
   }));
-  return Type.object(props);
+  return Type.object(props, constant);
 };
 
 const synthMember = (ast: MemberExpression, env: TypeEnv) => {
@@ -781,9 +781,9 @@ const synthTuple = (node: Tuple, env: TypeEnv) => {
   return Type.tuple(types);
 };
 
-const synthVector = (node: VectorLiteral, env: TypeEnv) => {
-  const types = node.members.map((m) => synth(m, env));
-  return Type.vector(Type.union(...types));
+const synthVector = (node: VectorLiteral, env: TypeEnv, constant = false) => {
+  const types = node.members.map((m) => synth(m, env, constant));
+  return Type.vector(Type.union(...types), constant);
 };
 
 const synthSlice = (node: SliceExpression, env: TypeEnv) => {

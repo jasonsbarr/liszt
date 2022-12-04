@@ -119,7 +119,12 @@ export class TypeChecker {
     );
   }
 
-  private checkNode(node: ASTNode, env: TypeEnv, type?: Type): BoundASTNode {
+  private checkNode(
+    node: ASTNode,
+    env: TypeEnv,
+    type?: Type,
+    { isDecl = false } = {}
+  ): BoundASTNode {
     switch (node.kind) {
       case SyntaxNodes.ProgramNode:
         return this.checkProgram(node as ProgramNode, env);
@@ -167,7 +172,12 @@ export class TypeChecker {
         return this.checkLambdaExpression(node as LambdaExpression, env, type);
 
       case SyntaxNodes.AssignmentExpression:
-        return this.checkAssignment(node as AssignmentExpression, env, type);
+        return this.checkAssignment(
+          node as AssignmentExpression,
+          env,
+          type,
+          isDecl
+        );
 
       case SyntaxNodes.VariableDeclaration:
         return this.checkVariableDeclaration(node as VariableDeclaration, env);
@@ -456,7 +466,8 @@ export class TypeChecker {
   private checkAssignment(
     node: AssignmentExpression | BinaryOperation,
     env: TypeEnv,
-    type?: Type
+    type?: Type,
+    isDecl = false
   ) {
     const left = node.left;
     const right = node.right;
@@ -464,10 +475,9 @@ export class TypeChecker {
     if (left instanceof Identifier) {
       const name = left.name;
 
-      // if this is a variable declaration, it's been
-      // previously defined and we need to make sure
-      // it's not an attempt to reassign a constant
-      if (env.lookup(left.name) && env.get(left.name)?.constant) {
+      // If this isn't a variable declaration, we need to
+      // make sure it's not trying to reassign a constant
+      if (!isDecl && env.lookup(left.name) && env.get(left.name)?.constant) {
         throw new Error(`Illegal assignment to constant variable ${left.name}`);
       }
 
@@ -483,9 +493,27 @@ export class TypeChecker {
 
       check(right, type, env);
     } else if (left instanceof MemberExpression) {
+      const objType =
+        left.object instanceof Identifier
+          ? env.get(left.object.name)
+          : synth(left.object, env);
+
+      if (objType.constant) {
+        throw new Error(`Cannot reassign a constant object property`);
+      }
+
       type = type ?? synth(left, env);
       check(right, type, env);
     } else if (left instanceof SliceExpression) {
+      const objType =
+        left.obj instanceof Identifier
+          ? env.get(left.obj.name)
+          : synth(left.obj, env);
+
+      if (objType.constant) {
+        throw new Error(`Cannot reassign index of a constant object`);
+      }
+
       type = type ?? synth(left, env);
       check(right, type, env);
     } else if (left instanceof TuplePattern) {
@@ -535,7 +563,7 @@ export class TypeChecker {
 
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
     const type = node.assignment.type
-      ? getType(node.assignment.type, env)
+      ? getType(node.assignment.type, env, node.constant)
       : synth(node.assignment.right, env, node.constant);
     const left = node.assignment.left;
 
@@ -589,11 +617,9 @@ export class TypeChecker {
       throw new Error(`Invalid left hand assignment value ${left.kind}`);
     }
 
-    const assign = this.checkNode(
-      node.assignment,
-      env,
-      type
-    ) as BoundAssignmentExpression;
+    const assign = this.checkNode(node.assignment, env, type, {
+      isDecl: true,
+    }) as BoundAssignmentExpression;
 
     return BoundVariableDeclaration.new(
       assign,
