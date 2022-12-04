@@ -611,27 +611,22 @@ export class TypeChecker {
     let i = 0;
     let lhvs: DestructuringLHV[] =
       node instanceof TuplePattern ? node.names : [];
+    let types = Type.isTuple(type) ? type.types : [];
 
     for (let lhv of lhvs) {
-      if (Type.isTuple(type)) {
-        if (lhv instanceof Identifier) {
-          let t = type.types[i];
-          env.set(lhv.name, t);
-        } else if (lhv instanceof SpreadOperation) {
-          let t = Type.isTuple(type)
-            ? Type.tuple(type.types.slice(i))
-            : Type.any();
-          env.set((lhv.expression as Identifier).name, t);
-        } else if (lhv instanceof TuplePattern) {
-          if (!Type.isTuple(type.types[i])) {
-            throw new Error(
-              `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
-            );
-          }
-          this.setNestedDestructuring(lhv, env, type.types[i]);
+      if (lhv instanceof Identifier) {
+        let t = types[i];
+        env.set(lhv.name, t);
+      } else if (lhv instanceof SpreadOperation) {
+        let t = Type.isTuple(type) ? Type.tuple(types.slice(i)) : Type.any();
+        env.set((lhv.expression as Identifier).name, t);
+      } else if (lhv instanceof TuplePattern) {
+        if (!Type.isTuple(types[i])) {
+          throw new Error(
+            `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
+          );
         }
-      } else {
-        throw new Error(`Destructuring LHV expected; ${node.kind} given`);
+        this.setNestedDestructuring(lhv, env, types[i]);
       }
 
       i++;
