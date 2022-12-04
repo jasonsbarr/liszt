@@ -458,17 +458,17 @@ export class TypeChecker {
     env: TypeEnv,
     type?: Type
   ) {
+    const left = node.left;
+    const right = node.right;
     // right now, all assignment involves identifiers. This will change.
-    if (node.left instanceof Identifier) {
-      const name = node.left.name;
+    if (left instanceof Identifier) {
+      const name = left.name;
 
       // if this is a variable declaration, it's been
       // previously defined and we need to make sure
       // it's not an attempt to reassign a constant
-      if (env.lookup(node.left.name) && env.get(node.left.name)?.constant) {
-        throw new Error(
-          `Illegal assignment to constant variable ${node.left.name}`
-        );
+      if (env.lookup(left.name) && env.get(left.name)?.constant) {
+        throw new Error(`Illegal assignment to constant variable ${left.name}`);
       }
 
       if (!type) {
@@ -481,14 +481,15 @@ export class TypeChecker {
         }
       }
 
-      check(node.right, type, env);
-    } else if (node.left instanceof MemberExpression) {
-      type = synth(node.right, env);
-      check(node.right, type, env);
-    } else if (node.left instanceof TuplePattern) {
-      if (!type) {
-        type = synth(node.right, env);
-      }
+      check(right, type, env);
+    } else if (left instanceof MemberExpression) {
+      type = type ?? synth(left, env);
+      check(right, type, env);
+    } else if (left instanceof SliceExpression) {
+      type = type ?? synth(left, env);
+      check(right, type, env);
+    } else if (left instanceof TuplePattern) {
+      type = type ?? synth(right, env);
 
       if (!Type.isTuple(type)) {
         throw new Error(
@@ -499,7 +500,7 @@ export class TypeChecker {
       // been set while checking the variable declaration
       let i = 0;
 
-      for (let lhv of node.left.names) {
+      for (let lhv of left.names) {
         if (lhv instanceof Identifier) {
           let t = type.types[i];
           check(lhv, t, env);
@@ -519,12 +520,12 @@ export class TypeChecker {
       throw new Error(`No type found for assignment`);
     }
 
-    const left = this.checkNode(node.left, env, type);
-    const right = this.checkNode(node.right, env, type);
+    const boundL = this.checkNode(node.left, env, type);
+    const boundR = this.checkNode(node.right, env, type);
 
     return BoundAssignmentExpression.new(
-      left,
-      right,
+      boundL,
+      boundR,
       node.operator,
       node.start,
       node.end,
