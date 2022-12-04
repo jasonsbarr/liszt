@@ -424,7 +424,7 @@ export class StatementParser extends TypeAnnotationParser {
 
     switch (token.name) {
       case TokenNames.Var:
-        return this.parseVariableDeclaration(false);
+        return this.parseVariableDeclaration();
       case TokenNames.Const:
         return this.parseVariableDeclaration(true);
       case TokenNames.Def:
@@ -699,7 +699,7 @@ export class StatementParser extends TypeAnnotationParser {
       : UnaryOperation.new(expression, token.value, start, end);
   }
 
-  private parseVariableDeclaration(constant: boolean) {
+  private parseVariableDeclaration(constant = false) {
     const token = this.reader.next();
     const start = token.location;
     const assignment = this.parseExpression() as AssignmentExpression;
