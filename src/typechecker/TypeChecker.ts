@@ -78,6 +78,7 @@ import { BoundForStatement } from "./bound/BoundForStatement";
 import { TuplePattern } from "../syntax/parser/ast/TuplePattern";
 import { SpreadOperation } from "../syntax/parser/ast/SpreadOperation";
 import { BoundTuplePattern } from "./bound/BoundTuplePattern";
+import { DestructuringLHV } from "../syntax/parser/ast/DestructuringLHV";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -535,9 +536,10 @@ export class TypeChecker {
     const type = node.assignment.type
       ? getType(node.assignment.type, env)
       : synth(node.assignment.right, env, node.constant);
+    const left = node.assignment.left;
 
-    if (node.assignment.left instanceof Identifier) {
-      const name = node.assignment.left.name;
+    if (left instanceof Identifier) {
+      const name = left.name;
 
       if (env.has(name) && Type.isUNDEFINED(env.get(name)) && isSecondPass) {
         throw new Error(
@@ -556,8 +558,8 @@ export class TypeChecker {
         }
       }
       // Need to set the variable name and type BEFORE checking and binding the assignment node
-      env.set((node.assignment.left as Identifier).name, type);
-    } else if (node.assignment.left instanceof TuplePattern) {
+      env.set((left as Identifier).name, type);
+    } else if (left instanceof TuplePattern) {
       if (!Type.isTuple(type)) {
         throw new Error(
           `Assignment type for tuple pattern must be a tuple; ${type} given`
@@ -565,24 +567,25 @@ export class TypeChecker {
       }
 
       let i = 0;
+      let lhvs = left instanceof TuplePattern ? left.names : [];
 
-      for (let lhv of node.assignment.left.names) {
+      for (let lhv of lhvs) {
         if (lhv instanceof Identifier) {
           let t = type.types[i];
           env.set(lhv.name, t);
         } else if (lhv instanceof SpreadOperation) {
-          let t = Type.tuple(type.types.slice(i));
+          let t = Type.isTuple(type)
+            ? Type.tuple(type.types.slice(i))
+            : Type.any();
           env.set((lhv.expression as Identifier).name, t);
         } else {
-          this.setNestedTuple(lhv, env, type.types[i] as Type.Tuple);
+          this.setNestedDestructuring(lhv, env, type.types[i]);
         }
 
         i++;
       }
     } else {
-      throw new Error(
-        `Invalid left hand assignment value ${node.assignment.left.kind}`
-      );
+      throw new Error(`Invalid left hand assignment value ${left.kind}`);
     }
 
     const assign = this.checkNode(
@@ -600,23 +603,35 @@ export class TypeChecker {
     );
   }
 
-  private setNestedTuple(node: TuplePattern, env: TypeEnv, type: Type.Tuple) {
+  private setNestedDestructuring(
+    node: DestructuringLHV,
+    env: TypeEnv,
+    type: Type
+  ) {
     let i = 0;
-    for (let name of node.names) {
-      if (name instanceof Identifier) {
-        let t = type.types[i];
-        env.set(name.name, t);
-      } else if (name instanceof SpreadOperation) {
-        let t = Type.tuple(type.types.slice(i));
-        env.set((name.expression as Identifier).name, t);
-      } else {
-        // is another tuple pattern
-        if (!Type.isTuple(type.types[i])) {
-          throw new Error(
-            `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
-          );
+    let lhvs: DestructuringLHV[] =
+      node instanceof TuplePattern ? node.names : [];
+
+    for (let lhv of lhvs) {
+      if (Type.isTuple(type)) {
+        if (lhv instanceof Identifier) {
+          let t = type.types[i];
+          env.set(lhv.name, t);
+        } else if (lhv instanceof SpreadOperation) {
+          let t = Type.isTuple(type)
+            ? Type.tuple(type.types.slice(i))
+            : Type.any();
+          env.set((lhv.expression as Identifier).name, t);
+        } else if (lhv instanceof TuplePattern) {
+          if (!Type.isTuple(type.types[i])) {
+            throw new Error(
+              `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
+            );
+          }
+          this.setNestedDestructuring(lhv, env, type.types[i]);
         }
-        this.setNestedTuple(name, env, type.types[i] as Type.Tuple);
+      } else {
+        throw new Error(`Destructuring LHV expected; ${node.kind} given`);
       }
 
       i++;

@@ -7,7 +7,7 @@ export abstract class ASTNode implements PrettyPrintable {
   public start: SrcLoc;
   public end: SrcLoc;
 
-  constructor(kind: SyntaxNodes, start: SrcLoc, end: SrcLoc) {
+  constructor(kind: string, start: SrcLoc, end: SrcLoc) {
     this.kind = kind;
     this.start = start;
     this.end = end;

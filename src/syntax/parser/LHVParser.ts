@@ -1,6 +1,6 @@
 import { LexResult } from "../lexer/LexResult";
-import { TokenNames } from "../lexer/TokenNames";
 import { ASTNode } from "./ast/ASTNode";
+import { DestructuringLHV } from "./ast/DestructuringLHV";
 import { Identifier } from "./ast/Identifier";
 import { SpreadOperation } from "./ast/SpreadOperation";
 import { SyntaxNodes } from "./ast/SyntaxNodes";
@@ -30,7 +30,7 @@ export class LHVParser extends BaseParser {
   }
 
   private parseTuplePattern(expr: Tuple) {
-    let names: (Identifier | SpreadOperation | TuplePattern)[] = [];
+    let names: DestructuringLHV[] = [];
     let rest = false;
     for (let value of expr.values) {
       if (rest) {
@@ -38,24 +38,29 @@ export class LHVParser extends BaseParser {
       }
 
       if (
-        value.kind !== SyntaxNodes.Identifier &&
-        value.kind !== SyntaxNodes.SpreadOperation &&
-        value.kind !== SyntaxNodes.Tuple
+        ![
+          SyntaxNodes.Identifier as string,
+          SyntaxNodes.SpreadOperation as string,
+          SyntaxNodes.Tuple as string,
+        ].includes(value.kind)
       ) {
         throw new Error(
           `Tuple pattern assignment requires valid identifiers, rest parameters, or nested tuples; ${expr} given`
         );
       }
 
-      if (value.kind === SyntaxNodes.Tuple) {
-        value = this.parseTuplePattern(value as Tuple);
-      }
-
       if (value.kind === SyntaxNodes.SpreadOperation) {
         rest = true;
       }
 
-      names.push(value as Identifier | SpreadOperation | TuplePattern);
+      if (
+        value.kind !== SyntaxNodes.Identifier &&
+        value.kind !== SyntaxNodes.SpreadOperation
+      ) {
+        value = this.parseLHV(value);
+      }
+
+      names.push(value as DestructuringLHV);
     }
 
     return TuplePattern.new(names, rest, expr.start, expr.end);

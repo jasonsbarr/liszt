@@ -1,12 +1,13 @@
 import { SrcLoc } from "../../lexer/SrcLoc";
 import { ASTNode } from "./ASTNode";
+import { DestructuringLHV } from "./DestructuringLHV";
 import { Identifier } from "./Identifier";
 import { SpreadOperation } from "./SpreadOperation";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export class TuplePattern extends ASTNode {
   constructor(
-    public names: (Identifier | SpreadOperation | TuplePattern)[],
+    public names: DestructuringLHV[],
     public rest: boolean,
     start: SrcLoc,
     end: SrcLoc
@@ -15,7 +16,7 @@ export class TuplePattern extends ASTNode {
   }
 
   public static new(
-    names: (Identifier | SpreadOperation | TuplePattern)[],
+    names: DestructuringLHV[],
     rest: boolean,
     start: SrcLoc,
     end: SrcLoc

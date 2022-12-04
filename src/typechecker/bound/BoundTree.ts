@@ -5,7 +5,7 @@ import { BoundProgramNode } from "./BoundProgramNode";
 
 export class BoundTree extends SyntaxTree {
   constructor(
-    root: BoundProgramNode,
+    public root: BoundProgramNode,
     tokens: TokenBag,
     diagnostics: DiagnosticBag,
     source: string,
