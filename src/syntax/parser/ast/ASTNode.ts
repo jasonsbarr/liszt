@@ -3,11 +3,11 @@ import { SrcLoc } from "../../lexer/SrcLoc";
 import { SyntaxNodes } from "./SyntaxNodes";
 
 export abstract class ASTNode implements PrettyPrintable {
-  public kind: string;
+  public kind: SyntaxNodes;
   public start: SrcLoc;
   public end: SrcLoc;
 
-  constructor(kind: string, start: SrcLoc, end: SrcLoc) {
+  constructor(kind: SyntaxNodes, start: SrcLoc, end: SrcLoc) {
     this.kind = kind;
     this.start = start;
     this.end = end;

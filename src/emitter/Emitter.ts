@@ -3,6 +3,7 @@ import { ASTNode } from "../syntax/parser/ast/ASTNode";
 import { CallExpression } from "../syntax/parser/ast/CallExpression";
 import { VariableDeclaration } from "../syntax/parser/ast/VariableDeclaration";
 import { BoundAssignmentExpression } from "../typechecker/bound/BoundAssignmentExpression";
+import { BoundASTNode } from "../typechecker/bound/BoundASTNode";
 import { BoundBinaryOperation } from "../typechecker/bound/BoundBinaryOperation";
 import { BoundBlock } from "../typechecker/bound/BoundBlock";
 import { BoundBooleanLiteral } from "../typechecker/bound/BoundBooleanLiteral";
@@ -45,7 +46,7 @@ export class Emitter {
     return this.emitNode(program);
   }
 
-  private emitNode(node: ASTNode): string {
+  private emitNode(node: BoundASTNode): string {
     switch (node.kind) {
       case BoundNodes.BoundProgramNode:
         return this.emitProgram(node as BoundProgramNode);
@@ -185,7 +186,7 @@ export class Emitter {
     return code;
   }
 
-  private emitCallExpression(node: CallExpression): string {
+  private emitCallExpression(node: BoundCallExpression): string {
     let code = `${this.emitNode(node.func)}`;
     code += `(${node.args.map((arg) => this.emitNode(arg)).join(", ")})`;
     return code;

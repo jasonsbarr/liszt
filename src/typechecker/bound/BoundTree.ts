@@ -3,16 +3,14 @@ import { TokenBag } from "../../syntax/lexer/TokenBag";
 import { SyntaxTree } from "../../syntax/parser/ast/SyntaxTree";
 import { BoundProgramNode } from "./BoundProgramNode";
 
-export class BoundTree extends SyntaxTree {
+export class BoundTree {
   constructor(
     public root: BoundProgramNode,
-    tokens: TokenBag,
-    diagnostics: DiagnosticBag,
-    source: string,
-    file: string
-  ) {
-    super(root, tokens, diagnostics, source, file);
-  }
+    public tokens: TokenBag,
+    public diagnostics: DiagnosticBag,
+    public source: string,
+    public file: string
+  ) {}
 
   public static new(
     root: BoundProgramNode,
