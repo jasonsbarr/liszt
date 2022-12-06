@@ -50,4 +50,6 @@ export enum SyntaxNodes {
   Tuple = "Tuple",
   TuplePattern = "TuplePattern",
   SpreadOperation = "SpreadOperation",
+  ObjectPattern = "ObjectPattern",
+  SetLiteral = "SetLiteral",
 }
