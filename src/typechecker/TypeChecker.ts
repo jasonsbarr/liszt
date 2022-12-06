@@ -75,6 +75,10 @@ import { SliceExpression } from "../syntax/parser/ast/SliceExpression";
 import { BoundSliceExpression } from "./bound/BoundSliceExpression";
 import { ForStatement } from "../syntax/parser/ast/ForStatement";
 import { BoundForStatement } from "./bound/BoundForStatement";
+import { TuplePattern } from "../syntax/parser/ast/TuplePattern";
+import { SpreadOperation } from "../syntax/parser/ast/SpreadOperation";
+import { BoundTuplePattern } from "./bound/BoundTuplePattern";
+import { DestructuringLHV } from "../syntax/parser/ast/DestructuringLHV";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -115,7 +119,12 @@ export class TypeChecker {
     );
   }
 
-  private checkNode(node: ASTNode, env: TypeEnv, type?: Type): BoundASTNode {
+  private checkNode(
+    node: ASTNode,
+    env: TypeEnv,
+    type?: Type,
+    { isDecl = false } = {}
+  ): BoundASTNode {
     switch (node.kind) {
       case SyntaxNodes.ProgramNode:
         return this.checkProgram(node as ProgramNode, env);
@@ -163,7 +172,12 @@ export class TypeChecker {
         return this.checkLambdaExpression(node as LambdaExpression, env, type);
 
       case SyntaxNodes.AssignmentExpression:
-        return this.checkAssignment(node as AssignmentExpression, env, type);
+        return this.checkAssignment(
+          node as AssignmentExpression,
+          env,
+          type,
+          isDecl
+        );
 
       case SyntaxNodes.VariableDeclaration:
         return this.checkVariableDeclaration(node as VariableDeclaration, env);
@@ -200,6 +214,9 @@ export class TypeChecker {
 
       case SyntaxNodes.ForStatement:
         return this.checkForStatement(node as ForStatement, env);
+
+      case SyntaxNodes.TuplePattern:
+        return this.checkTuplePattern(node as TuplePattern, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -449,19 +466,19 @@ export class TypeChecker {
   private checkAssignment(
     node: AssignmentExpression | BinaryOperation,
     env: TypeEnv,
-    type?: Type
+    type?: Type,
+    isDecl = false
   ) {
+    const left = node.left;
+    const right = node.right;
     // right now, all assignment involves identifiers. This will change.
-    if (node.left instanceof Identifier) {
-      const name = node.left.name;
+    if (left instanceof Identifier) {
+      const name = left.name;
 
-      // if this is a variable declaration, it's been
-      // previously defined and we need to make sure
-      // it's not an attempt to reassign a constant
-      if (env.lookup(node.left.name) && env.get(node.left.name)?.constant) {
-        throw new Error(
-          `Illegal assignment to constant variable ${node.left.name}`
-        );
+      // If this isn't a variable declaration, we need to
+      // make sure it's not trying to reassign a constant
+      if (!isDecl && env.lookup(left.name) && env.get(left.name)?.constant) {
+        throw new Error(`Illegal assignment to constant variable ${left.name}`);
       }
 
       if (!type) {
@@ -473,21 +490,70 @@ export class TypeChecker {
           );
         }
       }
+
+      check(right, type, env);
+    } else if (left instanceof MemberExpression) {
+      const objType =
+        left.object instanceof Identifier
+          ? env.get(left.object.name)
+          : synth(left.object, env);
+
+      if (objType.constant) {
+        throw new Error(`Cannot reassign a constant object property`);
+      }
+
+      type = type ?? synth(left, env);
+      check(right, type, env);
+    } else if (left instanceof SliceExpression) {
+      const objType =
+        left.obj instanceof Identifier
+          ? env.get(left.obj.name)
+          : synth(left.obj, env);
+
+      if (objType.constant) {
+        throw new Error(`Cannot reassign index of a constant object`);
+      }
+
+      type = type ?? synth(left, env);
+      check(right, type, env);
+    } else if (left instanceof TuplePattern) {
+      type = type ?? synth(right, env);
+
+      if (!Type.isTuple(type)) {
+        throw new Error(
+          `Tuple pattern assignment must have a tuple type for its right hand value`
+        );
+      }
+      // the type for each variable name will have already
+      // been set while checking the variable declaration
+      let i = 0;
+
+      for (let lhv of left.names) {
+        if (lhv instanceof Identifier) {
+          let t = type.types[i];
+          check(lhv, t, env);
+        } else if (lhv instanceof SpreadOperation) {
+          let t = Type.tuple(type.types.slice(i));
+          check(lhv.expression, t, env);
+        }
+
+        i++;
+      }
+    } else {
+      // This should never happen because it should be caught in the parser
+      throw new Error(`Invalid left hand value ${node.left.kind}`);
     }
 
     if (!type) {
       throw new Error(`No type found for assignment`);
     }
 
-    // No matter what the LHV, we should have the type by now
-    check(node.right, type, env);
-
-    const left = this.checkNode(node.left, env, type);
-    const right = this.checkNode(node.right, env, type);
+    const boundL = this.checkNode(node.left, env, type);
+    const boundR = this.checkNode(node.right, env, type);
 
     return BoundAssignmentExpression.new(
-      left,
-      right,
+      boundL,
+      boundR,
       node.operator,
       node.start,
       node.end,
@@ -495,40 +561,67 @@ export class TypeChecker {
     );
   }
 
-  private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
-    if (node.assignment.left instanceof Identifier) {
-      const name = node.assignment.left.name;
+  private checkIfIdentifierIsDefined(name: string, env: TypeEnv) {
+    if (env.has(name) && Type.isUNDEFINED(env.get(name)) && isSecondPass) {
+      throw new Error(`Cannot reference name ${name} prior to initialization`);
+    }
 
-      if (env.has(name) && Type.isUNDEFINED(env.get(name)) && isSecondPass) {
+    if (env.has(name) && !isSecondPass) {
+      const t = env.get(name);
+
+      if (
+        (!Type.isUNDEFINED(t) && !Type.isFunction(t)) ||
+        (Type.isFunction(t) && !isUndefinedFunction(t))
+      ) {
+        throw new Error(`Variable ${name} has already been declared`);
+      }
+    }
+  }
+
+  private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
+    const type = node.assignment.type
+      ? getType(node.assignment.type, env, node.constant)
+      : synth(node.assignment.right, env, node.constant);
+    const left = node.assignment.left;
+
+    if (left instanceof Identifier) {
+      const name = left.name;
+
+      this.checkIfIdentifierIsDefined(name, env);
+      // Need to set the variable name and type BEFORE checking and binding the assignment node
+      env.set((left as Identifier).name, type);
+    } else if (left instanceof TuplePattern) {
+      if (!Type.isTuple(type)) {
         throw new Error(
-          `Cannot reference name ${name} prior to initialization`
+          `Assignment type for tuple pattern must be a tuple; ${type} given`
         );
       }
 
-      if (env.has(name) && !isSecondPass) {
-        const t = env.get(name);
+      let i = 0;
+      let lhvs = left.names;
 
-        if (
-          (!Type.isUNDEFINED(t) && !Type.isFunction(t)) ||
-          (Type.isFunction(t) && !isUndefinedFunction(t))
-        ) {
-          throw new Error(`Variable ${name} has already been declared`);
+      for (let lhv of lhvs) {
+        if (lhv instanceof Identifier) {
+          let t = type.types[i];
+          env.set(lhv.name, t);
+        } else if (lhv instanceof SpreadOperation) {
+          let t = Type.isTuple(type)
+            ? Type.tuple(type.types.slice(i))
+            : Type.any();
+          env.set((lhv.expression as Identifier).name, t);
+        } else {
+          this.setNestedDestructuring(lhv, env, type.types[i]);
         }
+
+        i++;
       }
+    } else {
+      throw new Error(`Invalid left hand assignment value ${left.kind}`);
     }
 
-    const type = node.assignment.type
-      ? getType(node.assignment.type, env)
-      : synth(node.assignment.right, env, node.constant);
-
-    // Need to set the variable name and type BEFORE checking and binding the assignment node
-    env.set((node.assignment.left as Identifier).name, type);
-
-    const assign = this.checkNode(
-      node.assignment,
-      env,
-      type
-    ) as BoundAssignmentExpression;
+    const assign = this.checkNode(node.assignment, env, type, {
+      isDecl: true,
+    }) as BoundAssignmentExpression;
 
     return BoundVariableDeclaration.new(
       assign,
@@ -537,6 +630,36 @@ export class TypeChecker {
       node.start,
       node.end
     );
+  }
+
+  private setNestedDestructuring(
+    node: DestructuringLHV,
+    env: TypeEnv,
+    type: Type
+  ) {
+    let i = 0;
+    let lhvs: DestructuringLHV[] =
+      node instanceof TuplePattern ? node.names : [];
+    let types = Type.isTuple(type) ? type.types : [];
+
+    for (let lhv of lhvs) {
+      if (lhv instanceof Identifier) {
+        let t = types[i];
+        env.set(lhv.name, t);
+      } else if (lhv instanceof SpreadOperation) {
+        let t = Type.isTuple(type) ? Type.tuple(types.slice(i)) : Type.any();
+        env.set((lhv.expression as Identifier).name, t);
+      } else if (lhv instanceof TuplePattern) {
+        if (!Type.isTuple(types[i])) {
+          throw new Error(
+            `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
+          );
+        }
+        this.setNestedDestructuring(lhv, env, types[i]);
+      }
+
+      i++;
+    }
   }
 
   private checkBlock(node: Block, env: TypeEnv, type?: Type) {
@@ -720,6 +843,17 @@ export class TypeChecker {
       node.start,
       node.end
     );
+  }
+
+  private checkTuplePattern(node: TuplePattern, env: TypeEnv) {
+    // When we get here, types are already set in the env for each identifier
+    const names = node.names.map((n) => {
+      // This guarantees name instanceof Identifier
+      let name = n instanceof SpreadOperation ? n.expression : n;
+      return this.checkNode(name, env) as BoundIdentifier;
+    });
+
+    return BoundTuplePattern.new(names, node.rest, node.start, node.end);
   }
 
   private setType(node: TypeAlias, env: TypeEnv) {

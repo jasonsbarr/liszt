@@ -49,4 +49,7 @@ export enum SyntaxNodes {
   TypeAlias = "TypeAlias",
   Tuple = "Tuple",
   TuplePattern = "TuplePattern",
+  SpreadOperation = "SpreadOperation",
+  ObjectPattern = "ObjectPattern",
+  SetLiteral = "SetLiteral",
 }

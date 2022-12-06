@@ -17,7 +17,8 @@ import { VectorType } from "./Types";
 
 export const fromAnnotation = (
   type: TypeAnnotation | TypeAlias | ObjectPropertyType,
-  env?: TypeEnv
+  env?: TypeEnv,
+  constant = false
 ): Type => {
   if (type.kind === SyntaxNodes.TypeAlias) {
     if (type instanceof TypeAlias) {
@@ -26,17 +27,17 @@ export const fromAnnotation = (
   } else if (type instanceof TypeAnnotation) {
     switch (type.type.kind) {
       case SyntaxNodes.IntegerKeyword:
-        return Type.integer();
+        return Type.integer(constant);
       case SyntaxNodes.FloatKeyword:
-        return Type.float();
+        return Type.float(constant);
       case SyntaxNodes.NumberKeyword:
-        return Type.number();
+        return Type.number(constant);
       case SyntaxNodes.BooleanKeyword:
-        return Type.boolean();
+        return Type.boolean(constant);
       case SyntaxNodes.StringKeyword:
-        return Type.string();
+        return Type.string(constant);
       case SyntaxNodes.SymbolKeyword:
-        return Type.symbol();
+        return Type.symbol(constant);
       case SyntaxNodes.NilLiteral:
         return Type.nil();
       case SyntaxNodes.AnyKeyword:
@@ -46,9 +47,9 @@ export const fromAnnotation = (
       case SyntaxNodes.UnknownKeyword:
         return Type.unknown();
       case SyntaxNodes.TypeLiteral:
-        return generateObjectType(type.type as TypeLiteral);
+        return generateObjectType(type.type as TypeLiteral, env, constant);
       case SyntaxNodes.FunctionType:
-        return generateFunctionType(type.type as FunctionType);
+        return generateFunctionType(type.type as FunctionType, env);
       case SyntaxNodes.SingletonType:
         return generateSingletonType(type.type as SingletonType);
       case SyntaxNodes.UnionType:
@@ -73,7 +74,9 @@ export const fromAnnotation = (
         return Type.vector(
           fromAnnotation(
             (type.type as unknown as VectorType)
-              .type as unknown as TypeAnnotation
+              .type as unknown as TypeAnnotation,
+            env,
+            constant
           )
         );
       default:
@@ -81,23 +84,27 @@ export const fromAnnotation = (
     }
   } else if (type instanceof ObjectPropertyType) {
     const annotation = TypeAnnotation.new(type.type, type.start, type.end);
-    return fromAnnotation(annotation, env);
+    return fromAnnotation(annotation, env, constant);
   }
   throw new Error(
     "This should never happen but I have to make the type checker happy" // it did, in fact, happen
   );
 };
 
-const generateObjectType = (type: TypeLiteral, env?: TypeEnv) => {
+const generateObjectType = (
+  type: TypeLiteral,
+  env?: TypeEnv,
+  constant = false
+) => {
   const props = type.properties.map(
     (prop) =>
       ({
         name: prop.name,
-        type: fromAnnotation(prop, env),
+        type: fromAnnotation(prop, env, constant),
       } as Type.Property)
   );
 
-  return Type.object(props);
+  return Type.object(props, constant);
 };
 
 const generateFunctionType = (type: FunctionType, env?: TypeEnv) => {

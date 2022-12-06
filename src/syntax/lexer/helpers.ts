@@ -80,6 +80,11 @@ export type kw = keyof typeof KEYWORDS;
 
 export const OPERATORS = {
   "=": TokenNames.Equals,
+  "+=": TokenNames.PlusEquals,
+  "-=": TokenNames.MinusEquals,
+  "*=": TokenNames.TimesEquals,
+  "/=": TokenNames.DivEquals,
+  "%=": TokenNames.ModEquals,
   "=>": TokenNames.FatArrow,
   "+": TokenNames.Plus,
   "-": TokenNames.Minus,

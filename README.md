@@ -20,9 +20,11 @@ Liszt compiles to JavaScript, so it can be used both for browser-based applicati
 
 The type checker implementation owes a great deal to Jake Donham's [Reconstructing TypeScript](https://jaked.org/blog/2021-09-07-Reconstructing-TypeScript-part-0) series.
 
-## Syntax
+## The language
 
 Comments start with a semicolon and continue to the end of the line.
+
+### Literals
 
 There are literals for Integer, Float, String, Boolean, Symbol, Object, Tuple, Vector, and Nil types.
 
@@ -40,14 +42,18 @@ nil
 
 Note that both Integer and Float are subtypes of Number, so they can be mixed together in most operations (need to fix this).
 
+### Declaring bindings
+
 Declare variables with `var` and constants with `const`. Note that if you reassign a variable the new value must be of the same type as the one it was declared with.
 
 ```ruby
 var changeMe = "I can be changed!"
 const cantChangeMe = "Try to change me and it will throw an error"
 
-changeMe = 42 ;=> Type error!
+cantChangeMe = 42 ;=> Type error!
 ```
+
+### Defining functions
 
 Define functions with the `def` keyword and end the body with `end`. Note that we strongly recommend using type annotations with the function parameters, though a return type annotation is not necessary. If you don't annotate the function parameters, they will be typed as Any which basically turns off the type checker.
 
@@ -58,6 +64,8 @@ end
 ```
 
 If you want to annotate the return type you can do that too; sometimes it's a big help to the type checker (especially with recursive functions).
+
+Note that the if operation is an expression, not a statement, and it MUST have an else branch.
 
 ```ruby
 def fib(n: integer): integer
@@ -74,6 +82,8 @@ You can also just assign a lambda to a variable (though a lambda must use an exp
 const inc: (x: integer) => integer = (x) => x + 1
 ```
 
+### Generic functions
+
 You can use type variables in your function definitions for parametric polymorphism. Type variables start with a single quote character.
 
 ```ruby
@@ -81,6 +91,8 @@ def id(x: 'a)
     x
 end
 ```
+
+### Iteration
 
 Iterate over vectors with for statements.
 
@@ -93,6 +105,36 @@ end
 
 sum == 55  ;=> true
 ```
+
+### Constants are really constant
+
+In JavaScript, you can reassign properties of an object (or indices of an array) even if the object is declared with `const`, like so:
+
+```js
+const obj = { greeting: "Hello" };
+obj.greeting = "Hi!";
+
+const arr = [1, 2, 3];
+arr[2] = 5;
+```
+
+Trying to do that with a Liszt object or vector will cause a type error at compile time, so this
+
+```ruby
+const obj = { greeting: "Hello" };
+obj.greeting = "Hi!"
+```
+
+or this
+
+```ruby
+const v = vec[1, 2, 3]
+v[2] = 5
+```
+
+will throw an error. You can always reassign properties or indices of objects that are declared with `var` though.
+
+### Creating types
 
 You can also create your own types as aliases for built-in types, tuple types, and object types.
 

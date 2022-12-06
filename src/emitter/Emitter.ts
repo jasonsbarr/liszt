@@ -27,6 +27,7 @@ import { BoundStringLiteral } from "../typechecker/bound/BoundStringLiteral";
 import { BoundSymbolLiteral } from "../typechecker/bound/BoundSymbolLiteral";
 import { BoundTree } from "../typechecker/bound/BoundTree";
 import { BoundTuple } from "../typechecker/bound/BoundTuple";
+import { BoundTuplePattern } from "../typechecker/bound/BoundTuplePattern";
 import { BoundUnaryOperation } from "../typechecker/bound/BoundUnaryOperation";
 import { BoundVariableDeclaration } from "../typechecker/bound/BoundVariableDeclaration";
 import { BoundVector } from "../typechecker/bound/BoundVector";
@@ -101,6 +102,8 @@ export class Emitter {
         return this.emitSliceExpression(node as BoundSliceExpression);
       case BoundNodes.BoundForStatement:
         return this.emitForStatement(node as BoundForStatement);
+      case BoundNodes.BoundTuplePattern:
+        return this.emitTuplePattern(node as BoundTuplePattern);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -191,15 +194,15 @@ export class Emitter {
   private emitAssignment(node: BoundAssignmentExpression): string {
     return `${this.emitNode(node.left)} ${node.operator} ${this.emitNode(
       node.right
-    )}`;
+    )};\n`;
   }
 
   private emitVariableDeclaration(node: BoundVariableDeclaration): string {
     if (node.constant) {
-      return `const ${this.emitNode(node.assignment)};\n`;
+      return `const ${this.emitNode(node.assignment)}`;
     }
 
-    return `let ${this.emitNode(node.assignment)};\n`;
+    return `let ${this.emitNode(node.assignment)}`;
   }
 
   private emitFunctionDeclaration(node: BoundFunctionDeclaration): string {
@@ -218,7 +221,7 @@ export class Emitter {
         // this case is redundant, but I'm putting it here for emphasis
         if (expr.kind === BoundNodes.BoundReturnStatement) {
           return this.emitNode(expr);
-        } else if (i === a.length - 1 && node.statement) {
+        } else if (i === a.length - 1 && !node.statement) {
           return `return ${this.emitNode(expr)};`;
         }
         return this.emitNode(expr);
@@ -296,5 +299,19 @@ export class Emitter {
     code += "}\n";
 
     return code;
+  }
+
+  private emitTuplePattern(node: BoundTuplePattern): string {
+    return `[${node.names
+      .map((n, i, a) => {
+        if (node.rest && i === a.length - 1) {
+          return `...${(n as BoundIdentifier).name}`;
+        } else if (n instanceof BoundTuplePattern) {
+          return this.emitTuplePattern(n);
+        }
+
+        return n.name;
+      })
+      .join(", ")}]`;
   }
 }
