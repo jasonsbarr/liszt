@@ -36,6 +36,7 @@ import { VectorLiteral } from "./ast/ListLiteral";
 import { SliceExpression } from "./ast/SliceExpression";
 import { ForStatement } from "./ast/ForStatement";
 import { SpreadOperation } from "./ast/SpreadOperation";
+import { SetLiteral } from "./ast/SetLiteral";
 
 const nudAttributes = {
   [TokenNames.Integer]: { prec: 0, assoc: "none" },
@@ -186,7 +187,10 @@ export class StatementParser extends TypeAnnotationParser {
               this.parseParenthesizedExpression.bind(this)
             );
           case TokenNames.LBrace:
-            return this.parseObjectLiteral();
+            return this.or(
+              this.parseObjectLiteral.bind(this),
+              this.parseSetLiteral.bind(this)
+            );
           case TokenNames.Vec:
             return this.parseVectorLiteral();
           case TokenNames.Not:
@@ -607,6 +611,34 @@ export class StatementParser extends TypeAnnotationParser {
     const end = expression.end;
 
     return ReturnStatement.new(expression, start, end);
+  }
+
+  private parseSetLiteral() {
+    let token = this.reader.next();
+    const start = token.location;
+    let members: ASTNode[] = [];
+
+    token = this.reader.peek();
+
+    if (token.name === TokenNames.RBrace) {
+      // empty set
+      return SetLiteral.new(members, start, token.location);
+    }
+
+    while ((token.name as TokenNames) !== TokenNames.RBrace) {
+      members.push(this.parseExpr());
+      token = this.reader.peek();
+
+      if (token.name !== TokenNames.RBrace) {
+        this.reader.skip(TokenNames.Comma);
+        token = this.reader.peek();
+      }
+    }
+
+    const end = token.location;
+    this.reader.skip(TokenNames.RBrace);
+
+    return SetLiteral.new(members, start, end);
   }
 
   private parseSliceExpression(left: ASTNode) {
