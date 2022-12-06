@@ -598,7 +598,7 @@ export class TypeChecker {
       }
 
       let i = 0;
-      let lhvs = left instanceof TuplePattern ? left.names : [];
+      let lhvs = left.names;
 
       for (let lhv of lhvs) {
         if (lhv instanceof Identifier) {
