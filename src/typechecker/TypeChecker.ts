@@ -561,6 +561,23 @@ export class TypeChecker {
     );
   }
 
+  private checkIfIdentifierIsDefined(name: string, env: TypeEnv) {
+    if (env.has(name) && Type.isUNDEFINED(env.get(name)) && isSecondPass) {
+      throw new Error(`Cannot reference name ${name} prior to initialization`);
+    }
+
+    if (env.has(name) && !isSecondPass) {
+      const t = env.get(name);
+
+      if (
+        (!Type.isUNDEFINED(t) && !Type.isFunction(t)) ||
+        (Type.isFunction(t) && !isUndefinedFunction(t))
+      ) {
+        throw new Error(`Variable ${name} has already been declared`);
+      }
+    }
+  }
+
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
     const type = node.assignment.type
       ? getType(node.assignment.type, env, node.constant)
@@ -570,22 +587,7 @@ export class TypeChecker {
     if (left instanceof Identifier) {
       const name = left.name;
 
-      if (env.has(name) && Type.isUNDEFINED(env.get(name)) && isSecondPass) {
-        throw new Error(
-          `Cannot reference name ${name} prior to initialization`
-        );
-      }
-
-      if (env.has(name) && !isSecondPass) {
-        const t = env.get(name);
-
-        if (
-          (!Type.isUNDEFINED(t) && !Type.isFunction(t)) ||
-          (Type.isFunction(t) && !isUndefinedFunction(t))
-        ) {
-          throw new Error(`Variable ${name} has already been declared`);
-        }
-      }
+      this.checkIfIdentifierIsDefined(name, env);
       // Need to set the variable name and type BEFORE checking and binding the assignment node
       env.set((left as Identifier).name, type);
     } else if (left instanceof TuplePattern) {
