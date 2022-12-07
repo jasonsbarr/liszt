@@ -56,7 +56,7 @@ export class LHVParser extends BaseParser {
         ].includes(member.kind)
       ) {
         throw new Error(
-          `Object pattern assignment requires valid assignment parameter; ${expr} given`
+          `Object pattern assignment requires valid assignment parameter; ${member.kind} given`
         );
       }
 
