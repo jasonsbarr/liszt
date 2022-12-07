@@ -43,9 +43,9 @@ export class LHVParser extends BaseParser {
 
       if (
         ![
-          SyntaxNodes.Identifier as string,
-          SyntaxNodes.SpreadOperation as string,
-          SyntaxNodes.Tuple as string,
+          SyntaxNodes.Identifier,
+          SyntaxNodes.SpreadOperation,
+          SyntaxNodes.Tuple,
         ].includes(value.kind)
       ) {
         throw new Error(
