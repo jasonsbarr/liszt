@@ -57,12 +57,7 @@ export class LHVParser extends BaseParser {
         rest = true;
       }
 
-      if (
-        value.kind !== SyntaxNodes.Identifier &&
-        value.kind !== SyntaxNodes.SpreadOperation
-      ) {
-        value = this.parseLHV(value);
-      }
+      value = this.parseLHV(value);
 
       names.push(value as DestructuringLHV);
     }
