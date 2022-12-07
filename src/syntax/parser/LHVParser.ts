@@ -13,7 +13,7 @@ export class LHVParser extends BaseParser {
     super(lexResult);
   }
 
-  public parseLHV(expr: ASTNode): DestructuringLHV {
+  public parseLHV(expr: ASTNode) {
     if (expr.kind === SyntaxNodes.Identifier) {
       return expr;
     }
@@ -57,7 +57,7 @@ export class LHVParser extends BaseParser {
         rest = true;
       }
 
-      let name = this.parseLHV(value);
+      let name = this.parseLHV(value) as DestructuringLHV;
 
       names.push(name);
     }
