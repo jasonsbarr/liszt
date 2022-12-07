@@ -2,6 +2,8 @@ import { LexResult } from "../lexer/LexResult";
 import { ASTNode } from "./ast/ASTNode";
 import { DestructuringLHV } from "./ast/DestructuringLHV";
 import { Identifier } from "./ast/Identifier";
+import { ObjectPattern } from "./ast/ObjectPattern";
+import { SetLiteral } from "./ast/SetLiteral";
 import { SpreadOperation } from "./ast/SpreadOperation";
 import { SyntaxNodes } from "./ast/SyntaxNodes";
 import { Tuple } from "./ast/Tuple";
@@ -30,7 +32,44 @@ export class LHVParser extends BaseParser {
       return this.parseTuplePattern(expr as Tuple);
     }
 
+    if (expr.kind === SyntaxNodes.SetLiteral) {
+      return this.parseObjectPattern(expr as SetLiteral);
+    }
+
     throw new Error(`Invalid left side expression type ${expr.kind}`);
+  }
+
+  private parseObjectPattern(expr: SetLiteral) {
+    let names: DestructuringLHV[] = [];
+    let rest = false;
+    for (let member of expr.members) {
+      if (rest) {
+        throw new Error("No left hand values allowed after rest parameter");
+      }
+
+      if (
+        ![
+          SyntaxNodes.Identifier,
+          SyntaxNodes.SpreadOperation,
+          SyntaxNodes.Tuple,
+          SyntaxNodes.SetLiteral,
+        ].includes(member.kind)
+      ) {
+        throw new Error(
+          `Object pattern assignment requires valid assignment parameter; ${expr} given`
+        );
+      }
+
+      if (member.kind === SyntaxNodes.SpreadOperation) {
+        rest = true;
+      }
+
+      let name = this.parseLHV(member) as DestructuringLHV;
+
+      names.push(name);
+    }
+
+    return ObjectPattern.new(names, rest, expr.start, expr.end);
   }
 
   private parseTuplePattern(expr: Tuple) {
@@ -46,10 +85,11 @@ export class LHVParser extends BaseParser {
           SyntaxNodes.Identifier,
           SyntaxNodes.SpreadOperation,
           SyntaxNodes.Tuple,
+          SyntaxNodes.SetLiteral,
         ].includes(value.kind)
       ) {
         throw new Error(
-          `Tuple pattern assignment requires valid identifiers, rest parameters, or nested tuples; ${expr} given`
+          `Tuple pattern assignment requires valid assignment parameter; ${expr} given`
         );
       }
 
