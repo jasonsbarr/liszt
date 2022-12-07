@@ -672,6 +672,7 @@ export class TypeChecker {
 
         i++;
       }
+    } else if (node instanceof ObjectPattern) {
     }
   }
 
