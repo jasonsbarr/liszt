@@ -3,14 +3,14 @@ import { BoundASTNode } from "./BoundASTNode";
 import { BoundDestructuringLHV } from "./BoundDestructuringLHV";
 import { BoundNodes } from "./BoundNodes";
 
-export class BoundTuplePattern extends BoundASTNode {
+export class BoundObjectPattern extends BoundASTNode {
   constructor(
     public names: BoundDestructuringLHV[],
     public rest: boolean,
     start: SrcLoc,
     end: SrcLoc
   ) {
-    super(BoundNodes.BoundTuplePattern, start, end);
+    super(BoundNodes.BoundObjectPattern, start, end);
   }
 
   public static new(
@@ -19,7 +19,7 @@ export class BoundTuplePattern extends BoundASTNode {
     start: SrcLoc,
     end: SrcLoc
   ) {
-    return new BoundTuplePattern(names, rest, start, end);
+    return new BoundObjectPattern(names, rest, start, end);
   }
 
   public get children() {
