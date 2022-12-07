@@ -79,6 +79,7 @@ import { TuplePattern } from "../syntax/parser/ast/TuplePattern";
 import { SpreadOperation } from "../syntax/parser/ast/SpreadOperation";
 import { BoundTuplePattern } from "./bound/BoundTuplePattern";
 import { DestructuringLHV } from "../syntax/parser/ast/DestructuringLHV";
+import { ObjectPattern } from "../syntax/parser/ast/ObjectPattern";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -639,26 +640,38 @@ export class TypeChecker {
   ) {
     let i = 0;
     let lhvs: DestructuringLHV[] =
-      node instanceof TuplePattern ? node.names : [];
-    let types = Type.isTuple(type) ? type.types : [];
+      node instanceof TuplePattern || node instanceof ObjectPattern
+        ? node.names
+        : [];
 
-    for (let lhv of lhvs) {
-      if (lhv instanceof Identifier) {
-        let t = types[i];
-        env.set(lhv.name, t);
-      } else if (lhv instanceof SpreadOperation) {
-        let t = Type.isTuple(type) ? Type.tuple(types.slice(i)) : Type.any();
-        env.set((lhv.expression as Identifier).name, t);
-      } else if (lhv instanceof TuplePattern) {
-        if (!Type.isTuple(types[i])) {
-          throw new Error(
-            `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
-          );
+    if (node instanceof TuplePattern) {
+      let types = Type.isTuple(type) ? type.types : [];
+
+      for (let lhv of lhvs) {
+        if (lhv instanceof Identifier) {
+          let t = types[i];
+          env.set(lhv.name, t);
+        } else if (lhv instanceof SpreadOperation) {
+          let t = Type.isTuple(type) ? Type.tuple(types.slice(i)) : Type.any();
+          env.set((lhv.expression as Identifier).name, t);
+        } else if (lhv instanceof TuplePattern) {
+          if (!Type.isTuple(types[i])) {
+            throw new Error(
+              `Tuple pattern assignment must have a tuple type as its right hand value; ${type} given`
+            );
+          }
+          this.setNestedDestructuring(lhv, env, types[i]);
+        } else if ((lhv as DestructuringLHV) instanceof ObjectPattern) {
+          if (!Type.isObject(types[i])) {
+            throw new Error(
+              `Object pattern assignment must have an object type as its right hand value; ${type} given`
+            );
+          }
+          this.setNestedDestructuring(lhv, env, types[i]);
         }
-        this.setNestedDestructuring(lhv, env, types[i]);
-      }
 
-      i++;
+        i++;
+      }
     }
   }
 
