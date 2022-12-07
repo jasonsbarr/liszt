@@ -603,9 +603,14 @@ export class TypeChecker {
 
       for (let lhv of lhvs) {
         if (lhv instanceof Identifier) {
+          this.checkIfIdentifierIsDefined(lhv.name, env);
           let t = type.types[i];
           env.set(lhv.name, t);
         } else if (lhv instanceof SpreadOperation) {
+          this.checkIfIdentifierIsDefined(
+            (lhv.expression as Identifier).name,
+            env
+          );
           let t = Type.isTuple(type)
             ? Type.tuple(type.types.slice(i))
             : Type.any();
