@@ -613,13 +613,44 @@ export class TypeChecker {
           );
           let t = Type.isTuple(type)
             ? Type.tuple(type.types.slice(i))
-            : Type.any();
+            : Type.any(); // this should never happen because of above check for tuple type
           env.set((lhv.expression as Identifier).name, t);
         } else {
           this.setNestedDestructuring(lhv, env, type.types[i]);
         }
 
         i++;
+      }
+    } else if (left instanceof ObjectPattern) {
+      if (!Type.isObject(type)) {
+        throw new Error(
+          `Assignment type for object pattern must be an object; ${type} given`
+        );
+      }
+
+      let lhvs = left.names;
+      let properties = type.properties;
+      let propertiesUsed: string[] = [];
+
+      for (let lhv of lhvs) {
+        if (lhv instanceof Identifier) {
+          const prop = properties.find(
+            (p) => p.name === (lhv as Identifier).name
+          );
+
+          if (!prop) {
+            throw new Error(
+              `Property ${lhv.name} not found on object of type ${type}`
+            );
+          }
+
+          if (propertiesUsed.includes(prop.name)) {
+            throw new Error(`Cannot assign property ${prop.name} twice`);
+          }
+
+          propertiesUsed.push(prop.name);
+          env.set(prop.name, prop.type);
+        }
       }
     } else {
       throw new Error(`Invalid left hand assignment value ${left.kind}`);
@@ -654,9 +685,14 @@ export class TypeChecker {
 
       for (let lhv of lhvs) {
         if (lhv instanceof Identifier) {
+          this.checkIfIdentifierIsDefined(lhv.name, env);
           let t = types[i];
           env.set(lhv.name, t);
         } else if (lhv instanceof SpreadOperation) {
+          this.checkIfIdentifierIsDefined(
+            (lhv.expression as Identifier).name,
+            env
+          );
           let t = Type.isTuple(type) ? Type.tuple(types.slice(i)) : Type.any();
           env.set((lhv.expression as Identifier).name, t);
         } else if (lhv instanceof TuplePattern) {
