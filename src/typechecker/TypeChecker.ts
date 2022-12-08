@@ -726,14 +726,20 @@ export class TypeChecker {
     env: TypeEnv,
     type: Type
   ) {
-    let i = 0;
     let lhvs: DestructuringLHV[] =
       node instanceof TuplePattern || node instanceof ObjectPattern
         ? node.names
         : [];
 
     if (node instanceof TuplePattern) {
-      let types = Type.isTuple(type) ? type.types : [];
+      if (!Type.isTuple(type)) {
+        throw new Error(
+          `Tuple assignment pattern must have a tuple type as its right hand value; ${type} given`
+        );
+      }
+
+      let i = 0;
+      let types = type.types;
 
       for (let lhv of lhvs) {
         if (lhv instanceof Identifier) {
@@ -766,6 +772,39 @@ export class TypeChecker {
         i++;
       }
     } else if (node instanceof ObjectPattern) {
+      if (!Type.isObject(type)) {
+        throw new Error(
+          `Object assignment pattern must have object as its right hand type; ${type} given`
+        );
+      }
+
+      let propertiesUsed: string[] = [];
+
+      for (let lhv of lhvs) {
+        if (lhv instanceof Identifier) {
+          const name = lhv.name;
+
+          this.checkIfIdentifierIsDefined(name, env);
+
+          const t = propType(type, name);
+
+          if (!t) {
+            throw new Error(`Property ${name} not found in type ${type}`);
+          }
+
+          propertiesUsed.push(name);
+          env.set(name, t);
+        } else if (lhv instanceof SpreadOperation) {
+          const name = (lhv.expression as Identifier).name;
+
+          this.checkIfIdentifierIsDefined(name, env);
+
+          const props = this.getUnusedProperties(type, propertiesUsed);
+          const t = Type.object(props, type.constant);
+
+          env.set(name, t);
+        }
+      }
     }
   }
 
