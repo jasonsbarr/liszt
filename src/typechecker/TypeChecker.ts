@@ -668,8 +668,7 @@ export class TypeChecker {
         }
       }
     } else {
-      // not sure how to get the correct type here
-      // this.setNestedDestructuring(lhv, env, ???);
+      throw new Error(`Invalid left hand value for destructuring ${left.kind}`);
     }
 
     const assign = this.checkNode(node.assignment, env, type, {
