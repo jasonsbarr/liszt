@@ -563,6 +563,10 @@ export class TypeChecker {
 
           propertiesUsed.push(lhv.name);
           check(lhv, t, env);
+        } else if (lhv instanceof SpreadOperation) {
+          const props = this.getUnusedProperties(type, propertiesUsed);
+
+          check(lhv.expression, Type.object(props), env);
         } else {
           throw new Error(
             `Invalid left hand value for destructuring ${lhv.kind}`
