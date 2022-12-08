@@ -579,6 +579,16 @@ export class TypeChecker {
     }
   }
 
+  private getUnusedProperties(type: Type.Object, usedProperties: string[]) {
+    return type.properties.reduce((props, prop) => {
+      if (!usedProperties.includes(prop.name)) {
+        props = [...props, prop];
+      }
+
+      return props;
+    }, [] as Property[]);
+  }
+
   private checkVariableDeclaration(node: VariableDeclaration, env: TypeEnv) {
     const type = node.assignment.type
       ? getType(node.assignment.type, env, node.constant)
@@ -650,10 +660,16 @@ export class TypeChecker {
 
           propertiesUsed.push(prop.name);
           env.set(prop.name, prop.type);
+        } else if (lhv instanceof SpreadOperation) {
+          const props = this.getUnusedProperties(type, propertiesUsed);
+          // Guaranteed to be an identifier because parser will error otherwise
+          const name = (lhv.expression as Identifier).name;
+          env.set(name, Type.object(props, type.constant));
         }
       }
     } else {
-      throw new Error(`Invalid left hand assignment value ${left.kind}`);
+      // not sure how to get the correct type here
+      // this.setNestedDestructuring(lhv, env, ???);
     }
 
     const assign = this.checkNode(node.assignment, env, type, {
