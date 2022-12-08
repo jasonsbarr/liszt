@@ -756,7 +756,7 @@ export class TypeChecker {
             (lhv.expression as Identifier).name,
             env
           );
-          let t = Type.isTuple(type) ? Type.tuple(types.slice(i)) : Type.any();
+          let t = Type.isTuple(type) ? Type.tuple(types.slice(i)) : Type.any(); // this will never be Type.any because it would have thrown above
           env.set((lhv.expression as Identifier).name, t);
         } else if (lhv instanceof TuplePattern) {
           if (!Type.isTuple(types[i])) {
