@@ -681,6 +681,7 @@ export class TypeChecker {
 
       for (let lhv of lhvs) {
         if (lhv instanceof Identifier) {
+          this.checkIfIdentifierIsDefined(lhv.name, env);
           const prop = properties.find(
             (p) => p.name === (lhv as Identifier).name
           );
@@ -698,6 +699,10 @@ export class TypeChecker {
           propertiesUsed.push(prop.name);
           env.set(prop.name, prop.type);
         } else if (lhv instanceof SpreadOperation) {
+          this.checkIfIdentifierIsDefined(
+            (lhv.expression as Identifier).name,
+            env
+          );
           const props = this.getUnusedProperties(type, propertiesUsed);
           // Guaranteed to be an identifier because parser will error otherwise
           const name = (lhv.expression as Identifier).name;
