@@ -20,6 +20,7 @@ import { BoundMemberExpression } from "../typechecker/bound/BoundMemberExpressio
 import { BoundNilLiteral } from "../typechecker/bound/BoundNilLiteral";
 import { BoundNodes } from "../typechecker/bound/BoundNodes";
 import { BoundObjectLiteral } from "../typechecker/bound/BoundObjectLiteral";
+import { BoundObjectPattern } from "../typechecker/bound/BoundObjectPattern";
 import { BoundParenthesizedExpression } from "../typechecker/bound/BoundParenthesizedExpression";
 import { BoundProgramNode } from "../typechecker/bound/BoundProgramNode";
 import { BoundReturnStatement } from "../typechecker/bound/BoundReturnStatement";
@@ -105,6 +106,8 @@ export class Emitter {
         return this.emitForStatement(node as BoundForStatement);
       case BoundNodes.BoundTuplePattern:
         return this.emitTuplePattern(node as BoundTuplePattern);
+      case BoundNodes.BoundObjectPattern:
+        return this.emitObjectPattern(node as BoundObjectPattern);
       default:
         throw new Error(`Unknown bound node type ${node.kind}`);
     }
@@ -309,10 +312,25 @@ export class Emitter {
           return `...${(n as BoundIdentifier).name}`;
         } else if (n instanceof BoundTuplePattern) {
           return this.emitTuplePattern(n);
+        } else if (n instanceof BoundObjectPattern) {
+          return this.emitObjectPattern(n);
         }
 
         return n.name;
       })
       .join(", ")}]`;
+  }
+
+  private emitObjectPattern(node: BoundObjectPattern): string {
+    return `{${node.names
+      .map((n, i, a) => {
+        if (node.rest && i === a.length - 1) {
+          return `...${(n as BoundIdentifier).name}`;
+        }
+        // handle cases with nested tuple and object properties
+
+        return (n as BoundIdentifier).name;
+      })
+      .join(", ")}}`;
   }
 }
