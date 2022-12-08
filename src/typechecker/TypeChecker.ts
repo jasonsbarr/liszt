@@ -645,29 +645,11 @@ export class TypeChecker {
         );
       }
 
-      let i = 0;
-      let lhvs = left.names;
-
-      for (let lhv of lhvs) {
-        if (lhv instanceof Identifier) {
-          this.checkIfIdentifierIsDefined(lhv.name, env);
-          let t = type.types[i];
-          env.set(lhv.name, t);
-        } else if (lhv instanceof SpreadOperation) {
-          this.checkIfIdentifierIsDefined(
-            (lhv.expression as Identifier).name,
-            env
-          );
-          let t = Type.isTuple(type)
-            ? Type.tuple(type.types.slice(i))
-            : Type.any(); // this should never happen because of above check for tuple type
-          env.set((lhv.expression as Identifier).name, t);
-        } else {
-          this.setNestedDestructuring(lhv, env, type.types[i]);
-        }
-
-        i++;
-      }
+      this.setNestedDestructuring(
+        node.assignment.left as DestructuringLHV,
+        env,
+        type
+      );
     } else if (left instanceof ObjectPattern) {
       if (!Type.isObject(type)) {
         throw new Error(
@@ -675,40 +657,11 @@ export class TypeChecker {
         );
       }
 
-      let lhvs = left.names;
-      let properties = type.properties;
-      let propertiesUsed: string[] = [];
-
-      for (let lhv of lhvs) {
-        if (lhv instanceof Identifier) {
-          this.checkIfIdentifierIsDefined(lhv.name, env);
-          const prop = properties.find(
-            (p) => p.name === (lhv as Identifier).name
-          );
-
-          if (!prop) {
-            throw new Error(
-              `Property ${lhv.name} not found on object of type ${type}`
-            );
-          }
-
-          if (propertiesUsed.includes(prop.name)) {
-            throw new Error(`Cannot assign property ${prop.name} twice`);
-          }
-
-          propertiesUsed.push(prop.name);
-          env.set(prop.name, prop.type);
-        } else if (lhv instanceof SpreadOperation) {
-          this.checkIfIdentifierIsDefined(
-            (lhv.expression as Identifier).name,
-            env
-          );
-          const props = this.getUnusedProperties(type, propertiesUsed);
-          // Guaranteed to be an identifier because parser will error otherwise
-          const name = (lhv.expression as Identifier).name;
-          env.set(name, Type.object(props, type.constant));
-        }
-      }
+      this.setNestedDestructuring(
+        node.assignment.left as DestructuringLHV,
+        env,
+        type
+      );
     } else {
       throw new Error(`Invalid left hand value for destructuring ${left.kind}`);
     }
