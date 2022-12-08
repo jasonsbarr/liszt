@@ -80,6 +80,7 @@ import { SpreadOperation } from "../syntax/parser/ast/SpreadOperation";
 import { BoundTuplePattern } from "./bound/BoundTuplePattern";
 import { DestructuringLHV } from "../syntax/parser/ast/DestructuringLHV";
 import { ObjectPattern } from "../syntax/parser/ast/ObjectPattern";
+import { BoundObjectPattern } from "./bound/BoundObjectPattern";
 
 let isSecondPass = false;
 const getScopeNumber = (scopeName: string) => {
@@ -217,7 +218,10 @@ export class TypeChecker {
         return this.checkForStatement(node as ForStatement, env);
 
       case SyntaxNodes.TuplePattern:
-        return this.checkTuplePattern(node as TuplePattern, env);
+        return this.checkAssignmentPattern(node as TuplePattern, env);
+
+      case SyntaxNodes.ObjectPattern:
+        return this.checkAssignmentPattern(node as ObjectPattern, env);
 
       default:
         throw new Error(`Unknown AST node kind ${node.kind}`);
@@ -948,7 +952,10 @@ export class TypeChecker {
     );
   }
 
-  private checkTuplePattern(node: TuplePattern, env: TypeEnv) {
+  private checkAssignmentPattern(
+    node: TuplePattern | ObjectPattern,
+    env: TypeEnv
+  ) {
     // When we get here, types are already set in the env for each identifier
     const names = node.names.map((n) => {
       // This guarantees name instanceof Identifier
@@ -956,7 +963,10 @@ export class TypeChecker {
       return this.checkNode(name, env) as BoundIdentifier;
     });
 
-    return BoundTuplePattern.new(names, node.rest, node.start, node.end);
+    const patternClass =
+      node instanceof TuplePattern ? BoundTuplePattern : BoundObjectPattern;
+
+    return patternClass.new(names, node.rest, node.start, node.end);
   }
 
   private setType(node: TypeAlias, env: TypeEnv) {
