@@ -37,7 +37,7 @@ export class LHVParser extends BaseParser {
     }
 
     if (expr.kind === SyntaxNodes.SpreadOperation) {
-      this.parseSpreadOperation(expr as SpreadOperation);
+      return this.parseSpreadOperation(expr as SpreadOperation);
     }
 
     throw new Error(`Invalid left side expression type ${expr.kind}`);
@@ -82,6 +82,8 @@ export class LHVParser extends BaseParser {
         `Rest parameter in left hand assignment value must be a valid identifier; ${expr.kind} given`
       );
     }
+
+    return expr;
   }
 
   private parseTuplePattern(expr: Tuple) {
