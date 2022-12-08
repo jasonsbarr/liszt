@@ -522,7 +522,7 @@ export class TypeChecker {
 
       if (!Type.isTuple(type)) {
         throw new Error(
-          `Tuple pattern assignment must have a tuple type for its right hand value`
+          `Tuple pattern assignment must have a tuple type for its right hand value; ${type} given`
         );
       }
       // the type for each variable name will have already
@@ -539,6 +539,35 @@ export class TypeChecker {
         }
 
         i++;
+      }
+    } else if (left instanceof ObjectPattern) {
+      type = type ?? synth(right, env);
+
+      if (!Type.isObject(type)) {
+        throw new Error(
+          `Object pattern assignment must have an object type for its right hand value; ${type} given`
+        );
+      }
+
+      let propertiesUsed: string[] = [];
+
+      for (let lhv of left.names) {
+        if (lhv instanceof Identifier) {
+          const t = propType(type, lhv.name);
+
+          if (!t) {
+            throw new Error(
+              `Property ${lhv.name} not found on object of type ${type}`
+            );
+          }
+
+          propertiesUsed.push(lhv.name);
+          check(lhv, t, env);
+        } else {
+          throw new Error(
+            `Invalid left hand value for destructuring ${lhv.kind}`
+          );
+        }
       }
     } else {
       // This should never happen because it should be caught in the parser
